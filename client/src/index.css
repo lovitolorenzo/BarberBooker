@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 47 96% 53%;
+  --primary-foreground: 26 14% 9%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+
+  /* Custom barbershop colors */
+  --barbershop-bg: 15 15% 6%;
+  --barbershop-charcoal: 0 0% 10%;
+  --barbershop-dark: 0 0% 18%;
+  --barbershop-gold: 47 96% 53%;
+  --barbershop-card: 0 0% 12%;
+  --barbershop-text: 210 40% 98%;
+  --barbershop-muted: 215 20% 65%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 47 96% 53%;
+  --primary-foreground: 26 14% 9%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: hsl(var(--barbershop-bg));
+    color: hsl(var(--barbershop-text));
+  }
+}
+
+@layer utilities {
+  .barbershop-bg {
+    background-color: hsl(var(--barbershop-bg));
+  }
+  .barbershop-charcoal {
+    background-color: hsl(var(--barbershop-charcoal));
+  }
+  .barbershop-dark {
+    background-color: hsl(var(--barbershop-dark));
+  }
+  .barbershop-gold {
+    background-color: hsl(var(--barbershop-gold));
+  }
+  .barbershop-card {
+    background-color: hsl(var(--barbershop-card));
+  }
+  .text-barbershop-text {
+    color: hsl(var(--barbershop-text));
+  }
+  .text-barbershop-muted {
+    color: hsl(var(--barbershop-muted));
+  }
+  .text-barbershop-gold {
+    color: hsl(var(--barbershop-gold));
+  }
+  .border-barbershop-dark {
+    border-color: hsl(var(--barbershop-dark));
+  }
+  .border-barbershop-charcoal {
+    border-color: hsl(var(--barbershop-charcoal));
+  }
+}
