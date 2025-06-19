@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Scissors } from "lucide-react";
+import { Link } from "wouter";
 import CalendarComponent from "@/components/calendar";
 import BookingForm from "@/components/booking-form";
 import ConfirmationModal from "@/components/confirmation-modal";
@@ -35,7 +36,7 @@ export default function BookingPage() {
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Services</a>
-              <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</a>
+              <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
               <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</a>
             </nav>
           </div>
