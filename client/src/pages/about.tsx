@@ -25,26 +25,7 @@ export default function AboutPage() {
     }
   ];
 
-  const barbers = [
-    {
-      name: "Marcus Johnson",
-      title: "Master Barber & Owner",
-      experience: "15+ years",
-      specialty: "Classic cuts & beard styling"
-    },
-    {
-      name: "Alex Rodriguez", 
-      title: "Senior Barber",
-      experience: "8+ years",
-      specialty: "Modern styles & fades"
-    },
-    {
-      name: "David Kim",
-      title: "Barber",
-      experience: "5+ years", 
-      specialty: "Traditional grooming"
-    }
-  ];
+
 
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
@@ -156,72 +137,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Meet Our Team */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal">
-        <div className="max-w-6xl mx-auto">
-          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">Meet Our Master Barbers</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {barbers.map((barber, index) => (
-              <Card key={index} className="barbershop-card border-barbershop-dark">
-                <CardContent className="p-6 text-center">
-                  <div className="w-20 h-20 barbershop-dark rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="text-barbershop-gold h-10 w-10" />
-                  </div>
-                  <h4 className="text-xl font-semibold text-barbershop-text mb-1">{barber.name}</h4>
-                  <div className="text-barbershop-gold font-medium mb-2">{barber.title}</div>
-                  <div className="text-barbershop-muted text-sm mb-2">{barber.experience}</div>
-                  <p className="text-barbershop-muted text-sm">{barber.specialty}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Why Choose Us */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">Why Choose Elite Barbershop</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="text-black h-8 w-8" />
-              </div>
-              <h4 className="text-lg font-semibold text-barbershop-text mb-2">Expert Craftsmanship</h4>
-              <p className="text-barbershop-muted text-sm">
-                Our barbers are trained in both traditional and modern techniques
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="text-black h-8 w-8" />
-              </div>
-              <h4 className="text-lg font-semibold text-barbershop-text mb-2">Convenient Booking</h4>
-              <p className="text-barbershop-muted text-sm">
-                Easy online scheduling that fits your busy lifestyle
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="text-black h-8 w-8" />
-              </div>
-              <h4 className="text-lg font-semibold text-barbershop-text mb-2">Premium Experience</h4>
-              <p className="text-barbershop-muted text-sm">
-                Luxury amenities and attention to every detail
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="text-black h-8 w-8" />
-              </div>
-              <h4 className="text-lg font-semibold text-barbershop-text mb-2">Personal Service</h4>
-              <p className="text-barbershop-muted text-sm">
-                Tailored consultations for your unique style
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Contact Info */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal border-t border-barbershop-dark">
