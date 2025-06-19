@@ -30,6 +30,7 @@ import { Link } from "wouter";
 import Navbar from "@/components/navbar";
 import type { Appointment, Client, Product, ServiceProduct } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface RevenueData {
   date: string;
@@ -40,6 +41,7 @@ interface RevenueData {
 
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const { t, i18n } = useTranslation();
 
   const getDateRange = () => {
     const end = new Date().toISOString().split('T')[0];
@@ -104,6 +106,20 @@ export default function AnalyticsPage() {
   const totalAppointments = revenueData.reduce((sum, day) => sum + day.appointments, 0);
   const avgDailyRevenue = revenueData.length > 0 ? totalRevenue / revenueData.length : 0;
 
+  // Extract service name helper
+  const getServiceName = (serviceKey: string) => {
+    const serviceTranslations: { [key: string]: string } = {
+      'haircut': t('haircut'),
+      'beard': t('beard'), 
+      'shave': t('shave'),
+      'styling': t('styling'),
+      'wash': t('wash'),
+      'mustache': t('mustache'),
+      'fullservice': t('fullservice')
+    };
+    return serviceTranslations[serviceKey.toLowerCase()] || services[serviceKey as ServiceKey]?.name || serviceKey;
+  };
+
   // Service popularity
   const serviceStats = appointments.reduce((acc, appointment) => {
     const service = appointment.service;
@@ -112,7 +128,7 @@ export default function AnalyticsPage() {
   }, {} as { [key: string]: number });
 
   const serviceChartData = Object.entries(serviceStats).map(([service, count]) => ({
-    name: services[service as ServiceKey]?.name || service,
+    name: getServiceName(service),
     value: count,
     percentage: ((count / appointments.length) * 100).toFixed(1)
   }));
@@ -141,43 +157,64 @@ export default function AnalyticsPage() {
   }, {} as { [key: string]: number });
 
   const profitMargins = Object.entries(serviceCosts).map(([serviceType, cost]) => {
-    const servicePrice = services[serviceType as ServiceKey]?.price * 100 || 0;
+    const servicePrice = (services[serviceType as ServiceKey]?.price || 0) * 100;
     const profit = servicePrice - cost;
-    const margin = ((profit / servicePrice) * 100).toFixed(1);
+    
+    // Safe margin calculation
+    let margin = 0;
+    if (servicePrice > 0) {
+      margin = parseFloat(((profit / servicePrice) * 100).toFixed(1));
+    } else if (cost > 0) {
+      margin = -100; // 100% loss if no price but has cost
+    }
+    
     return {
-      service: services[serviceType as ServiceKey]?.name || serviceType,
-      cost: cost / 100,
-      price: servicePrice / 100,
-      profit: profit / 100,
-      margin: parseFloat(margin)
+      service: serviceType,
+      cost: Math.max(0, cost / 100), // Ensure non-negative
+      price: Math.max(0, servicePrice / 100), // Ensure non-negative
+      profit: profit / 100, // This can be negative
+      margin: isFinite(margin) ? margin : 0 // Ensure finite number
     };
   });
 
-  const COLORS = ['#7BB3F0', '#4A90E2', '#2E5BBA', '#1E3A8A', '#0F172A'];
+  const formatCurrency = (amount: number) => {
+    const absAmount = Math.abs(amount);
+    const formattedAmount = absAmount.toFixed(2);
+    const prefix = amount < 0 ? '-' : '';
+    
+    if (i18n.language === 'it') {
+      return `${prefix}€${formattedAmount}`;
+    }
+    return `${prefix}$${formattedAmount}`;
+  };
 
-  const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(2)}`;
+  const formatMargin = (margin: number) => {
+    if (!isFinite(margin)) return '0%';
+    return `${margin.toFixed(1)}%`;
+  };
+
+  const COLORS = ['#B8860B', '#8B7355', '#CD853F', '#DEB887', '#F4A460'];
 
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
-      {/* Header */}
       <Navbar />
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">{t('navbar.analytics')}</h1>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Date Range Selector */}
         <div className="flex space-x-2 mb-8">
           {[
-            { key: '7d', label: '7 Days' },
-            { key: '30d', label: '30 Days' },
-            { key: '90d', label: '90 Days' }
+            { key: '7d', label: t('analytics.dateRanges.7d') },
+            { key: '30d', label: t('analytics.dateRanges.30d') },
+            { key: '90d', label: t('analytics.dateRanges.90d') }
           ].map(({ key, label }) => (
             <Button
               key={key}
               variant={dateRange === key ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDateRange(key as any)}
+              onClick={() => setDateRange(key as '7d' | '30d' | '90d')}
               className={dateRange === key 
-                ? "barbershop-gold text-white" 
-                : "barbershop-dark text-barbershop-text border-barbershop-charcoal hover:barbershop-charcoal"
+                ? "bg-barbershop-gold text-barbershop-dark hover:bg-barbershop-gold/90" 
+                : "border-barbershop-gold text-barbershop-gold hover:bg-barbershop-gold hover:text-barbershop-dark"
               }
             >
               {label}
@@ -186,64 +223,49 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Client Metrics */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-barbershop-text mb-4">Client Metrics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="barbershop-card border-barbershop-dark">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <Users className="text-barbershop-gold h-5 w-5" />
-                  <div>
-                    <p className="text-barbershop-muted text-sm">Total Clients</p>
-                    <p className="text-2xl font-bold text-barbershop-text">{totalClients}</p>
-                  </div>
+        <Card className="mb-8 barbershop-card border-barbershop-dark">
+          <CardHeader>
+            <CardTitle className="text-barbershop-text">{t('analytics.clientMetrics.title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Users className="text-barbershop-gold h-6 w-6 mr-2" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="barbershop-card border-barbershop-dark">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="text-barbershop-gold h-5 w-5" />
-                  <div>
-                    <p className="text-barbershop-muted text-sm">Avg Spend/Visit</p>
-                    <p className="text-2xl font-bold text-barbershop-text">{formatCurrency(avgSpendPerVisit)}</p>
-                  </div>
+                <p className="text-3xl font-bold text-barbershop-gold">{totalClients}</p>
+                <p className="text-barbershop-muted">{t('analytics.clientMetrics.totalClients')}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <DollarSign className="text-barbershop-gold h-6 w-6 mr-2" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="barbershop-card border-barbershop-dark">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="text-barbershop-gold h-5 w-5" />
-                  <div>
-                    <p className="text-barbershop-muted text-sm">Avg Visit Frequency</p>
-                    <p className="text-2xl font-bold text-barbershop-text">{avgVisitFrequency.toFixed(1)}</p>
-                  </div>
+                <p className="text-3xl font-bold text-barbershop-gold">{formatCurrency(avgSpendPerVisit)}</p>
+                <p className="text-barbershop-muted">{t('analytics.clientMetrics.avgSpendPerVisit')}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Calendar className="text-barbershop-gold h-6 w-6 mr-2" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="barbershop-card border-barbershop-dark">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="text-barbershop-gold h-5 w-5" />
-                  <div>
-                    <p className="text-barbershop-muted text-sm">Lifetime Value</p>
-                    <p className="text-2xl font-bold text-barbershop-text">{formatCurrency(totalLifetimeValue)}</p>
-                  </div>
+                <p className="text-3xl font-bold text-barbershop-gold">{avgVisitFrequency.toFixed(1)}</p>
+                <p className="text-barbershop-muted">{t('analytics.clientMetrics.avgVisitFrequency')}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <TrendingUp className="text-barbershop-gold h-6 w-6 mr-2" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                <p className="text-3xl font-bold text-barbershop-gold">{formatCurrency(totalLifetimeValue)}</p>
+                <p className="text-barbershop-muted">{t('analytics.clientMetrics.lifetimeValue')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Revenue Trends */}
         <div className="mb-8">
           <Card className="barbershop-card border-barbershop-dark">
             <CardHeader>
-              <CardTitle className="text-barbershop-text">Revenue Trends</CardTitle>
+              <CardTitle className="text-barbershop-text">{t('analytics.charts.revenueTrends')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
@@ -275,11 +297,11 @@ export default function AnalyticsPage() {
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <Card className="barbershop-card border-barbershop-dark">
             <CardHeader>
-              <CardTitle className="text-barbershop-text">Service Popularity</CardTitle>
+              <CardTitle className="text-barbershop-text">{t('analytics.charts.servicePopularity')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
                       data={serviceChartData}
@@ -304,7 +326,7 @@ export default function AnalyticsPage() {
 
           <Card className="barbershop-card border-barbershop-dark">
             <CardHeader>
-              <CardTitle className="text-barbershop-text">Peak Hours Analysis</CardTitle>
+              <CardTitle className="text-barbershop-text">{t('analytics.charts.peakHours')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
@@ -330,15 +352,15 @@ export default function AnalyticsPage() {
 
         {/* Inventory Management */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-barbershop-text mb-4">Inventory Management</h2>
+          <h2 className="text-xl font-semibold text-barbershop-text mb-4">{t('analytics.inventory.title')}</h2>
           
           {/* Low Stock Alerts */}
           {lowStockProducts.length > 0 && (
-            <Card className="barbershop-card border-red-500 mb-6">
+            <Card className="barbershop-card border-barbershop-dark">
               <CardHeader>
-                <CardTitle className="text-red-400 flex items-center space-x-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  <span>Low Stock Alerts</span>
+                <CardTitle className="text-barbershop-text flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-yellow-500" />
+                  {t('analytics.inventory.lowStockAlerts')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -354,7 +376,7 @@ export default function AnalyticsPage() {
                           {product.currentStock} / {product.minStockThreshold}
                         </Badge>
                         <p className="text-sm text-barbershop-muted mt-1">
-                          Cost: {formatCurrency(product.costPerUnit)}
+                          {t('analytics.inventory.cost')}: {formatCurrency(product.costPerUnit)}
                         </p>
                       </div>
                     </div>
@@ -367,30 +389,30 @@ export default function AnalyticsPage() {
           {/* Service Cost Analysis */}
           <Card className="barbershop-card border-barbershop-dark">
             <CardHeader>
-              <CardTitle className="text-barbershop-text">Service Profitability</CardTitle>
+              <CardTitle className="text-barbershop-text">{t('analytics.inventory.profitability')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {profitMargins.map((service) => (
                   <div key={service.service} className="p-4 barbershop-dark rounded">
                     <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-medium text-barbershop-text">{service.service}</h4>
+                      <h4 className="font-medium text-barbershop-text">{getServiceName(service.service)}</h4>
                       <Badge className={service.margin > 70 ? "bg-green-500" : service.margin > 50 ? "bg-yellow-500" : "bg-red-500"}>
-                        {service.margin}% margin
+                        {formatMargin(service.margin)} {t('analytics.inventory.margin')}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
-                        <p className="text-barbershop-muted">Product Cost</p>
-                        <p className="text-barbershop-text font-medium">${service.cost.toFixed(2)}</p>
+                        <p className="text-barbershop-muted">{t('analytics.inventory.productCost')}</p>
+                        <p className="text-barbershop-text font-medium">{formatCurrency(service.cost)}</p>
                       </div>
                       <div>
-                        <p className="text-barbershop-muted">Service Price</p>
-                        <p className="text-barbershop-text font-medium">${service.price.toFixed(2)}</p>
+                        <p className="text-barbershop-muted">{t('analytics.inventory.servicePrice')}</p>
+                        <p className="text-barbershop-text font-medium">{formatCurrency(service.price)}</p>
                       </div>
                       <div>
-                        <p className="text-barbershop-muted">Profit</p>
-                        <p className="text-barbershop-text font-medium">${service.profit.toFixed(2)}</p>
+                        <p className="text-barbershop-muted">{t('analytics.inventory.profit')}</p>
+                        <p className="text-barbershop-text font-medium">{formatCurrency(service.profit)}</p>
                       </div>
                     </div>
                   </div>
@@ -403,21 +425,23 @@ export default function AnalyticsPage() {
         {/* Business Summary */}
         <Card className="barbershop-card border-barbershop-dark">
           <CardHeader>
-            <CardTitle className="text-barbershop-text">Business Summary ({dateRange})</CardTitle>
+            <CardTitle className="text-barbershop-text">
+              {t('analytics.businessSummary.title')} ({t(`analytics.dateRanges.${dateRange}`)})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <p className="text-3xl font-bold text-barbershop-gold">{formatCurrency(totalRevenue)}</p>
-                <p className="text-barbershop-muted">Total Revenue</p>
+                <p className="text-barbershop-muted">{t('analytics.businessSummary.totalRevenue')}</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-barbershop-gold">{totalAppointments}</p>
-                <p className="text-barbershop-muted">Total Appointments</p>
+                <p className="text-barbershop-muted">{t('analytics.businessSummary.totalAppointments')}</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-barbershop-gold">{formatCurrency(avgDailyRevenue)}</p>
-                <p className="text-barbershop-muted">Avg Daily Revenue</p>
+                <p className="text-barbershop-muted">{t('analytics.businessSummary.avgDailyRevenue')}</p>
               </div>
             </div>
           </CardContent>

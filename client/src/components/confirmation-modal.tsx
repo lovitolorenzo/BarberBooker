@@ -1,6 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Appointment } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
 import AddToCalendar from "./add-to-calendar";
@@ -16,27 +17,56 @@ export default function ConfirmationModal({
   booking, 
   onClose 
 }: ConfirmationModalProps) {
+  const { t, i18n } = useTranslation();
+
   if (!booking) return null;
 
   const formatDisplayDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    const locale = i18n.language === 'it' ? 'it-IT' : 'en-US';
+    
+    if (i18n.language === 'it') {
+      // Custom Italian formatting
+      const day = date.getDate();
+      const month = t(`months.${date.toLocaleDateString('en-US', { month: 'long' }).toLowerCase()}`);
+      const year = date.getFullYear();
+      const dayName = t(`daysFull.${date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}`);
+      return `${dayName}, ${day} ${month} ${year}`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
   };
 
   const formatTime = (timeStr: string) => {
     const [hours, minutes] = timeStr.split(':');
     const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-    return `${displayHour}:${minutes} ${ampm}`;
+    
+    if (i18n.language === 'it') {
+      // Use 24-hour format for Italian
+      return `${hours}:${minutes}`;
+    } else {
+      // Use 12-hour format for English
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
   };
 
   const getServiceName = (serviceKey: string) => {
-    return services[serviceKey as ServiceKey]?.name || serviceKey;
+    // Use translations for service names
+    const translations: { [key: string]: string } = {
+      'haircut': t('haircut'),
+      'beard': t('beard'),
+      'full': t('styling'),
+      'shave': t('shave'),
+      'wash': t('wash')
+    };
+    return translations[serviceKey] || serviceKey;
   };
 
   const formatPrice = (priceInCents: number) => {
@@ -51,34 +81,34 @@ export default function ConfirmationModal({
             <Check className="text-white text-2xl h-8 w-8" />
           </div>
           <h3 className="text-xl font-semibold text-barbershop-text mb-2">
-            Booking Confirmed!
+            {t('confirmation.title')}
           </h3>
           <p className="text-barbershop-muted mb-6">
-            Your appointment has been successfully booked.
+            {t('confirmation.description')}
           </p>
           
           <div className="barbershop-dark rounded-lg p-4 mb-6 text-left">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-barbershop-muted">Service:</span>
+                <span className="text-barbershop-muted">{t('confirmation.service')}:</span>
                 <span className="text-barbershop-text">{getServiceName(booking.service)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-barbershop-muted">Date:</span>
+                <span className="text-barbershop-muted">{t('confirmation.date')}:</span>
                 <span className="text-barbershop-text">{formatDisplayDate(booking.appointmentDate)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-barbershop-muted">Time:</span>
+                <span className="text-barbershop-muted">{t('confirmation.time')}:</span>
                 <span className="text-barbershop-text">{formatTime(booking.appointmentTime)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-barbershop-muted">Customer:</span>
+                <span className="text-barbershop-muted">{t('confirmation.customer')}:</span>
                 <span className="text-barbershop-text">
                   {booking.customerFirstName} {booking.customerLastName}
                 </span>
               </div>
               <div className="flex justify-between border-t border-barbershop-charcoal pt-2 mt-2">
-                <span className="text-barbershop-muted">Total:</span>
+                <span className="text-barbershop-muted">{t('confirmation.total')}:</span>
                 <span className="text-barbershop-gold font-semibold">
                   {formatPrice(booking.price)}
                 </span>
@@ -92,7 +122,7 @@ export default function ConfirmationModal({
               onClick={onClose}
               className="flex-1 barbershop-dark text-barbershop-text border-barbershop-charcoal hover:barbershop-charcoal transition-colors"
             >
-              Close
+              {t('common.close')}
             </Button>
             <AddToCalendar booking={booking} className="flex-1" />
           </div>

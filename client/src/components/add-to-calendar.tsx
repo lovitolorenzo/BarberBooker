@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import {
   generateGoogleCalendarUrl,
   generateOutlookUrl,
@@ -26,6 +27,7 @@ interface AddToCalendarProps {
 export default function AddToCalendar({ booking, className = "" }: AddToCalendarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const createCalendarEvent = (): CalendarEvent => {
     const serviceName = services[booking.service as ServiceKey]?.name || booking.service;
@@ -36,14 +38,14 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
     // Calculate end date by adding duration
     const endDate = new Date(startDate.getTime() + booking.duration * 60 * 1000);
     
-    const title = `Barber Appointment - ${serviceName}`;
+    const title = t('addToCalendar.appointmentTitle', { service: serviceName });
     const description = [
-      `Service: ${serviceName}`,
-      `Customer: ${booking.customerFirstName} ${booking.customerLastName}`,
-      `Phone: ${booking.customerPhone || 'Not provided'}`,
-      `Duration: ${booking.duration} minutes`,
+      `${t('confirmation.service')}: ${serviceName}`,
+      `${t('confirmation.customer')}: ${booking.customerFirstName} ${booking.customerLastName}`,
+      `${t('confirmation.phone')}: ${booking.customerPhone || 'Not provided'}`,
+      `${t('booking.duration')} ${booking.duration} ${t('booking.minutes')}`,
       `Price: $${(booking.price / 100).toFixed(0)}`,
-      ...(booking.notes ? [`Notes: ${booking.notes}`] : []),
+      ...(booking.notes ? [`${t('confirmation.notes')}: ${booking.notes}`] : []),
       '',
       'Booked via BarberBooker'
     ].join('\n');
@@ -83,8 +85,8 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
     } catch (error) {
       console.error('Error downloading .ics file:', error);
       toast({
-        title: "Error",
-        description: "Failed to download calendar file. Please try again.",
+        title: t("common.error"),
+        description: t("addToCalendar.error"),
         variant: "destructive",
       });
     } finally {
@@ -100,7 +102,7 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
           disabled={isLoading}
         >
           <Calendar className="mr-2 h-4 w-4" />
-          Add to Calendar
+          {t('addToCalendar.button')}
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -110,28 +112,28 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
           className="text-barbershop-text hover:barbershop-charcoal cursor-pointer"
         >
           <ExternalLink className="mr-2 h-4 w-4" />
-          Google Calendar
+          {t('addToCalendar.googleCalendar')}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={handleOutlookCalendar}
           className="text-barbershop-text hover:barbershop-charcoal cursor-pointer"
         >
           <ExternalLink className="mr-2 h-4 w-4" />
-          Outlook Calendar
+          {t('addToCalendar.outlookCalendar')}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={handleYahooCalendar}
           className="text-barbershop-text hover:barbershop-charcoal cursor-pointer"
         >
           <ExternalLink className="mr-2 h-4 w-4" />
-          Yahoo Calendar
+          {t('addToCalendar.yahooCalendar')}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={handleDownloadIcs}
           className="text-barbershop-text hover:barbershop-charcoal cursor-pointer border-t border-barbershop-charcoal"
         >
           <Download className="mr-2 h-4 w-4" />
-          Download .ics file
+          {t('addToCalendar.downloadIcs')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

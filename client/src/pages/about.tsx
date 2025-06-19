@@ -2,27 +2,30 @@ import { Scissors, Award, Clock, Users, Star, MapPin, Phone, Mail } from "lucide
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/navbar";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+  
   const services = [
     {
-      name: "Classic Haircut",
-      duration: "30 minutes",
+      name: t("services.classicHaircut.name"),
+      duration: t("services.classicHaircut.duration"),
       price: "$25",
-      description: "Professional scissor cut with styling"
+      description: t("services.classicHaircut.description")
     },
     {
-      name: "Beard Trim",
-      duration: "15 minutes", 
+      name: t("services.beardTrim.name"),
+      duration: t("services.beardTrim.duration"), 
       price: "$15",
-      description: "Precision beard shaping and styling"
+      description: t("services.beardTrim.description")
     },
     {
-      name: "Full Service",
-      duration: "45 minutes",
+      name: t("services.fullService.name"),
+      duration: t("services.fullService.duration"),
       price: "$35", 
-      description: "Complete haircut and beard service"
+      description: t("services.fullService.description")
     }
   ];
 
@@ -36,16 +39,14 @@ export default function AboutPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-barbershop-text mb-6">
-            Crafting Excellence Since 2009
+            {t("hero.title")}
           </h2>
           <p className="text-xl text-barbershop-muted mb-8 leading-relaxed">
-            At Elite Barbershop, we combine traditional craftsmanship with modern techniques 
-            to deliver the finest grooming experience in the city. Our skilled barbers are 
-            dedicated to helping you look and feel your absolute best.
+            {t("hero.description")}
           </p>
           <Link href="/">
             <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
-              Book Your Appointment
+              {t("hero.bookAppointment")}
             </Button>
           </Link>
         </div>
@@ -54,22 +55,16 @@ export default function AboutPage() {
       {/* Our Story */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl font-bold text-barbershop-text mb-8">Our Story</h3>
+          <h3 className="text-3xl font-bold text-barbershop-text mb-8">{t("ourStory.title")}</h3>
           <div className="space-y-6 text-barbershop-muted text-lg leading-relaxed">
             <p>
-              Founded in 2009 by master barber Marcus Johnson, Elite Barbershop began as a 
-              vision to create a space where traditional barbering techniques meet contemporary 
-              style and comfort.
+              {t("ourStory.founded")}
             </p>
             <p>
-              What started as a single chair operation has grown into the city's premier 
-              destination for men's grooming, built on a foundation of quality, consistency, 
-              and exceptional customer service.
+              {t("ourStory.grown")}
             </p>
             <p>
-              Today, we serve hundreds of satisfied clients who trust us with their personal 
-              style, from business professionals to artists, each receiving the same attention 
-              to detail and craftsmanship.
+              {t("ourStory.today")}
             </p>
           </div>
           
@@ -77,19 +72,19 @@ export default function AboutPage() {
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="text-3xl font-bold text-barbershop-gold mb-2">15+</div>
-                <div className="text-barbershop-muted">Years Experience</div>
+                <div className="text-barbershop-muted">{t("ourStory.yearsExperience")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-barbershop-gold mb-2">5000+</div>
-                <div className="text-barbershop-muted">Happy Clients</div>
+                <div className="text-barbershop-muted">{t("ourStory.happyClients")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-barbershop-gold mb-2">1</div>
-                <div className="text-barbershop-muted">Master Barber</div>
+                <div className="text-barbershop-muted">{t("ourStory.masterBarber")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-barbershop-gold mb-2">4.9</div>
-                <div className="text-barbershop-muted">Star Rating</div>
+                <div className="text-barbershop-muted">{t("ourStory.starRating")}</div>
               </div>
             </div>
           </div>
@@ -99,7 +94,7 @@ export default function AboutPage() {
       {/* Services */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">Our Services</h3>
+          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">{t("services.title")}</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <Card key={index} className="barbershop-card border-barbershop-dark">
@@ -121,17 +116,17 @@ export default function AboutPage() {
       {/* Meet Our Master Barber */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">Meet Our Master Barber</h3>
+          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">{t("meetOurMasterBarber.title")}</h3>
           <div className="flex justify-center">
             <Card className="barbershop-card border-barbershop-dark max-w-sm">
               <CardContent className="p-6 text-center">
                 <div className="w-20 h-20 barbershop-dark rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="text-barbershop-gold h-10 w-10" />
                 </div>
-                <h4 className="text-xl font-semibold text-barbershop-text mb-1">Marcus Johnson</h4>
-                <div className="text-barbershop-gold font-medium mb-2">Master Barber & Owner</div>
-                <div className="text-barbershop-muted text-sm mb-2">15+ years experience</div>
-                <p className="text-barbershop-muted text-sm">Classic cuts & beard styling specialist</p>
+                <h4 className="text-xl font-semibold text-barbershop-text mb-1">{t("meetOurMasterBarber.name")}</h4>
+                <div className="text-barbershop-gold font-medium mb-2">{t("meetOurMasterBarber.masterBarber")}</div>
+                <div className="text-barbershop-muted text-sm mb-2">{t("meetOurMasterBarber.yearsExperience")}</div>
+                <p className="text-barbershop-muted text-sm">{t("meetOurMasterBarber.specialist")}</p>
               </CardContent>
             </Card>
           </div>
@@ -141,13 +136,13 @@ export default function AboutPage() {
       {/* Contact Info */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal border-t border-barbershop-dark">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl font-bold text-barbershop-text mb-8">Get In Touch</h3>
+          <h3 className="text-3xl font-bold text-barbershop-text mb-8">{t("contactInfo.title")}</h3>
           <p className="text-barbershop-muted mb-8">
-            Ready to experience the finest barbering in the city? Contact us or visit our shop.
+            {t("contactInfo.description")}
           </p>
           <Link href="/contact">
             <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
-              Contact Us
+              {t("contactInfo.contactUs")}
             </Button>
           </Link>
         </div>

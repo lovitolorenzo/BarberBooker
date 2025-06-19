@@ -1,0 +1,417 @@
+{
+	"nav": {
+		"booking": "Book Now",
+		"about": "About",
+		"contact": "Contact",
+		"admin": "Admin",
+		"analytics": "Analytics",
+		"dashboard": "Dashboard",
+		"login": "Login",
+		"logout": "Logout",
+		"register": "Register"
+	},
+	"auth": {
+		"firstName": "First Name",
+		"lastName": "Last Name",
+		"password": "Password",
+		"confirmPassword": "Confirm Password",
+		"loginTitle": "Login to your account",
+		"registerTitle": "Create a new account",
+		"loginButton": "Login",
+		"registerButton": "Register",
+		"loginLink": "Already have an account? Login here",
+		"registerLink": "Don't have an account? Register here",
+		"loginSuccess": "Login successful!",
+		"registerSuccess": "Registration completed successfully!",
+		"loginError": "Invalid username or password",
+		"registerError": "Registration error",
+		"passwordMismatch": "Passwords do not match",
+		"fillAllFields": "Please fill all fields"
+	},
+	"booking": {
+		"title": "Book your appointment",
+		"selectDate": "Select Date & Time",
+		"selectService": "Select Service",
+		"chooseService": "Choose a service...",
+		"selectedAppointment": "Selected Appointment",
+		"duration": "Duration:",
+		"minutes": "minutes",
+		"phoneNumber": "Phone Number",
+		"notes": "Notes (optional)",
+		"bookingFor": "Booking for",
+		"submitButton": "Book Appointment",
+		"bookAppointment": "Book Appointment",
+		"booking": "Booking...",
+		"specialRequests": "Special Requests (Optional)",
+		"anySpecificRequests": "Any specific requests or preferences...",
+		"pleaseLogin": "Please log in to make a booking",
+		"loginRequired": "You must be logged in to book",
+		"success": "Appointment booked successfully!",
+		"error": "Error booking appointment",
+		"selectDateFirst": "Please select a date first",
+		"selectTimeFirst": "Please select a time first",
+		"selectServiceFirst": "Please select a service first"
+	},
+	"bookingConfirmed": {
+		"title": "Booking Confirmed!",
+		"description": "Your appointment has been successfully booked."
+	},
+	"bookingFailed": {
+		"title": "Booking Failed",
+		"description": "Failed to book appointment. Please try again."
+	},
+	"missingInformation": {
+		"title": "Missing Information",
+		"description": "Please select a date, time, and service."
+	},
+	"authenticationRequired": {
+		"title": "Authentication Required",
+		"description": "Please log in to make a booking."
+	},
+	"calendar": {
+		"availableTimes": "Available Times",
+		"available": "Available",
+		"selected": "Selected",
+		"booked": "Booked",
+		"past": "Past",
+		"select_date_time": "Select Date & Time",
+		"available_times": "Available Times",
+		"sunday": "Sun",
+		"monday": "Mon",
+		"tuesday": "Tue",
+		"wednesday": "Wed",
+		"thursday": "Thu",
+		"friday": "Fri",
+		"saturday": "Sat",
+		"months": {
+			"january": "January",
+			"february": "February",
+			"march": "March",
+			"april": "April",
+			"may": "May",
+			"june": "June",
+			"july": "July",
+			"august": "August",
+			"september": "September",
+			"october": "October",
+			"november": "November",
+			"december": "December"
+		},
+		"days": {
+			"sun": "Sun",
+			"mon": "Mon",
+			"tue": "Tue",
+			"wed": "Wed",
+			"thu": "Thu",
+			"fri": "Fri",
+			"sat": "Sat"
+		},
+		"daysFull": {
+			"sunday": "Sunday",
+			"monday": "Monday",
+			"tuesday": "Tuesday",
+			"wednesday": "Wednesday",
+			"thursday": "Thursday",
+			"friday": "Friday",
+			"saturday": "Saturday"
+		}
+	},
+	"services": {
+		"haircut": "Haircut",
+		"beard": "Beard",
+		"shave": "Shave",
+		"styling": "Styling",
+		"wash": "Wash",
+		"mustache": "Mustache",
+		"fullservice": "Full Service",
+		"title": "Our Services",
+		"classicHaircut": {
+			"name": "Classic Haircut",
+			"duration": "30 minutes",
+			"description": "Professional scissor cut with styling"
+		},
+		"beardTrim": {
+			"name": "Beard Trim",
+			"duration": "15 minutes",
+			"description": "Precision beard shaping and styling"
+		},
+		"fullService": {
+			"name": "Full Service",
+			"duration": "45 minutes",
+			"description": "Complete haircut and beard service"
+		}
+	},
+	"hero": {
+		"title": "Crafting Excellence Since 2009",
+		"description": "At Barbershop, we combine traditional craftsmanship with modern techniques to deliver the finest grooming experience in the city. Our skilled barbers are dedicated to helping you look and feel your absolute best.",
+		"bookAppointment": "Book Your Appointment"
+	},
+	"ourStory": {
+		"title": "Our Story",
+		"founded": "Founded in 2009 by master barber Gabriele Dilaurenza, Barbershop began as a vision to create a space where traditional barbering techniques meet contemporary style and comfort.",
+		"grown": "What started as a single chair operation has grown into the city's premier destination for men's grooming, built on a foundation of quality, consistency, and exceptional customer service.",
+		"today": "Today, we serve hundreds of satisfied clients who trust us with their personal style, from business professionals to artists, each receiving the same attention to detail and craftsmanship.",
+		"yearsExperience": "Years Experience",
+		"happyClients": "Happy Clients",
+		"masterBarber": "Master Barber",
+		"starRating": "Star Rating"
+	},
+	"meetOurMasterBarber": {
+		"title": "Meet Our Master Barber",
+		"name": "Gabriele Dilaurenza",
+		"masterBarber": "Master Barber & Owner",
+		"yearsExperience": "15+ years experience",
+		"specialist": "Classic cuts & beard styling specialist"
+	},
+	"contactInfo": {
+		"title": "Get In Touch",
+		"description": "Ready to experience the finest barbering in the city? Contact us or visit our shop.",
+		"contactUs": "Contact Us"
+	},
+	"confirmation": {
+		"title": "Booking Confirmed!",
+		"description": "Your appointment has been successfully booked.",
+		"service": "Service",
+		"date": "Date",
+		"time": "Time",
+		"customer": "Customer",
+		"phone": "Phone",
+		"notes": "Notes",
+		"total": "Total"
+	},
+	"common": {
+		"loading": "Loading...",
+		"error": "Error",
+		"success": "Success",
+		"cancel": "Cancel",
+		"confirm": "Confirm",
+		"save": "Save",
+		"edit": "Edit",
+		"delete": "Delete",
+		"close": "Close",
+		"back": "Back",
+		"next": "Next",
+		"submit": "Submit",
+		"retry": "Retry"
+	},
+	"addToCalendar": {
+		"button": "Add to Calendar",
+		"googleCalendar": "Google Calendar",
+		"outlookCalendar": "Outlook Calendar",
+		"yahooCalendar": "Yahoo Calendar",
+		"downloadIcs": "Download .ics file",
+		"appointmentTitle": "Barber Appointment - {{service}}",
+		"error": "Failed to download calendar file. Please try again."
+	},
+	"dashboard": {
+		"title": "Dashboard",
+		"welcome": "Welcome",
+		"stats": {
+			"totalAppointments": "Total Appointments",
+			"todayAppointments": "Today's Appointments",
+			"revenue": "Revenue",
+			"clients": "Clients"
+		},
+		"recentAppointments": "Recent Appointments",
+		"noAppointments": "No appointments found"
+	},
+	"language": {
+		"switchTo": "Switch language",
+		"italian": "Italiano",
+		"english": "English"
+	},
+	"login": {
+		"title": "Barbershop",
+		"subtitle": "Sign in to your account",
+		"firstName": {
+			"label": "First Name",
+			"placeholder": "Enter your first name"
+		},
+		"lastName": {
+			"label": "Last Name",
+			"placeholder": "Enter your last name"
+		},
+		"password": {
+			"label": "Password",
+			"placeholder": "Enter your password"
+		},
+		"button": {
+			"label": "Sign In",
+			"loading": "Signing In..."
+		},
+		"or": {
+			"label": "Or"
+		},
+		"success": {
+			"title": "Login Successful",
+			"description": "Welcome {{name}}!"
+		},
+		"failure": {
+			"title": "Login Failed",
+			"description": "Invalid credentials"
+		},
+		"demo": {
+			"credentials": {
+				"title": "Demo Credentials:",
+				"admin": {
+					"title": "Admin Access:",
+					"description": "Admin User / admin123"
+				},
+				"customer": {
+					"title": "Customer Access:",
+					"description": "John Smith / customer123"
+				},
+				"guest": {
+					"title": "Quick Guest:",
+					"description": "Use the \"Quick Guest Login\" button above"
+				}
+			}
+		},
+		"no": {
+			"account": {
+				"label": "Don't have an account?",
+				"link": "Create one here"
+			}
+		}
+	},
+	"register": {
+		"createAccount": "Create your account",
+		"firstName": "First Name",
+		"lastName": "Last Name",
+		"password": "Password",
+		"confirmPassword": "Confirm Password",
+		"firstNamePlaceholder": "Enter your first name",
+		"lastNamePlaceholder": "Enter your last name",
+		"passwordPlaceholder": "Enter your password",
+		"confirmPasswordPlaceholder": "Confirm your password",
+		"createAccountButton": "Create Account",
+		"creating": "Creating Account...",
+		"alreadyHaveAccount": "Already have an account?",
+		"signInHere": "Sign in here",
+		"successful": "Registration Successful",
+		"failed": "Registration Failed",
+		"welcomeMessage": "Welcome {{name}}! You can now log in.",
+		"fillAllFields": "Please fill in all fields",
+		"passwordMismatch": "Passwords do not match",
+		"passwordLength": "Password must be at least 6 characters long",
+		"defaultError": "Registration failed",
+		"networkError": "Unable to connect to server. Please try again."
+	},
+	"guest": {
+		"login": {
+			"button": {
+				"label": "Quick Guest Login",
+				"loading": "Signing In..."
+			},
+			"success": {
+				"title": "Welcome!",
+				"description": "Signed in as {{name}}"
+			},
+			"failure": {
+				"title": "Login Failed",
+				"description": "Unable to sign in as guest"
+			}
+		}
+	},
+	"contact": {
+		"visitUs": "Visit Us Today",
+		"description": "Ready for your next cut? We're here to help you look your best.",
+		"bookAppointment": "Book Your Appointment",
+		"location": "Location",
+		"phone": "Phone",
+		"hours": "Hours",
+		"questions": "Questions? We're Here to Help",
+		"additionalInfo": "Whether you're a first-time client or a regular, we're always happy to answer any questions about our services, pricing, or availability. Give us a call or stop by during business hours.",
+		"callNow": "Call Now",
+		"learnMore": "Learn More About Us",
+		"address": {
+			"street": "123 Main Street",
+			"district": "Downtown District",
+			"city": "New York, NY 10001"
+		},
+		"phoneNumbers": {
+			"primary": "(555) 123-4567",
+			"secondary": "(555) 765-4321"
+		},
+		"schedule": {
+			"weekdays": "Mon-Fri: 9AM-6PM",
+			"saturday": "Saturday: 9AM-5PM",
+			"sunday": "Sunday: 10AM-4PM"
+		}
+	},
+	"select_date_time": "Select Date & Time",
+	"bookAppointment": "Book Appointment",
+	"selectService": "Select Service",
+	"chooseService": "Choose Service",
+	"bookingFor": "Booking for",
+	"phoneNumber": "Phone Number",
+	"specialRequests": "Special Requests",
+	"anySpecificRequests": "Any specific requests",
+	"available": "Available",
+	"selected": "Selected",
+	"booked": "Booked",
+	"past": "Past",
+	"sunday": "Sun",
+	"monday": "Mon",
+	"tuesday": "Tue",
+	"wednesday": "Wed",
+	"thursday": "Thu",
+	"friday": "Fri",
+	"saturday": "Sat",
+	"admin": {
+		"totalAppointments": "Total Appointments",
+		"today": "Today",
+		"upcoming": "Upcoming",
+		"revenue": "Revenue",
+		"allAppointments": "All Appointments",
+		"todayFilter": "Today",
+		"upcomingFilter": "Upcoming",
+		"completed": "Completed",
+		"appointments": "Appointments",
+		"notes": "Notes",
+		"status": {
+			"confirmed": "confirmed",
+			"completed": "completed",
+			"cancelled": "cancelled",
+			"no-show": "no-show"
+		},
+		"loading": "Loading appointments...",
+		"noAppointments": "No appointments found for the selected filter."
+	},
+	"analytics": {
+		"dateRanges": {
+			"7d": "7 Days",
+			"30d": "30 Days", 
+			"90d": "90 Days"
+		},
+		"clientMetrics": {
+			"title": "Client Metrics",
+			"totalClients": "Total Clients",
+			"avgSpendPerVisit": "Avg Spend/Visit",
+			"avgVisitFrequency": "Avg Visit Frequency",
+			"lifetimeValue": "Lifetime Value"
+		},
+		"charts": {
+			"revenueTrends": "Revenue Trends",
+			"servicePopularity": "Service Popularity",
+			"peakHours": "Peak Hours Analysis"
+		},
+		"inventory": {
+			"title": "Inventory Management",
+			"lowStock": "Low Stock",
+			"lowStockAlerts": "Low Stock Alerts",
+			"cost": "Cost",
+			"profitability": "Service Profitability",
+			"productCost": "Product Cost",
+			"servicePrice": "Service Price",
+			"profit": "Profit",
+			"margin": "margin"
+		},
+		"businessSummary": {
+			"title": "Business Summary",
+			"totalRevenue": "Total Revenue",
+			"totalAppointments": "Total Appointments",
+			"avgDailyRevenue": "Avg Daily Revenue"
+		}
+	}
+}

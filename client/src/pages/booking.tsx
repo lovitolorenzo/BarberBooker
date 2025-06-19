@@ -8,6 +8,7 @@ import ConfirmationModal from "@/components/confirmation-modal";
 import Navbar from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import type { Appointment } from "@shared/schema";
 
 export default function BookingPage() {
@@ -18,6 +19,7 @@ export default function BookingPage() {
   const [, setLocation] = useLocation();
   const { isLoggedIn, userEmail, userFirstName, userLastName, logout } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleBookingConfirmed = (booking: Appointment) => {
     setConfirmedBooking(booking);

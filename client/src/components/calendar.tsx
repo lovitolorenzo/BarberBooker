@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
+import { apiRequest } from "@/lib/queryClient";
 import type { Appointment } from "@shared/schema";
 
 interface CalendarProps {
@@ -25,6 +27,7 @@ export default function CalendarComponent({
   onTimeSelect 
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { t } = useTranslation();
 
   // Get appointments for the current month
   const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString().split('T')[0];
@@ -70,7 +73,7 @@ export default function CalendarComponent({
   const isPastSlot = (date: string, time: string) => {
     const now = new Date();
     const slotDateTime = new Date(`${date}T${time}:00`);
-    return slotDateTime < now;
+    return slotDateTime.getTime() < now.getTime();
   };
 
   const renderCalendar = () => {
@@ -121,7 +124,7 @@ export default function CalendarComponent({
 
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-medium text-barbershop-text">Available Times</h3>
+        <h3 className="text-lg font-medium text-barbershop-text">{t('available_times')}</h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {timeSlots.map(time => {
             const isBooked = isSlotBooked(selectedDate, time);
@@ -164,7 +167,7 @@ export default function CalendarComponent({
     <Card className="barbershop-card border-barbershop-dark shadow-xl">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-barbershop-text">Select Date & Time</h2>
+          <h2 className="text-xl font-semibold text-barbershop-text">{t('select_date_time')}</h2>
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
@@ -191,7 +194,7 @@ export default function CalendarComponent({
         {/* Calendar Grid */}
         <div className="mb-6">
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            {[t('sunday'), t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday')].map(day => (
               <div key={day} className="text-center text-sm font-medium text-barbershop-muted py-2">
                 {day}
               </div>
@@ -210,19 +213,19 @@ export default function CalendarComponent({
           <div className="flex flex-wrap gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded bg-emerald-500"></div>
-              <span className="text-barbershop-muted">Available</span>
+              <span className="text-barbershop-muted">{t('available')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded bg-blue-500"></div>
-              <span className="text-barbershop-muted">Selected</span>
+              <span className="text-barbershop-muted">{t('selected')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded bg-gray-500"></div>
-              <span className="text-barbershop-muted">Booked</span>
+              <span className="text-barbershop-muted">{t('booked')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded bg-gray-700"></div>
-              <span className="text-barbershop-muted">Past</span>
+              <span className="text-barbershop-muted">{t('past')}</span>
             </div>
           </div>
         </div>

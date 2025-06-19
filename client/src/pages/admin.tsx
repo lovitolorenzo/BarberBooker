@@ -8,9 +8,11 @@ import { Link } from "wouter";
 import Navbar from "@/components/navbar";
 import type { Appointment } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 export default function AdminPage() {
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
+  const { t, i18n } = useTranslation();
 
   const { data: appointments = [], isLoading } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/all'],
@@ -45,6 +47,12 @@ export default function AdminPage() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00');
+    if (i18n.language === 'it') {
+      const weekdays = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
+      const months = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 
+                     'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+      return `${weekdays[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+    }
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -53,6 +61,9 @@ export default function AdminPage() {
   };
 
   const formatTime = (timeStr: string) => {
+    if (i18n.language === 'it') {
+      return timeStr; // 24-hour format for Italian
+    }
     const [hours, minutes] = timeStr.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -61,10 +72,20 @@ export default function AdminPage() {
   };
 
   const getServiceName = (serviceKey: string) => {
-    return services[serviceKey as ServiceKey]?.name || serviceKey;
+    const serviceTranslations: { [key: string]: string } = {
+      'haircut': t('haircut'),
+      'beard': t('beard'), 
+      'shave': t('shave'),
+      'styling': t('styling'),
+      'wash': t('wash')
+    };
+    return serviceTranslations[serviceKey] || services[serviceKey as ServiceKey]?.name || serviceKey;
   };
 
   const formatPrice = (priceInCents: number) => {
+    if (i18n.language === 'it') {
+      return `€${(priceInCents / 100).toFixed(0)}`;
+    }
     return `$${(priceInCents / 100).toFixed(0)}`;
   };
 
@@ -73,8 +94,13 @@ export default function AdminPage() {
       case 'confirmed': return 'bg-blue-500';
       case 'completed': return 'bg-green-500';
       case 'cancelled': return 'bg-red-500';
+      case 'no-show': return 'bg-gray-500';
       default: return 'bg-gray-500';
     }
+  };
+
+  const getStatusText = (status: string) => {
+    return t(`admin.status.${status}`) || status;
   };
 
   return (
@@ -89,7 +115,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2">
                 <Calendar className="text-barbershop-gold h-5 w-5" />
                 <div>
-                  <p className="text-barbershop-muted text-sm">Total Appointments</p>
+                  <p className="text-barbershop-muted text-sm">{t('admin.totalAppointments')}</p>
                   <p className="text-2xl font-bold text-barbershop-text">{stats.total}</p>
                 </div>
               </div>
@@ -101,7 +127,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2">
                 <Clock className="text-barbershop-gold h-5 w-5" />
                 <div>
-                  <p className="text-barbershop-muted text-sm">Today</p>
+                  <p className="text-barbershop-muted text-sm">{t('admin.today')}</p>
                   <p className="text-2xl font-bold text-barbershop-text">{stats.today}</p>
                 </div>
               </div>
@@ -113,7 +139,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2">
                 <Users className="text-barbershop-gold h-5 w-5" />
                 <div>
-                  <p className="text-barbershop-muted text-sm">Upcoming</p>
+                  <p className="text-barbershop-muted text-sm">{t('admin.upcoming')}</p>
                   <p className="text-2xl font-bold text-barbershop-text">{stats.upcoming}</p>
                 </div>
               </div>
@@ -125,7 +151,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2">
                 <DollarSign className="text-barbershop-gold h-5 w-5" />
                 <div>
-                  <p className="text-barbershop-muted text-sm">Revenue</p>
+                  <p className="text-barbershop-muted text-sm">{t('admin.revenue')}</p>
                   <p className="text-2xl font-bold text-barbershop-text">{formatPrice(stats.revenue)}</p>
                 </div>
               </div>
@@ -136,10 +162,10 @@ export default function AdminPage() {
         {/* Filters */}
         <div className="flex space-x-2 mb-6">
           {[
-            { key: 'all', label: 'All Appointments' },
-            { key: 'today', label: 'Today' },
-            { key: 'upcoming', label: 'Upcoming' },
-            { key: 'completed', label: 'Completed' }
+            { key: 'all', label: t('admin.allAppointments') },
+            { key: 'today', label: t('admin.todayFilter') },
+            { key: 'upcoming', label: t('admin.upcomingFilter') },
+            { key: 'completed', label: t('admin.completed') }
           ].map(({ key, label }) => (
             <Button
               key={key}
@@ -160,17 +186,17 @@ export default function AdminPage() {
         <Card className="barbershop-card border-barbershop-dark">
           <CardHeader>
             <CardTitle className="text-barbershop-text">
-              Appointments ({filteredAppointments.length})
+              {t('admin.appointments')} ({filteredAppointments.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-barbershop-muted">
-                Loading appointments...
+                {t('admin.loading')}
               </div>
             ) : filteredAppointments.length === 0 ? (
               <div className="text-center py-8 text-barbershop-muted">
-                No appointments found for the selected filter.
+                {t('admin.noAppointments')}
               </div>
             ) : (
               <div className="space-y-4">
@@ -186,7 +212,7 @@ export default function AdminPage() {
                             {appointment.customerFirstName} {appointment.customerLastName}
                           </h3>
                           <Badge className={`${getStatusColor(appointment.status || 'confirmed')} text-white`}>
-                            {appointment.status || 'confirmed'}
+                            {getStatusText(appointment.status || 'confirmed')}
                           </Badge>
                         </div>
                         
@@ -238,7 +264,7 @@ export default function AdminPage() {
 
                         {appointment.notes && (
                           <div className="mt-3 text-sm">
-                            <span className="text-barbershop-gold">Notes: </span>
+                            <span className="text-barbershop-gold">{t('admin.notes')}: </span>
                             <span className="text-barbershop-muted">{appointment.notes}</span>
                           </div>
                         )}

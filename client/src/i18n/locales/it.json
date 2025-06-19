@@ -1,0 +1,446 @@
+{
+	"nav": {
+		"booking": "Prenota Ora",
+		"about": "Chi Siamo",
+		"contact": "Contatti",
+		"admin": "Admin",
+		"analytics": "Analytics",
+		"dashboard": "Dashboard",
+		"login": "Accedi",
+		"logout": "Esci",
+		"register": "Registrati"
+	},
+	"auth": {
+		"firstName": "Nome",
+		"lastName": "Cognome",
+		"password": "Password",
+		"confirmPassword": "Conferma Password",
+		"loginTitle": "Accedi al tuo account",
+		"registerTitle": "Crea un nuovo account",
+		"loginButton": "Accedi",
+		"registerButton": "Registrati",
+		"loginLink": "Hai già un account? Accedi qui",
+		"registerLink": "Non hai un account? Registrati qui",
+		"loginSuccess": "Accesso effettuato con successo!",
+		"registerSuccess": "Registrazione completata con successo!",
+		"loginError": "Nome utente o password non validi",
+		"registerError": "Errore durante la registrazione",
+		"passwordMismatch": "Le password non coincidono",
+		"fillAllFields": "Compila tutti i campi"
+	},
+	"booking": {
+		"title": "Prenota il tuo appuntamento",
+		"selectDate": "Seleziona Data e Ora",
+		"selectService": "Seleziona Servizio",
+		"chooseService": "Scegli un servizio...",
+		"selectedAppointment": "Appuntamento Selezionato",
+		"duration": "Durata:",
+		"minutes": "minuti",
+		"phoneNumber": "Numero di Telefono",
+		"notes": "Note (opzionale)",
+		"bookingFor": "Prenotazione per",
+		"submitButton": "Prenota Appuntamento",
+		"bookAppointment": "Prenota Appuntamento",
+		"booking": "Prenotazione...",
+		"specialRequests": "Richieste Speciali (Opzionale)",
+		"anySpecificRequests": "Richieste specifiche o preferenze...",
+		"pleaseLogin": "Effettua l'accesso per prenotare",
+		"loginRequired": "Devi essere loggato per prenotare",
+		"success": "Appuntamento prenotato con successo!",
+		"error": "Errore durante la prenotazione",
+		"selectDateFirst": "Seleziona prima una data",
+		"selectTimeFirst": "Seleziona prima un orario",
+		"selectServiceFirst": "Seleziona prima un servizio"
+	},
+	"bookingConfirmed": {
+		"title": "Prenotazione Confermata!",
+		"description": "Il tuo appuntamento è stato prenotato con successo."
+	},
+	"bookingFailed": {
+		"title": "Prenotazione Fallita",
+		"description": "Impossibile prenotare l'appuntamento. Riprova."
+	},
+	"missingInformation": {
+		"title": "Informazioni Mancanti",
+		"description": "Seleziona data, ora e servizio."
+	},
+	"authenticationRequired": {
+		"title": "Autenticazione Richiesta",
+		"description": "Effettua l'accesso per prenotare."
+	},
+	"calendar": {
+		"availableTimes": "Orari Disponibili",
+		"available": "Disponibile",
+		"selected": "Selezionato",
+		"booked": "Prenotato",
+		"past": "Passato",
+		"select_date_time": "Seleziona Data e Ora",
+		"available_times": "Orari Disponibili",
+		"sunday": "Dom",
+		"monday": "Lun",
+		"tuesday": "Mar",
+		"wednesday": "Mer",
+		"thursday": "Gio",
+		"friday": "Ven",
+		"saturday": "Sab",
+		"months": {
+			"january": "Gennaio",
+			"february": "Febbraio",
+			"march": "Marzo",
+			"april": "Aprile",
+			"may": "Maggio",
+			"june": "Giugno",
+			"july": "Luglio",
+			"august": "Agosto",
+			"september": "Settembre",
+			"october": "Ottobre",
+			"november": "Novembre",
+			"december": "Dicembre"
+		},
+		"days": {
+			"sun": "Domenica",
+			"mon": "Lunedì",
+			"tue": "Martedì",
+			"wed": "Mercoledì",
+			"thu": "Giovedì",
+			"fri": "Venerdì",
+			"sat": "Sabato"
+		}
+	},
+	"services": {
+		"title": "I Nostri Servizi",
+		"classicHaircut": {
+			"name": "Taglio Classico",
+			"duration": "30 minuti",
+			"description": "Taglio professionale con forbici e styling"
+		},
+		"beardTrim": {
+			"name": "Rifinitura Barba",
+			"duration": "15 minuti",
+			"description": "Modellatura di precisione e styling della barba"
+		},
+		"fullService": {
+			"name": "Servizio Completo",
+			"duration": "45 minuti",
+			"description": "Taglio completo e servizio barba"
+		},
+		"haircut": "Taglio",
+		"beard": "Barba",
+		"shave": "Rasatura",
+		"styling": "Styling",
+		"wash": "Lavaggio",
+		"mustache": "Baffi",
+		"fullservice": "Servizio Completo",
+		"selectedAppointment": "Appuntamento Selezionato"
+	},
+	"hero": {
+		"title": "Eccellenza Artigianale dal 2009",
+		"description": "Al Barbershop, combiniamo l'artigianato tradizionale con tecniche moderne per offrire la migliore esperienza di toelettatura della città. I nostri barbieri esperti si dedicano ad aiutarti a sembrare e sentirti al meglio.",
+		"bookAppointment": "Prenota il Tuo Appuntamento"
+	},
+	"ourStory": {
+		"title": "La Nostra Storia",
+		"founded": "Fondato nel 2009 dal maestro barbiere Gabriele Dilaurenza, Barbershop è nato dalla visione di creare uno spazio dove le tecniche tradizionali di barbiere incontrano stile e comfort contemporanei.",
+		"grown": "Quello che iniziò come un'operazione a singola postazione è cresciuto fino a diventare la destinazione principale della città per la toelettatura maschile, costruita su una base di qualità, coerenza e servizio clienti eccezionale.",
+		"today": "Oggi serviamo centinaia di clienti soddisfatti che si fidano di noi per il loro stile personale, dai professionisti agli artisti, ognuno riceve la stessa attenzione ai dettagli e artigianalità.",
+		"yearsExperience": "Anni di Esperienza",
+		"happyClients": "Clienti Felici",
+		"masterBarber": "Maestro Barbiere",
+		"starRating": "Valutazione Stelle"
+	},
+	"meetOurMasterBarber": {
+		"title": "Incontra il Nostro Maestro Barbiere",
+		"name": "Gabriele Dilaurenza",
+		"masterBarber": "Maestro Barbiere e Proprietario",
+		"yearsExperience": "15+ anni di esperienza",
+		"specialist": "Specialista in tagli classici e styling barba"
+	},
+	"contact": {
+		"visitUs": "Vieni a Trovarci Oggi",
+		"description": "Pronto per il tuo prossimo taglio? Siamo qui per aiutarti a dare il meglio di te.",
+		"bookAppointment": "Prenota il Tuo Appuntamento",
+		"location": "Posizione",
+		"phone": "Telefono",
+		"hours": "Orari",
+		"questions": "Domande? Siamo Qui per Aiutarti",
+		"additionalInfo": "Che tu sia un cliente per la prima volta o un habitué, siamo sempre felici di rispondere a qualsiasi domanda sui nostri servizi, prezzi o disponibilità. Chiamaci o passa durante gli orari di apertura.",
+		"callNow": "Chiama Ora",
+		"learnMore": "Scopri di Più su di Noi",
+		"address": {
+			"street": "Via Roma 123",
+			"district": "Centro Storico",
+			"city": "Milano, MI 20100"
+		},
+		"phoneNumbers": {
+			"primary": "(+39) 02 1234567",
+			"secondary": "(+39) 02 7654321"
+		},
+		"schedule": {
+			"weekdays": "Lun-Ven: 9:00-18:00",
+			"saturday": "Sabato: 9:00-17:00",
+			"sunday": "Domenica: 10:00-16:00"
+		}
+	},
+	"contactInfo": {
+		"title": "Mettiti in Contatto",
+		"description": "Pronto a vivere la migliore esperienza di barbiere della città? Contattaci o visita il nostro negozio.",
+		"contactUs": "Contattaci"
+	},
+	"confirmation": {
+		"title": "Prenotazione Confermata!",
+		"description": "Il tuo appuntamento è stato prenotato con successo.",
+		"service": "Servizio",
+		"date": "Data",
+		"time": "Ora",
+		"customer": "Cliente",
+		"phone": "Telefono",
+		"notes": "Note",
+		"total": "Totale"
+	},
+	"common": {
+		"loading": "Caricamento...",
+		"error": "Errore",
+		"success": "Successo",
+		"cancel": "Annulla",
+		"confirm": "Conferma",
+		"save": "Salva",
+		"edit": "Modifica",
+		"delete": "Elimina",
+		"close": "Chiudi",
+		"back": "Indietro",
+		"next": "Avanti",
+		"submit": "Invia",
+		"retry": "Riprova"
+	},
+	"addToCalendar": {
+		"button": "Aggiungi al Calendario",
+		"googleCalendar": "Google Calendar",
+		"outlookCalendar": "Outlook Calendar",
+		"yahooCalendar": "Yahoo Calendar",
+		"downloadIcs": "Scarica file .ics",
+		"appointmentTitle": "Appuntamento Barbiere - {{service}}",
+		"error": "Impossibile scaricare il file calendario. Riprova."
+	},
+	"dashboard": {
+		"title": "Dashboard",
+		"welcome": "Benvenuto",
+		"stats": {
+			"totalAppointments": "Appuntamenti Totali",
+			"todayAppointments": "Appuntamenti Oggi",
+			"revenue": "Ricavi",
+			"clients": "Clienti"
+		},
+		"recentAppointments": "Appuntamenti Recenti",
+		"noAppointments": "Nessun appuntamento trovato per il filtro selezionato."
+	},
+	"language": {
+		"switchTo": "Cambia lingua",
+		"italian": "Italiano",
+		"english": "English"
+	},
+	"login": {
+		"title": "Barbershop",
+		"subtitle": "Accedi al tuo account",
+		"firstName": {
+			"label": "Nome",
+			"placeholder": "Inserisci il tuo nome"
+		},
+		"lastName": {
+			"label": "Cognome",
+			"placeholder": "Inserisci il tuo cognome"
+		},
+		"password": {
+			"label": "Password",
+			"placeholder": "Inserisci la tua password"
+		},
+		"button": {
+			"label": "Accedi",
+			"loading": "Accesso in corso..."
+		},
+		"or": {
+			"label": "Oppure"
+		},
+		"success": {
+			"title": "Accesso Effettuato",
+			"description": "Benvenuto {{name}}!"
+		},
+		"failure": {
+			"title": "Accesso Fallito",
+			"description": "Credenziali non valide"
+		},
+		"demo": {
+			"credentials": {
+				"title": "Credenziali Demo:",
+				"admin": {
+					"title": "Accesso Admin:",
+					"description": "Admin User / admin123"
+				},
+				"customer": {
+					"title": "Accesso Cliente:",
+					"description": "John Smith / customer123"
+				},
+				"guest": {
+					"title": "Accesso Rapido:",
+					"description": "Usa il pulsante \"Accesso Ospite Rapido\" sopra"
+				}
+			}
+		},
+		"no": {
+			"account": {
+				"label": "Non hai un account?",
+				"link": "Creane uno qui"
+			}
+		}
+	},
+	"register": {
+		"createAccount": "Crea il tuo account",
+		"firstName": "Nome",
+		"lastName": "Cognome",
+		"password": "Password",
+		"confirmPassword": "Conferma Password",
+		"firstNamePlaceholder": "Inserisci il tuo nome",
+		"lastNamePlaceholder": "Inserisci il tuo cognome",
+		"passwordPlaceholder": "Inserisci la password",
+		"confirmPasswordPlaceholder": "Conferma la password",
+		"createAccountButton": "Crea Account",
+		"creating": "Creazione Account...",
+		"alreadyHaveAccount": "Hai già un account?",
+		"signInHere": "Accedi qui",
+		"successful": "Registrazione Completata",
+		"failed": "Registrazione Fallita",
+		"welcomeMessage": "Benvenuto {{name}}! Ora puoi accedere.",
+		"fillAllFields": "Compila tutti i campi",
+		"passwordMismatch": "Le password non corrispondono",
+		"passwordLength": "La password deve essere lunga almeno 6 caratteri",
+		"defaultError": "Registrazione fallita",
+		"networkError": "Impossibile connettersi al server. Riprova."
+	},
+	"guest": {
+		"login": {
+			"button": {
+				"label": "Accesso Ospite Rapido",
+				"loading": "Accesso in corso..."
+			},
+			"success": {
+				"title": "Benvenuto!",
+				"description": "Accesso effettuato come {{name}}"
+			},
+			"failure": {
+				"title": "Accesso Fallito",
+				"description": "Impossibile accedere come ospite"
+			}
+		}
+	},
+	"select_date_time": "Seleziona Data e Ora",
+	"bookAppointment": "Prenota Appuntamento",
+	"selectService": "Seleziona Servizio",
+	"chooseService": "Scegli Servizio",
+	"bookingFor": "Prenotazione per",
+	"phoneNumber": "Numero di Telefono",
+	"specialRequests": "Richieste Speciali",
+	"anySpecificRequests": "Eventuali richieste specifiche",
+	"available": "Disponibile",
+	"selected": "Selezionato",
+	"booked": "Prenotato",
+	"past": "Passato",
+	"sunday": "Domenica",
+	"monday": "Lunedì",
+	"tuesday": "Martedì",
+	"wednesday": "Mercoledì",
+	"thursday": "Giovedì",
+	"friday": "Venerdì",
+	"saturday": "Sabato",
+	"daysFull": {
+		"sunday": "Domenica",
+		"monday": "Lunedì",
+		"tuesday": "Martedì",
+		"wednesday": "Mercoledì",
+		"thursday": "Giovedì",
+		"friday": "Venerdì",
+		"saturday": "Sabato"
+	},
+	"months": {
+		"january": "Gennaio",
+		"february": "Febbraio",
+		"march": "Marzo",
+		"april": "Aprile",
+		"may": "Maggio",
+		"june": "Giugno",
+		"july": "Luglio",
+		"august": "Agosto",
+		"september": "Settembre",
+		"october": "Ottobre",
+		"november": "Novembre",
+		"december": "Dicembre"
+	},
+	"duration": "Durata",
+	"minutes": "Minuti",
+	"haircut": "Taglio",
+	"beard": "Barba",
+	"shave": "Rasatura",
+	"styling": "Styling",
+	"wash": "Lavaggio",
+	"mustache": "Baffi",
+	"fullservice": "Servizio Completo",
+	"selectedAppointment": "Appuntamento Selezionato",
+	"businessHours": "Lun-Ven: 9:00-18:00",
+	"saturdayHours": "Sabato: 9:00-17:00",
+	"sundayHours": "Domenica: 10:00-16:00",
+	"businessAddress": "Via Roma 123, Centro Storico, Milano",
+	"admin": {
+		"totalAppointments": "Totale Appuntamenti",
+		"today": "Oggi",
+		"upcoming": "Prossimi",
+		"revenue": "Ricavi",
+		"allAppointments": "Tutti gli Appuntamenti",
+		"todayFilter": "Oggi",
+		"upcomingFilter": "Prossimi",
+		"completed": "Completati",
+		"appointments": "Appuntamenti",
+		"notes": "Note",
+		"status": {
+			"confirmed": "confermato",
+			"completed": "completato",
+			"cancelled": "cancellato",
+			"no-show": "non presentato"
+		},
+		"loading": "Caricamento appuntamenti...",
+		"noAppointments": "Nessun appuntamento trovato per il filtro selezionato."
+	},
+	"analytics": {
+		"dateRanges": {
+			"7d": "7 Giorni",
+			"30d": "30 Giorni", 
+			"90d": "90 Giorni"
+		},
+		"clientMetrics": {
+			"title": "Metriche Clienti",
+			"totalClients": "Totale Clienti",
+			"avgSpendPerVisit": "Spesa Media/Visita",
+			"avgVisitFrequency": "Frequenza Media Visite",
+			"lifetimeValue": "Valore Lifetime"
+		},
+		"charts": {
+			"revenueTrends": "Andamento Ricavi",
+			"servicePopularity": "Popolarità Servizi",
+			"peakHours": "Analisi Ore di Picco"
+		},
+		"inventory": {
+			"title": "Gestione Inventario",
+			"lowStock": "Scorte Basse",
+			"lowStockAlerts": "Avvisi Scorte Basse",
+			"cost": "Costo",
+			"profitability": "Redditività Servizi",
+			"productCost": "Costo Prodotto",
+			"servicePrice": "Prezzo Servizio",
+			"profit": "Profitto",
+			"margin": "margine"
+		},
+		"businessSummary": {
+			"title": "Riepilogo Business",
+			"totalRevenue": "Ricavi Totali",
+			"totalAppointments": "Appuntamenti Totali",
+			"avgDailyRevenue": "Ricavi Medi Giornalieri"
+		}
+	}
+}
