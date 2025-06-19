@@ -5,7 +5,7 @@ export interface MongoAppointment {
   _id?: any;
   customerFirstName: string;
   customerLastName: string;
-  customerEmail: string;
+  customerEmail?: string;
   customerPhone: string;
   service: string;
   appointmentDate: string;
@@ -22,7 +22,7 @@ export interface Appointment {
   _id?: string;
   customerFirstName: string;
   customerLastName: string;
-  customerEmail: string;
+  customerEmail?: string;
   customerPhone: string;
   service: string;
   appointmentDate: string;
@@ -99,7 +99,7 @@ export interface AnalyticsData {
 export const insertAppointmentSchema = z.object({
   customerFirstName: z.string().min(1, "First name is required"),
   customerLastName: z.string().min(1, "Last name is required"),
-  customerEmail: z.string().email("Valid email is required"),
+  customerEmail: z.string().email().optional(),
   customerPhone: z.string().min(1, "Phone number is required"),
   service: z.string().min(1, "Service selection is required"),
   appointmentDate: z.string().min(1, "Date is required"),

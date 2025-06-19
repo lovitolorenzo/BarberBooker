@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { services, type ServiceKey, type Appointment, type InsertAppointment } from "@shared/schema";
 
@@ -21,9 +22,6 @@ interface BookingFormProps {
 }
 
 const bookingSchema = z.object({
-  customerFirstName: z.string().min(1, "First name is required"),
-  customerLastName: z.string().min(1, "Last name is required"),
-  customerEmail: z.string().email("Please enter a valid email address"),
   customerPhone: z.string().regex(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, "Please enter a valid phone number"),
   service: z.string().min(1, "Please select a service"),
   notes: z.string().optional(),
@@ -38,14 +36,12 @@ export default function BookingForm({
 }: BookingFormProps) {
   const [selectedService, setSelectedService] = useState<ServiceKey | null>(null);
   const { toast } = useToast();
+  const { userFirstName, userLastName } = useAuth();
   const queryClient = useQueryClient();
 
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      customerFirstName: "",
-      customerLastName: "",
-      customerEmail: "",
       customerPhone: "",
       service: "",
       notes: "",
@@ -104,9 +100,22 @@ export default function BookingForm({
       return;
     }
 
+    if (!userFirstName || !userLastName) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to make a booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const serviceInfo = services[selectedService];
     const appointmentData: InsertAppointment = {
-      ...data,
+      customerFirstName: userFirstName,
+      customerLastName: userLastName,
+      customerPhone: data.customerPhone,
+      service: data.service,
+      notes: data.notes,
       appointmentDate: selectedDate,
       appointmentTime: selectedTime,
       duration: serviceInfo.duration,
@@ -122,7 +131,7 @@ export default function BookingForm({
     form.setValue("service", value);
   };
 
-  const isFormValid = selectedDate && selectedTime && selectedService;
+  const isFormValid = selectedDate && selectedTime && selectedService && userFirstName && userLastName;
 
   return (
     <Card className="barbershop-card border-barbershop-dark shadow-xl">
@@ -175,34 +184,22 @@ export default function BookingForm({
           )}
 
           {/* Customer Information */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          {userFirstName && userLastName ? (
             <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-sm font-medium text-barbershop-text">
-                First Name
+              <Label className="text-sm font-medium text-barbershop-text">
+                Booking for
               </Label>
-              <Input
-                {...form.register("customerFirstName")}
-                placeholder="John"
-                className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-              />
-              {form.formState.errors.customerFirstName && (
-                <p className="text-red-400 text-sm">{form.formState.errors.customerFirstName.message}</p>
-              )}
+              <div className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text bg-barbershop-dark">
+                {userFirstName} {userLastName}
+              </div>
             </div>
+          ) : (
             <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-sm font-medium text-barbershop-text">
-                Last Name
-              </Label>
-              <Input
-                {...form.register("customerLastName")}
-                placeholder="Doe"
-                className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-              />
-              {form.formState.errors.customerLastName && (
-                <p className="text-red-400 text-sm">{form.formState.errors.customerLastName.message}</p>
-              )}
+              <div className="w-full px-4 py-3 border border-red-400 rounded-lg text-red-400 bg-red-50">
+                Please log in to make a booking
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-sm font-medium text-barbershop-text">
@@ -216,21 +213,6 @@ export default function BookingForm({
             />
             {form.formState.errors.customerPhone && (
               <p className="text-red-400 text-sm">{form.formState.errors.customerPhone.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-barbershop-text">
-              Email Address
-            </Label>
-            <Input
-              {...form.register("customerEmail")}
-              type="email"
-              placeholder="john@example.com"
-              className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-            />
-            {form.formState.errors.customerEmail && (
-              <p className="text-red-400 text-sm">{form.formState.errors.customerEmail.message}</p>
             )}
           </div>
 
