@@ -137,7 +137,25 @@ export default function AboutPage() {
         </div>
       </section>
 
-
+      {/* Meet Our Master Barber */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-3xl font-bold text-barbershop-text text-center mb-12">Meet Our Master Barber</h3>
+          <div className="flex justify-center">
+            <Card className="barbershop-card border-barbershop-dark max-w-sm">
+              <CardContent className="p-6 text-center">
+                <div className="w-20 h-20 barbershop-dark rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="text-barbershop-gold h-10 w-10" />
+                </div>
+                <h4 className="text-xl font-semibold text-barbershop-text mb-1">Marcus Johnson</h4>
+                <div className="text-barbershop-gold font-medium mb-2">Master Barber & Owner</div>
+                <div className="text-barbershop-muted text-sm mb-2">15+ years experience</div>
+                <p className="text-barbershop-muted text-sm">Classic cuts & beard styling specialist</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Contact Info */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal border-t border-barbershop-dark">
