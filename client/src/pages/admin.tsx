@@ -27,9 +27,9 @@ export default function AdminPage() {
       case 'today':
         return appointment.appointmentDate === today;
       case 'upcoming':
-        return appointment.appointmentDate >= today && appointment.status === 'confirmed';
+        return appointment.appointmentDate >= today && (appointment.status || 'confirmed') === 'confirmed';
       case 'completed':
-        return appointment.status === 'completed';
+        return (appointment.status || 'confirmed') === 'completed';
       default:
         return true;
     }
@@ -38,8 +38,8 @@ export default function AdminPage() {
   const stats = {
     total: appointments.length,
     today: appointments.filter(a => a.appointmentDate === today).length,
-    upcoming: appointments.filter(a => a.appointmentDate >= today && a.status === 'confirmed').length,
-    revenue: appointments.filter(a => a.status === 'completed').reduce((sum, a) => sum + a.price, 0)
+    upcoming: appointments.filter(a => a.appointmentDate >= today && (a.status || 'confirmed') === 'confirmed').length,
+    revenue: appointments.filter(a => (a.status || 'confirmed') === 'completed').reduce((sum, a) => sum + a.price, 0)
   };
 
   const formatDate = (dateStr: string) => {
@@ -193,7 +193,7 @@ export default function AdminPage() {
               <div className="space-y-4">
                 {filteredAppointments.map((appointment) => (
                   <div
-                    key={appointment.id}
+                    key={appointment._id || Math.random()}
                     className="barbershop-dark rounded-lg p-4 border border-barbershop-charcoal"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -202,8 +202,8 @@ export default function AdminPage() {
                           <h3 className="text-lg font-semibold text-barbershop-text">
                             {appointment.customerFirstName} {appointment.customerLastName}
                           </h3>
-                          <Badge className={`${getStatusColor(appointment.status)} text-white`}>
-                            {appointment.status}
+                          <Badge className={`${getStatusColor(appointment.status || 'confirmed')} text-white`}>
+                            {appointment.status || 'confirmed'}
                           </Badge>
                         </div>
                         

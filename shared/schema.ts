@@ -1,58 +1,78 @@
-import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User tables
-export const users = pgTable("users", {
-  id: text("id").primaryKey(),
-  email: text("email").unique().notNull(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-  profileImageUrl: text("profile_image_url"),
-  role: text("role").notNull().default("customer"), // customer, admin
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+// MongoDB document interfaces
+export interface MongoAppointment {
+  _id?: any;
+  customerFirstName: string;
+  customerLastName: string;
+  customerEmail: string;
+  customerPhone: string;
+  service: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  duration: number;
+  price: number;
+  notes?: string;
+  status?: string;
+  bookedBy?: string;
+  createdAt: Date;
+}
+
+export interface Appointment {
+  _id?: string;
+  customerFirstName: string;
+  customerLastName: string;
+  customerEmail: string;
+  customerPhone: string;
+  service: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  duration: number;
+  price: number;
+  notes?: string;
+  status?: string;
+  bookedBy?: string;
+  createdAt: Date;
+}
+
+export interface User {
+  _id?: string;
+  id: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+  role?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Zod schemas for validation
+export const insertAppointmentSchema = z.object({
+  customerFirstName: z.string().min(1, "First name is required"),
+  customerLastName: z.string().min(1, "Last name is required"),
+  customerEmail: z.string().email("Valid email is required"),
+  customerPhone: z.string().min(1, "Phone number is required"),
+  service: z.string().min(1, "Service selection is required"),
+  appointmentDate: z.string().min(1, "Date is required"),
+  appointmentTime: z.string().min(1, "Time is required"),
+  duration: z.number().min(1, "Duration must be positive"),
+  price: z.number().min(1, "Price must be positive"),
+  notes: z.string().optional(),
+  status: z.string().optional(),
+  bookedBy: z.string().optional(),
 });
 
-export const sessions = pgTable("sessions", {
-  sid: text("sid").primaryKey(),
-  sess: text("sess").notNull(),
-  expire: timestamp("expire").notNull(),
-});
-
-// Appointment table
-export const appointments = pgTable("appointments", {
-  id: serial("id").primaryKey(),
-  customerFirstName: text("customer_first_name").notNull(),
-  customerLastName: text("customer_last_name").notNull(),
-  customerEmail: text("customer_email").notNull(),
-  customerPhone: text("customer_phone").notNull(),
-  service: text("service").notNull(),
-  appointmentDate: text("appointment_date").notNull(), // YYYY-MM-DD format
-  appointmentTime: text("appointment_time").notNull(), // HH:MM format
-  duration: integer("duration").notNull(), // in minutes
-  price: integer("price").notNull(), // in cents
-  notes: text("notes"),
-  status: text("status").notNull().default("confirmed"), // confirmed, cancelled, completed
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  bookedBy: text("booked_by"), // user ID who booked (optional for walk-ins)
-});
-
-// Schema definitions
-export const insertAppointmentSchema = createInsertSchema(appointments).omit({
-  id: true,
-  createdAt: true,
-  bookedBy: true,
-});
-
-export const insertUserSchema = createInsertSchema(users).omit({
-  createdAt: true,
-  updatedAt: true,
+export const insertUserSchema = z.object({
+  id: z.string(),
+  email: z.string().email().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  profileImageUrl: z.string().optional(),
+  role: z.string().optional(),
 });
 
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
-export type Appointment = typeof appointments.$inferSelect;
-export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 

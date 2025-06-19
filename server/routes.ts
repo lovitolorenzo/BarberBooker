@@ -79,11 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get a specific appointment
   app.get("/api/appointments/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid appointment ID" });
-      }
-      
+      const { id } = req.params;
       const appointment = await storage.getAppointment(id);
       
       if (!appointment) {
@@ -99,11 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update an appointment
   app.patch("/api/appointments/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid appointment ID" });
-      }
-      
+      const { id } = req.params;
       const updateData = insertAppointmentSchema.partial().parse(req.body);
       
       const appointment = await storage.updateAppointment(id, updateData);
@@ -127,11 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete an appointment
   app.delete("/api/appointments/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid appointment ID" });
-      }
-      
+      const { id } = req.params;
       const success = await storage.deleteAppointment(id);
       
       if (!success) {
