@@ -1,29 +1,13 @@
-import { Scissors, MapPin, Phone, Clock, Mail } from "lucide-react";
+import { MapPin, Phone, Clock, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import Navbar from "@/components/navbar";
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
-      {/* Header */}
-      <header className="barbershop-charcoal border-b border-barbershop-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <Scissors className="text-barbershop-gold text-2xl" />
-              <h1 className="text-2xl font-bold text-barbershop-text">Elite Barbershop</h1>
-            </div>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">
-                Book Now
-              </Link>
-              <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
-              <a href="#" className="text-barbershop-gold">Contact</a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

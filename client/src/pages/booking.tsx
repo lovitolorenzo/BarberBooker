@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import CalendarComponent from "@/components/calendar";
 import BookingForm from "@/components/booking-form";
 import ConfirmationModal from "@/components/confirmation-modal";
+import Navbar from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import type { Appointment } from "@shared/schema";
@@ -41,54 +42,7 @@ export default function BookingPage() {
 
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
-      {/* Header */}
-      <header className="barbershop-charcoal border-b border-barbershop-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <Scissors className="text-barbershop-gold text-2xl" />
-              <h1 className="text-2xl font-bold text-barbershop-text">Elite Barbershop</h1>
-            </div>
-            <div className="flex items-center space-x-6">
-              <nav className="hidden md:flex space-x-8">
-                <span className="text-barbershop-gold">Book Now</span>
-                <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
-                <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
-                <Link href="/admin" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Admin</Link>
-                <Link href="/analytics" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Analytics</Link>
-              </nav>
-              {isLoggedIn ? (
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-sm text-barbershop-muted">
-                    <User className="h-4 w-4" />
-                    <span>{userEmail}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
-                  >
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Login
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

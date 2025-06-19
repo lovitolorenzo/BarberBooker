@@ -21,13 +21,13 @@ import {
   Package, 
   AlertTriangle,
   Calendar,
-  Clock,
-  Scissors
+  Clock
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
+import Navbar from "@/components/navbar";
 import type { Appointment, Client, Product, ServiceProduct } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
 
@@ -160,25 +160,7 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
       {/* Header */}
-      <header className="barbershop-charcoal border-b border-barbershop-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <TrendingUp className="text-barbershop-gold text-2xl" />
-              <h1 className="text-2xl font-bold text-barbershop-text">Analytics Dashboard</h1>
-            </div>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">
-                Book Now
-              </Link>
-              <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
-              <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
-              <Link href="/admin" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Admin</Link>
-              <span className="text-barbershop-gold">Analytics</span>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Date Range Selector */}
