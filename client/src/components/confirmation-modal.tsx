@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import type { Appointment } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
+import AddToCalendar from "./add-to-calendar";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -93,15 +94,7 @@ export default function ConfirmationModal({
             >
               Close
             </Button>
-            <Button
-              className="flex-1 barbershop-gold text-black font-semibold hover:bg-yellow-500 transition-colors"
-              onClick={() => {
-                // In a real app, this would integrate with calendar APIs
-                alert('Calendar integration would be implemented here');
-              }}
-            >
-              Add to Calendar
-            </Button>
+            <AddToCalendar booking={booking} className="flex-1" />
           </div>
         </div>
       </DialogContent>

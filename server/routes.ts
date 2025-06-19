@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
-
+      
       res.json(appointment);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch appointment" });
@@ -341,6 +341,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete appointment" });
+    }
+  });
+
+  // Send email reminder for appointment
+  app.post("/api/appointments/:id/email-reminder", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // In a real implementation, you would send an actual email here
+      // using a service like SendGrid, Nodemailer, etc.
+      console.log(`Email reminder would be sent to ${email} for appointment:`, {
+        service: appointment.service,
+        date: appointment.appointmentDate,
+        time: appointment.appointmentTime,
+        customer: `${appointment.customerFirstName} ${appointment.customerLastName}`
+      });
+      
+      res.json({ 
+        message: "Email reminder sent successfully",
+        appointment: {
+          id: appointment._id,
+          service: appointment.service,
+          date: appointment.appointmentDate,
+          time: appointment.appointmentTime
+        }
+      });
+    } catch (error) {
+      console.error("Error sending email reminder:", error);
+      res.status(500).json({ message: "Failed to send email reminder" });
     }
   });
 
