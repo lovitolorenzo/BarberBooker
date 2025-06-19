@@ -69,46 +69,43 @@ export default function AboutPage() {
 
       {/* Our Story */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-3xl font-bold text-barbershop-text mb-6">Our Story</h3>
-              <div className="space-y-4 text-barbershop-muted">
-                <p>
-                  Founded in 2009 by master barber Marcus Johnson, Elite Barbershop began as a 
-                  vision to create a space where traditional barbering techniques meet contemporary 
-                  style and comfort.
-                </p>
-                <p>
-                  What started as a single chair operation has grown into the city's premier 
-                  destination for men's grooming, built on a foundation of quality, consistency, 
-                  and exceptional customer service.
-                </p>
-                <p>
-                  Today, we serve hundreds of satisfied clients who trust us with their personal 
-                  style, from business professionals to artists, each receiving the same attention 
-                  to detail and craftsmanship.
-                </p>
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-3xl font-bold text-barbershop-text mb-8">Our Story</h3>
+          <div className="space-y-6 text-barbershop-muted text-lg leading-relaxed">
+            <p>
+              Founded in 2009 by master barber Marcus Johnson, Elite Barbershop began as a 
+              vision to create a space where traditional barbering techniques meet contemporary 
+              style and comfort.
+            </p>
+            <p>
+              What started as a single chair operation has grown into the city's premier 
+              destination for men's grooming, built on a foundation of quality, consistency, 
+              and exceptional customer service.
+            </p>
+            <p>
+              Today, we serve hundreds of satisfied clients who trust us with their personal 
+              style, from business professionals to artists, each receiving the same attention 
+              to detail and craftsmanship.
+            </p>
+          </div>
+          
+          <div className="barbershop-dark rounded-lg p-8 mt-12 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-barbershop-gold mb-2">15+</div>
+                <div className="text-barbershop-muted">Years Experience</div>
               </div>
-            </div>
-            <div className="barbershop-dark rounded-lg p-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-barbershop-gold mb-2">15+</div>
-                  <div className="text-barbershop-muted">Years Experience</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-barbershop-gold mb-2">5000+</div>
-                  <div className="text-barbershop-muted">Happy Clients</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-barbershop-gold mb-2">3</div>
-                  <div className="text-barbershop-muted">Master Barbers</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-barbershop-gold mb-2">4.9</div>
-                  <div className="text-barbershop-muted">Star Rating</div>
-                </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-barbershop-gold mb-2">5000+</div>
+                <div className="text-barbershop-muted">Happy Clients</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-barbershop-gold mb-2">1</div>
+                <div className="text-barbershop-muted">Master Barber</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-barbershop-gold mb-2">4.9</div>
+                <div className="text-barbershop-muted">Star Rating</div>
               </div>
             </div>
           </div>
