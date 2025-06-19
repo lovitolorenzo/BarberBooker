@@ -251,7 +251,7 @@ export default function BookingForm({
           <Button
             type="submit"
             disabled={!isFormValid || createAppointmentMutation.isPending}
-            className="w-full barbershop-gold text-black font-semibold py-3 px-6 rounded-lg hover:bg-yellow-500 focus:ring-2 focus:ring-barbershop-gold focus:ring-offset-2 focus:ring-offset-barbershop-card transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full barbershop-gold text-black font-semibold py-3 px-6 rounded-lg hover:opacity-90 focus:ring-2 focus:ring-barbershop-gold focus:ring-offset-2 focus:ring-offset-barbershop-card transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <CalendarCheck className="mr-2 h-4 w-4" />
             {createAppointmentMutation.isPending ? "Booking..." : "Book Appointment"}
