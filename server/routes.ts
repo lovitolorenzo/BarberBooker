@@ -76,6 +76,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics routes
+  app.get("/api/analytics/clients", async (req, res) => {
+    try {
+      const clients = await storage.getAllClients();
+      res.json(clients);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch clients" });
+    }
+  });
+
+  app.get("/api/analytics/products", async (req, res) => {
+    try {
+      const products = await storage.getAllProducts();
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch products" });
+    }
+  });
+
+  app.get("/api/analytics/products/low-stock", async (req, res) => {
+    try {
+      const lowStockProducts = await storage.getLowStockProducts();
+      res.json(lowStockProducts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch low stock products" });
+    }
+  });
+
+  app.get("/api/analytics/service-products", async (req, res) => {
+    try {
+      const serviceProducts = await storage.getAllServiceProducts();
+      res.json(serviceProducts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch service products" });
+    }
+  });
+
+  app.get("/api/analytics/revenue/:startDate/:endDate", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.params;
+      const appointments = await storage.getAppointmentsByDateRange(startDate, endDate);
+      
+      const revenueData = appointments.reduce((acc, appointment) => {
+        const date = appointment.appointmentDate;
+        if (!acc[date]) {
+          acc[date] = {
+            date,
+            revenue: 0,
+            appointments: 0,
+            services: {}
+          };
+        }
+        
+        acc[date].revenue += appointment.price;
+        acc[date].appointments += 1;
+        acc[date].services[appointment.service] = (acc[date].services[appointment.service] || 0) + 1;
+        
+        return acc;
+      }, {} as any);
+
+      res.json(Object.values(revenueData));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch revenue data" });
+    }
+  });
+
   // Get a specific appointment
   app.get("/api/appointments/:id", async (req, res) => {
     try {

@@ -41,6 +41,7 @@ export default function BookingPage() {
                 <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
                 <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
                 <Link href="/admin" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Admin</Link>
+                <Link href="/analytics" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Analytics</Link>
               </nav>
               <Link href="/login">
                 <Button

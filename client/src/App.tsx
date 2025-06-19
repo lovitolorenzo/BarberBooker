@@ -7,6 +7,7 @@ import BookingPage from "@/pages/booking";
 import AboutPage from "@/pages/about";
 import ContactPage from "@/pages/contact";
 import AdminPage from "@/pages/admin";
+import AnalyticsPage from "@/pages/analytics";
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/analytics" component={AnalyticsPage} />
       <Route path="/login" component={LoginPage} />
       <Route component={NotFound} />
     </Switch>
