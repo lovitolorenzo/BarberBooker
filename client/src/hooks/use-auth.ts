@@ -4,6 +4,8 @@ interface AuthState {
   isLoggedIn: boolean;
   userRole: string | null;
   userEmail: string | null;
+  userFirstName: string | null;
+  userLastName: string | null;
 }
 
 export function useAuth() {
@@ -11,6 +13,8 @@ export function useAuth() {
     isLoggedIn: false,
     userRole: null,
     userEmail: null,
+    userFirstName: null,
+    userLastName: null,
   });
 
   // Check authentication status on mount and storage changes
@@ -18,11 +22,15 @@ export function useAuth() {
     const checkAuthStatus = () => {
       const userRole = localStorage.getItem('userRole');
       const userEmail = localStorage.getItem('userEmail');
+      const userFirstName = localStorage.getItem('userFirstName');
+      const userLastName = localStorage.getItem('userLastName');
       
       setAuthState({
         isLoggedIn: !!(userRole && userEmail),
         userRole,
         userEmail,
+        userFirstName,
+        userLastName,
       });
     };
 
@@ -44,11 +52,15 @@ export function useAuth() {
   const logout = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userFirstName');
+    localStorage.removeItem('userLastName');
     
     setAuthState({
       isLoggedIn: false,
       userRole: null,
       userEmail: null,
+      userFirstName: null,
+      userLastName: null,
     });
 
     // Dispatch custom event to notify other components

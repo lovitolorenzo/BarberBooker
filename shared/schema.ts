@@ -41,6 +41,7 @@ export interface User {
   email?: string;
   firstName?: string;
   lastName?: string;
+  password?: string;
   profileImageUrl?: string;
   role?: string;
   createdAt: Date;
@@ -115,6 +116,7 @@ export const insertUserSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  password: z.string().optional(), // Add password field
   profileImageUrl: z.string().optional(),
   role: z.string().optional(),
 });
@@ -161,8 +163,6 @@ export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type InsertServiceProduct = z.infer<typeof insertServiceProductSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
-
-
 
 // Service definitions
 export const services = {

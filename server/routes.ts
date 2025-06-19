@@ -145,21 +145,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { firstName, lastName, password } = req.body;
       
-      console.log("Login attempt:", { email, passwordLength: password?.length });
+      console.log("Login attempt:", { firstName, lastName, passwordLength: password?.length });
       
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
+      if (!firstName || !lastName || !password) {
+        return res.status(400).json({ message: "First name, last name and password are required" });
       }
 
-      // Find user by email
-      const user = await storage.getUserByEmail(email);
+      // Find user by first and last name
+      const user = await storage.getUserByName(firstName, lastName);
       
       console.log("User found:", user ? "YES" : "NO");
       if (user) {
         console.log("User details:", { 
           id: user.id, 
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email, 
           role: user.role,
           hasPassword: !!(user as any).password
@@ -167,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (!user) {
-        return res.status(401).json({ message: "Invalid email or password" });
+        return res.status(401).json({ message: "Invalid name or password" });
       }
 
       // In production, this would use proper password hashing (bcrypt)
@@ -180,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (userPassword !== password) {
-        return res.status(401).json({ message: "Invalid email or password" });
+        return res.status(401).json({ message: "Invalid name or password" });
       }
 
       // Return user info (excluding password)
@@ -192,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
 
-      console.log("Login successful for:", email);
+      console.log("Login successful for:", `${firstName} ${lastName}`);
       res.json({ 
         message: "Login successful", 
         user: userResponse 
@@ -200,6 +202,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { firstName, lastName, password } = req.body;
+      
+      if (!firstName || !lastName || !password) {
+        return res.status(400).json({ message: "First name, last name and password are required" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      // Check if user already exists by name
+      const existingUserByName = await storage.getUserByName(firstName, lastName);
+      if (existingUserByName) {
+        return res.status(409).json({ message: "A user with this name already exists" });
+      }
+
+      // Create new user
+      const newUser = await storage.createUser({
+        id: `customer-${Date.now()}`, // Generate unique ID
+        firstName,
+        lastName,
+        password, // In production, this should be hashed
+        role: "customer", // Default role for new registrations
+      });
+
+      // Return success (don't return password)
+      const userResponse = {
+        id: newUser.id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        role: newUser.role
+      };
+
+      res.status(201).json({ 
+        message: "Registration successful", 
+        user: userResponse 
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
     }
   });
 

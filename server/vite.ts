@@ -40,9 +40,30 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  // Use Vite middlewares but wrap them to skip API routes
+  app.use((req, res, next) => {
+    // Skip API routes - let them be handled by our API handlers
+    if (req.url.startsWith('/api/')) {
+      return next();
+    }
+    
+    // Apply Vite middleware for all other routes
+    vite.middlewares(req, res, next);
+  });
+
+  // Handle SPA routing for non-API, non-asset GET requests
+  app.get("*", async (req, res, next) => {
     const url = req.originalUrl;
+
+    // Skip API routes - let them be handled by our API handlers
+    if (url.startsWith('/api/')) {
+      return next();
+    }
+
+    // Skip asset requests that Vite should handle
+    if (url.startsWith('/@') || url.startsWith('/src/') || url.includes('.')) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(

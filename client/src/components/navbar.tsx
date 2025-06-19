@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
-  const { isLoggedIn, userEmail, userRole, logout } = useAuth();
+  const { isLoggedIn, userEmail, userRole, userFirstName, userLastName, logout } = useAuth();
   const { toast } = useToast();
 
   const handleLogout = () => {
@@ -16,6 +16,18 @@ export default function Navbar() {
       description: "You have been successfully logged out.",
     });
     setLocation("/");
+  };
+
+  const getUserDisplayName = () => {
+    if (userFirstName && userLastName) {
+      return `${userFirstName} ${userLastName}`;
+    } else if (userFirstName) {
+      return userFirstName;
+    } else if (userEmail) {
+      return userEmail;
+    } else {
+      return "User";
+    }
   };
 
   const navItems = [
@@ -59,7 +71,7 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 text-sm text-barbershop-muted">
                   <User className="h-4 w-4" />
-                  <span>{userEmail}</span>
+                  <span>{getUserDisplayName()}</span>
                 </div>
                 <Button
                   variant="outline"

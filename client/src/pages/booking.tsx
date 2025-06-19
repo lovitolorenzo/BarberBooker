@@ -16,7 +16,7 @@ export default function BookingPage() {
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [, setLocation] = useLocation();
-  const { isLoggedIn, userEmail, logout } = useAuth();
+  const { isLoggedIn, userEmail, userFirstName, userLastName, logout } = useAuth();
   const { toast } = useToast();
 
   const handleBookingConfirmed = (booking: Appointment) => {

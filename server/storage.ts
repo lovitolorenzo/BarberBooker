@@ -28,6 +28,7 @@ export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByName(firstName: string, lastName: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined>;
 
@@ -509,6 +510,19 @@ export class MongoStorage implements IStorage {
       return user || undefined;
     } catch (error) {
       console.error("Error getting user by email:", error);
+      return undefined;
+    }
+  }
+
+  async getUserByName(firstName: string, lastName: string): Promise<User | undefined> {
+    try {
+      const user = await this.users.findOne({ 
+        firstName: firstName, 
+        lastName: lastName 
+      });
+      return user || undefined;
+    } catch (error) {
+      console.error("Error getting user by name:", error);
       return undefined;
     }
   }
