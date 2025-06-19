@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import CalendarComponent from "@/components/calendar";
 import BookingForm from "@/components/booking-form";
 import ConfirmationModal from "@/components/confirmation-modal";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import type { Appointment } from "@shared/schema";
 
 export default function BookingPage() {
@@ -12,6 +14,9 @@ export default function BookingPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [, setLocation] = useLocation();
+  const { isLoggedIn, userEmail, logout } = useAuth();
+  const { toast } = useToast();
 
   const handleBookingConfirmed = (booking: Appointment) => {
     setConfirmedBooking(booking);
@@ -23,6 +28,15 @@ export default function BookingPage() {
     setConfirmedBooking(null);
     setSelectedDate(null);
     setSelectedTime(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    setLocation("/");
   };
 
   return (
@@ -43,16 +57,34 @@ export default function BookingPage() {
                 <Link href="/admin" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Admin</Link>
                 <Link href="/analytics" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Analytics</Link>
               </nav>
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Login
-                </Button>
-              </Link>
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm text-barbershop-muted">
+                    <User className="h-4 w-4" />
+                    <span>{userEmail}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

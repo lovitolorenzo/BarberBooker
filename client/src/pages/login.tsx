@@ -19,34 +19,50 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simple demo authentication - in production, this would connect to a real auth system
-      if (email === "admin@barbershop.com" && password === "admin123") {
-        localStorage.setItem("userRole", "admin");
-        localStorage.setItem("userEmail", email);
+      // Call the authentication API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store user info in localStorage
+        localStorage.setItem("userRole", data.user.role);
+        localStorage.setItem("userEmail", data.user.email);
+        localStorage.setItem("userFirstName", data.user.firstName || "");
+        localStorage.setItem("userLastName", data.user.lastName || "");
+        
+        // Dispatch auth change event to update other components
+        window.dispatchEvent(new Event('auth-change'));
+        
         toast({
           title: "Login Successful",
-          description: "Welcome to the admin dashboard!",
+          description: `Welcome ${data.user.firstName || 'back'}!`,
         });
-        setLocation("/admin");
-      } else if (email && password) {
-        localStorage.setItem("userRole", "customer");
-        localStorage.setItem("userEmail", email);
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-        });
-        setLocation("/");
+
+        // Redirect based on role
+        if (data.user.role === "admin" || data.user.role === "barber") {
+          setLocation("/admin");
+        } else {
+          setLocation("/");
+        }
       } else {
         toast({
           title: "Login Failed", 
-          description: "Please enter both email and password.",
+          description: data.message || "Invalid credentials",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description: "An error occurred. Please try again.",
+        description: "Unable to connect to server. Please try again.",
         variant: "destructive",
       });
     } finally {

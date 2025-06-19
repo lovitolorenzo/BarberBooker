@@ -142,6 +142,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      console.log("Login attempt:", { email, passwordLength: password?.length });
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      console.log("User found:", user ? "YES" : "NO");
+      if (user) {
+        console.log("User details:", { 
+          id: user.id, 
+          email: user.email, 
+          role: user.role,
+          hasPassword: !!(user as any).password
+        });
+      }
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // In production, this would use proper password hashing (bcrypt)
+      // For demo purposes, we're doing simple string comparison
+      const userPassword = (user as any).password;
+      console.log("Password comparison:", { 
+        provided: password, 
+        stored: userPassword, 
+        match: userPassword === password 
+      });
+      
+      if (userPassword !== password) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Return user info (excluding password)
+      const userResponse = {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      };
+
+      console.log("Login successful for:", email);
+      res.json({ 
+        message: "Login successful", 
+        user: userResponse 
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Debug endpoint to check database status
+  app.get("/api/debug/db-status", async (req, res) => {
+    try {
+      const db = storage.getDatabase();
+      
+      // List all collections
+      const collections = await db.listCollections().toArray();
+      
+      // Count documents in each collection
+      const collectionStats = await Promise.all(
+        collections.map(async (col: any) => {
+          const count = await db.collection(col.name).countDocuments();
+          return { name: col.name, count };
+        })
+      );
+      
+      res.json({
+        database: db.databaseName,
+        collections: collectionStats,
+        totalCollections: collections.length
+      });
+    } catch (error: any) {
+      console.error("Database debug error:", error);
+      res.status(500).json({ message: "Failed to get database status", error: error.message });
+    }
+  });
+
+  // Test endpoint to seed users (for development only)
+  app.post("/api/test/seed-users", async (req, res) => {
+    try {
+      const count = await storage.seedSampleUsers();
+      res.json({ message: "Users seeded successfully", count });
+    } catch (error) {
+      console.error("Seeding error:", error);
+      res.status(500).json({ message: "Failed to seed users" });
+    }
+  });
+
   // Get a specific appointment
   app.get("/api/appointments/:id", async (req, res) => {
     try {

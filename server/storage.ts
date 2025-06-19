@@ -53,6 +53,12 @@ export interface IStorage {
   getAnalyticsByDate(date: string): Promise<AnalyticsData | undefined>;
   getAnalyticsByDateRange(startDate: string, endDate: string): Promise<AnalyticsData[]>;
   createOrUpdateAnalytics(analytics: InsertAnalytics): Promise<AnalyticsData>;
+
+  // Development method to seed sample users
+  seedSampleUsers(): Promise<number>;
+
+  // Get database instance for debugging
+  getDatabase(): any;
 }
 
 export class MongoStorage implements IStorage {
@@ -89,344 +95,310 @@ export class MongoStorage implements IStorage {
   }
 
   private async seedMockData() {
-    const count = await this.appointments.countDocuments();
-    if (count > 0) return; // Already seeded
-
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const dayAfter = new Date(today);
-    dayAfter.setDate(today.getDate() + 2);
-
-    // Generate historical data for the past 90 days
-    const historicalAppointments: Omit<MongoAppointment, '_id'>[] = [];
-    const customerEmails = [
-      "john.smith@email.com", "mike.johnson@email.com", "david.wilson@email.com",
-      "sarah.connor@email.com", "emily.davis@email.com", "james.brown@email.com",
-      "lisa.martinez@email.com", "robert.garcia@email.com", "maria.rodriguez@email.com",
-      "william.taylor@email.com", "jennifer.anderson@email.com", "michael.thomas@email.com"
-    ];
+    console.log("🌱 Starting comprehensive database seeding...");
     
-    const firstNames = ["John", "Mike", "David", "Sarah", "Emily", "James", "Lisa", "Robert", "Maria", "William", "Jennifer", "Michael"];
-    const lastNames = ["Smith", "Johnson", "Wilson", "Connor", "Davis", "Brown", "Martinez", "Garcia", "Rodriguez", "Taylor", "Anderson", "Thomas"];
-    const services = ["haircut", "beard", "full"];
-    const timeSlots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
-    const statuses = ["confirmed", "completed", "cancelled"];
-
-    // Generate 90 days of historical data
-    for (let daysAgo = 90; daysAgo >= 0; daysAgo--) {
-      const appointmentDate = new Date();
-      appointmentDate.setDate(appointmentDate.getDate() - daysAgo);
-      const dateStr = appointmentDate.toISOString().split('T')[0];
-      
-      // Skip future dates for completed appointments
-      const isToday = daysAgo === 0;
-      const isFuture = daysAgo < 0;
-      
-      // Generate 3-8 appointments per day
-      const appointmentsPerDay = Math.floor(Math.random() * 6) + 3;
-      
-      for (let i = 0; i < appointmentsPerDay; i++) {
-        const customerIndex = Math.floor(Math.random() * customerEmails.length);
-        const service = services[Math.floor(Math.random() * services.length)];
-        const timeSlot = timeSlots[Math.floor(Math.random() * timeSlots.length)];
-        
-        let status = "completed";
-        if (isToday || isFuture) {
-          status = Math.random() < 0.9 ? "confirmed" : "cancelled";
-        } else {
-          // Historical appointments: 85% completed, 10% cancelled, 5% no-show
-          const rand = Math.random();
-          if (rand < 0.85) status = "completed";
-          else if (rand < 0.95) status = "cancelled";
-          else status = "no-show";
-        }
-        
-        const servicePrice = service === "haircut" ? 2500 : service === "beard" ? 1500 : 3500;
-        const duration = service === "haircut" ? 30 : service === "beard" ? 15 : 45;
-        
-        historicalAppointments.push({
-          customerFirstName: firstNames[customerIndex],
-          customerLastName: lastNames[customerIndex],
-          customerEmail: customerEmails[customerIndex],
-          customerPhone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
-          service: service,
-          appointmentDate: dateStr,
-          appointmentTime: timeSlot,
-          duration: duration,
-          price: servicePrice,
-          notes: Math.random() < 0.3 ? "Special request" : "",
-          status: status,
-          createdAt: new Date(appointmentDate.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000)
-        });
-      }
-    }
-
-    // Add future appointments
-    historicalAppointments.push(
+    // Clear all collections first
+    await Promise.all([
+      this.appointments.deleteMany({}),
+      this.users.deleteMany({}),
+      this.clients.deleteMany({}),
+      this.products.deleteMany({}),
+      this.serviceProducts.deleteMany({}),
+      this.analytics.deleteMany({})
+    ]);
+    console.log("🗑️ Database cleared");
+    
+    // 1. Seed Users (with passwords for authentication)
+    const users = [
       {
-        customerFirstName: "John",
-        customerLastName: "Smith",
-        customerEmail: "john.smith@email.com",
-        customerPhone: "(555) 123-4567",
-        service: "haircut",
-        appointmentDate: tomorrow.toISOString().split('T')[0],
-        appointmentTime: "10:00",
-        duration: 30,
-        price: 2500,
-        notes: "",
-        status: "confirmed",
-        createdAt: new Date()
+        id: "admin-001",
+        email: "admin@barbershop.com",
+        password: "admin123", // Plain text for demo
+        firstName: "Admin",
+        lastName: "User",
+        profileImageUrl: "",
+        role: "admin",
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        customerFirstName: "Mike",
-        customerLastName: "Johnson",
-        customerEmail: "mike.johnson@email.com",
-        customerPhone: "(555) 987-6543",
-        service: "full",
-        appointmentDate: tomorrow.toISOString().split('T')[0],
-        appointmentTime: "14:30",
-        duration: 45,
-        price: 3500,
-        notes: "Beard styling preferred",
-        status: "confirmed",
-        createdAt: new Date()
-      }
-    );
-
-    await this.appointments.insertMany(historicalAppointments);
-
-    // Generate client profiles based on appointment history
-    const clientProfiles = new Map();
-    
-    historicalAppointments.forEach(appointment => {
-      const email = appointment.customerEmail;
-      if (!clientProfiles.has(email)) {
-        clientProfiles.set(email, {
-          email,
-          firstName: appointment.customerFirstName,
-          lastName: appointment.customerLastName,
-          phone: appointment.customerPhone,
-          totalVisits: 0,
-          totalSpent: 0,
-          appointments: [],
-          services: new Set()
-        });
-      }
-      
-      const profile = clientProfiles.get(email);
-      if (appointment.status === "completed") {
-        profile.totalVisits++;
-        profile.totalSpent += appointment.price;
-      }
-      profile.appointments.push(appointment);
-      profile.services.add(appointment.service);
-    });
-
-    const mockClients: Omit<Client, '_id'>[] = Array.from(clientProfiles.values()).map(profile => {
-      const sortedAppointments = profile.appointments.sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
-      const firstVisit = sortedAppointments[0] ? new Date(sortedAppointments[0].appointmentDate) : new Date();
-      const lastVisit = sortedAppointments[sortedAppointments.length - 1] ? new Date(sortedAppointments[sortedAppointments.length - 1].appointmentDate) : new Date();
-      
-      return {
-        email: profile.email,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        phone: profile.phone,
-        totalVisits: profile.totalVisits,
-        totalSpent: profile.totalSpent,
-        lastVisit,
-        firstVisit,
-        preferredServices: Array.from(profile.services),
-        createdAt: firstVisit,
+        id: "barber-001",
+        email: "marco@barbershop.com", 
+        password: "barber123",
+        firstName: "Marco",
+        lastName: "Rodriguez",
+        profileImageUrl: "",
+        role: "barber",
+        createdAt: new Date(),
         updatedAt: new Date()
-      };
-    });
+      },
+      {
+        id: "customer-001",
+        email: "john.smith@email.com",
+        password: "customer123", 
+        firstName: "John",
+        lastName: "Smith",
+        profileImageUrl: "",
+        role: "customer",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "customer-002",
+        email: "mike.johnson@email.com",
+        password: "mike2024",
+        firstName: "Mike", 
+        lastName: "Johnson",
+        profileImageUrl: "",
+        role: "customer",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    await this.users.insertMany(users);
+    console.log("✅ Users seeded");
 
-    await this.clients.insertMany(mockClients);
-
-    // Seed products with realistic inventory levels
-    const mockProducts: Omit<Product, '_id'>[] = [
+    // 2. Seed Products
+    const products = [
       {
         name: "Premium Hair Shampoo",
         category: "Hair Care",
-        currentStock: 25,
+        currentStock: 50,
+        minStockThreshold: 10,
+        costPerUnit: 12.50,
+        supplier: "Professional Hair Co.",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "Hair Styling Gel",
+        category: "Styling",
+        currentStock: 30,
         minStockThreshold: 5,
-        costPerUnit: 1200,
-        supplier: "Beauty Supply Co",
+        costPerUnit: 8.75,
+        supplier: "Style Master Inc.",
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: "Beard Oil",
         category: "Beard Care",
-        currentStock: 3,
-        minStockThreshold: 5,
-        costPerUnit: 800,
-        supplier: "Grooming Essentials",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: "Hair Styling Gel",
-        category: "Hair Care",
-        currentStock: 15,
+        currentStock: 25,
         minStockThreshold: 8,
-        costPerUnit: 600,
-        supplier: "Style Masters",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: "Aftershave Lotion",
-        category: "Skin Care",
-        currentStock: 2,
-        minStockThreshold: 4,
-        costPerUnit: 950,
-        supplier: "Grooming Essentials",
+        costPerUnit: 15.00,
+        supplier: "Beard Bros Ltd.",
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: "Hair Conditioner",
-        category: "Hair Care",
-        currentStock: 12,
-        minStockThreshold: 6,
-        costPerUnit: 1100,
-        supplier: "Beauty Supply Co",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: "Razor Blades",
-        category: "Tools",
-        currentStock: 1,
-        minStockThreshold: 10,
-        costPerUnit: 250,
-        supplier: "Sharp Edge Supply",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: "Beard Balm",
-        category: "Beard Care",
-        currentStock: 8,
-        minStockThreshold: 3,
-        costPerUnit: 1050,
-        supplier: "Grooming Essentials",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: "Hair Wax",
-        category: "Hair Care",
-        currentStock: 20,
-        minStockThreshold: 7,
-        costPerUnit: 750,
-        supplier: "Style Masters",
+        category: "Hair Care", 
+        currentStock: 40,
+        minStockThreshold: 12,
+        costPerUnit: 10.25,
+        supplier: "Professional Hair Co.",
         createdAt: new Date(),
         updatedAt: new Date()
       }
     ];
+    await this.products.insertMany(products);
+    console.log("✅ Products seeded");
 
-    const productResults = await this.products.insertMany(mockProducts);
-    const productIds = productResults.insertedIds;
-
-    // Seed service products with realistic usage patterns
-    const productIdArray = Object.values(productIds);
-    const mockServiceProducts: Omit<ServiceProduct, '_id'>[] = [
-      // Haircut service products
+    // 3. Seed Service Products (linking services to products)
+    const serviceProducts = [
       {
-        serviceType: "haircut",
-        productId: productIdArray[0].toString(),
+        serviceType: "Haircut",
+        productId: "shampoo-001",
         productName: "Premium Hair Shampoo",
-        quantityUsed: 0.5,
-        costPerService: 600
-      },
-      {
-        serviceType: "haircut",
-        productId: productIdArray[2].toString(),
-        productName: "Hair Styling Gel",
-        quantityUsed: 0.3,
-        costPerService: 180
-      },
-      {
-        serviceType: "haircut",
-        productId: productIdArray[4].toString(),
-        productName: "Hair Conditioner",
-        quantityUsed: 0.3,
-        costPerService: 330
-      },
-      // Beard service products
-      {
-        serviceType: "beard",
-        productId: productIdArray[1].toString(),
-        productName: "Beard Oil",
-        quantityUsed: 0.2,
-        costPerService: 160
-      },
-      {
-        serviceType: "beard",
-        productId: productIdArray[3].toString(),
-        productName: "Aftershave Lotion",
         quantityUsed: 0.1,
-        costPerService: 95
+        costPerService: 1.25
       },
       {
-        serviceType: "beard",
-        productId: productIdArray[6].toString(),
-        productName: "Beard Balm",
-        quantityUsed: 0.15,
-        costPerService: 158
-      },
-      // Full service products
-      {
-        serviceType: "full",
-        productId: productIdArray[0].toString(),
-        productName: "Premium Hair Shampoo",
-        quantityUsed: 0.5,
-        costPerService: 600
-      },
-      {
-        serviceType: "full",
-        productId: productIdArray[1].toString(),
-        productName: "Beard Oil",
-        quantityUsed: 0.2,
-        costPerService: 160
-      },
-      {
-        serviceType: "full",
-        productId: productIdArray[2].toString(),
+        serviceType: "Haircut", 
+        productId: "gel-001",
         productName: "Hair Styling Gel",
-        quantityUsed: 0.3,
-        costPerService: 180
+        quantityUsed: 0.05,
+        costPerService: 0.44
       },
       {
-        serviceType: "full",
-        productId: productIdArray[3].toString(),
-        productName: "Aftershave Lotion",
-        quantityUsed: 0.1,
-        costPerService: 95
+        serviceType: "Beard Trim",
+        productId: "beard-oil-001", 
+        productName: "Beard Oil",
+        quantityUsed: 0.02,
+        costPerService: 0.30
       },
       {
-        serviceType: "full",
-        productId: productIdArray[4].toString(),
-        productName: "Hair Conditioner",
-        quantityUsed: 0.3,
-        costPerService: 330
-      },
-      {
-        serviceType: "full",
-        productId: productIdArray[6].toString(),
-        productName: "Beard Balm",
+        serviceType: "Hair Wash",
+        productId: "shampoo-001",
+        productName: "Premium Hair Shampoo", 
         quantityUsed: 0.15,
-        costPerService: 158
+        costPerService: 1.88
+      },
+      {
+        serviceType: "Hair Wash",
+        productId: "conditioner-001",
+        productName: "Hair Conditioner",
+        quantityUsed: 0.1,
+        costPerService: 1.03
       }
     ];
+    await this.serviceProducts.insertMany(serviceProducts);
+    console.log("✅ Service Products seeded");
 
-    await this.serviceProducts.insertMany(mockServiceProducts);
+    // 4. Seed Appointments (90 days of data)
+    const appointments = [];
+    const services = ["Haircut", "Beard Trim", "Hair Wash", "Full Service", "Mustache Trim"];
+    const servicePrices = { "Haircut": 25, "Beard Trim": 15, "Hair Wash": 10, "Full Service": 45, "Mustache Trim": 8 };
+    const statuses = ["confirmed", "completed", "cancelled", "no-show"];
+    const customerNames = [
+      { first: "John", last: "Smith", email: "john.smith@email.com", phone: "+1234567890" },
+      { first: "Mike", last: "Johnson", email: "mike.johnson@email.com", phone: "+1234567891" },
+      { first: "David", last: "Brown", email: "david.brown@email.com", phone: "+1234567892" },
+      { first: "James", last: "Wilson", email: "james.wilson@email.com", phone: "+1234567893" },
+      { first: "Robert", last: "Davis", email: "robert.davis@email.com", phone: "+1234567894" },
+      { first: "William", last: "Miller", email: "william.miller@email.com", phone: "+1234567895" },
+      { first: "Richard", last: "Moore", email: "richard.moore@email.com", phone: "+1234567896" },
+      { first: "Joseph", last: "Taylor", email: "joseph.taylor@email.com", phone: "+1234567897" },
+      { first: "Thomas", last: "Anderson", email: "thomas.anderson@email.com", phone: "+1234567898" },
+      { first: "Daniel", last: "Thomas", email: "daniel.thomas@email.com", phone: "+1234567899" }
+    ];
 
-    console.log("MongoDB seeded with mock data including analytics components");
+    // Generate appointments for the last 90 days
+    for (let i = 90; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      // Generate 3-8 appointments per day
+      const dailyAppointments = Math.floor(Math.random() * 6) + 3;
+      
+      for (let j = 0; j < dailyAppointments; j++) {
+        const customer = customerNames[Math.floor(Math.random() * customerNames.length)];
+        const service = services[Math.floor(Math.random() * services.length)];
+        const hour = Math.floor(Math.random() * 8) + 9; // 9 AM to 5 PM
+        const minute = Math.random() > 0.5 ? "00" : "30";
+        const status = i === 0 ? "confirmed" : statuses[Math.floor(Math.random() * statuses.length)];
+        
+        appointments.push({
+          customerFirstName: customer.first,
+          customerLastName: customer.last,
+          customerEmail: customer.email,
+          customerPhone: customer.phone,
+          service: service,
+          appointmentDate: dateStr,
+          appointmentTime: `${hour.toString().padStart(2, '0')}:${minute}`,
+          duration: service === "Full Service" ? 90 : service === "Haircut" ? 45 : 30,
+          price: servicePrices[service as keyof typeof servicePrices],
+          notes: Math.random() > 0.7 ? "Regular customer" : "",
+          status: status,
+          bookedBy: "online",
+          createdAt: new Date(date.getTime() - Math.random() * 24 * 60 * 60 * 1000)
+        });
+      }
+    }
+    
+    await this.appointments.insertMany(appointments);
+    console.log(`✅ ${appointments.length} Appointments seeded`);
+
+    // 5. Generate Clients from appointment data
+    const clientMap = new Map();
+    appointments.forEach(apt => {
+      const key = apt.customerEmail;
+      if (!clientMap.has(key)) {
+        clientMap.set(key, {
+          email: apt.customerEmail,
+          firstName: apt.customerFirstName,
+          lastName: apt.customerLastName,
+          phone: apt.customerPhone,
+          totalVisits: 0,
+          totalSpent: 0,
+          appointments: []
+        });
+      }
+      const client = clientMap.get(key);
+      if (apt.status === "completed") {
+        client.totalVisits++;
+        client.totalSpent += apt.price;
+      }
+      client.appointments.push(apt);
+    });
+
+    const clients = Array.from(clientMap.values()).map(client => {
+      const sortedApts = client.appointments.sort((a: any, b: any) => 
+        new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime()
+      );
+      const services = [...new Set(client.appointments.map((apt: any) => apt.service))];
+      
+      return {
+        email: client.email,
+        firstName: client.firstName,
+        lastName: client.lastName,
+        phone: client.phone,
+        totalVisits: client.totalVisits,
+        totalSpent: client.totalSpent,
+        lastVisit: new Date(sortedApts[sortedApts.length - 1].appointmentDate),
+        firstVisit: new Date(sortedApts[0].appointmentDate),
+        preferredServices: services,
+        createdAt: new Date(sortedApts[0].appointmentDate),
+        updatedAt: new Date()
+      };
+    });
+
+    await this.clients.insertMany(clients);
+    console.log(`✅ ${clients.length} Clients seeded`);
+
+    // 6. Generate Analytics Data
+    const analyticsData = [];
+    const dateMap = new Map();
+    
+    appointments.forEach(apt => {
+      if (!dateMap.has(apt.appointmentDate)) {
+        dateMap.set(apt.appointmentDate, {
+          revenue: 0,
+          count: 0,
+          noShows: 0,
+          services: {},
+          hours: {}
+        });
+      }
+      const dayData = dateMap.get(apt.appointmentDate);
+      
+      if (apt.status === "completed") {
+        dayData.revenue += apt.price;
+      }
+      dayData.count++;
+      if (apt.status === "no-show") {
+        dayData.noShows++;
+      }
+      
+      dayData.services[apt.service] = (dayData.services[apt.service] || 0) + 1;
+      const hour = apt.appointmentTime.split(':')[0];
+      dayData.hours[hour] = (dayData.hours[hour] || 0) + 1;
+    });
+
+    Array.from(dateMap.entries()).forEach(([date, data]) => {
+      analyticsData.push({
+        date: date,
+        dailyRevenue: data.revenue,
+        appointmentCount: data.count,
+        noShowCount: data.noShows,
+        serviceBreakdown: data.services,
+        hourlyBookings: data.hours,
+        createdAt: new Date()
+      });
+    });
+
+    await this.analytics.insertMany(analyticsData);
+    console.log(`✅ ${analyticsData.length} Analytics records seeded`);
+    
+    console.log("🎉 Database seeding completed successfully!");
+    console.log("📊 Summary:");
+    console.log(`   - ${users.length} Users`);
+    console.log(`   - ${products.length} Products`);
+    console.log(`   - ${serviceProducts.length} Service Products`);
+    console.log(`   - ${appointments.length} Appointments`);
+    console.log(`   - ${clients.length} Clients`);
+    console.log(`   - ${analyticsData.length} Analytics records`);
   }
 
   private convertToAppointment(doc: MongoAppointment): Appointment {
@@ -749,21 +721,87 @@ export class MongoStorage implements IStorage {
       const result = await this.analytics.findOneAndUpdate(
         { date: analyticsData.date },
         { 
-          $set: { 
+          $set: {
             ...analyticsData, 
-            createdAt: new Date() 
-          } 
+            updatedAt: new Date()
+          }
         },
         { 
           upsert: true, 
-          returnDocument: 'after' 
+          returnDocument: 'after'
         }
       );
-      return result!;
+      return result as AnalyticsData;
     } catch (error) {
       console.error("Error creating/updating analytics:", error);
       throw error;
     }
+  }
+
+  // Development method to seed sample users
+  async seedSampleUsers(): Promise<number> {
+    try {
+      const sampleUsers = [
+        {
+          id: "admin-001",
+          email: "admin@barbershop.com",
+          password: "admin123",
+          role: "admin",
+          firstName: "Admin",
+          lastName: "User",
+          profileImageUrl: "",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: "barber-001", 
+          email: "marco@barbershop.com",
+          password: "barber123",
+          role: "barber",
+          firstName: "Marco",
+          lastName: "Rodriguez",
+          profileImageUrl: "",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: "customer-001",
+          email: "john.smith@email.com",
+          password: "customer123",
+          role: "customer", 
+          firstName: "John",
+          lastName: "Smith",
+          profileImageUrl: "",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: "customer-002",
+          email: "mike.johnson@email.com",
+          password: "mike2024",
+          role: "customer",
+          firstName: "Mike", 
+          lastName: "Johnson",
+          profileImageUrl: "",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      // Clear existing users and insert new ones
+      await this.users.deleteMany({});
+      await this.users.insertMany(sampleUsers);
+      
+      return sampleUsers.length;
+    } catch (error) {
+      console.error("Error seeding users:", error);
+      throw error;
+    }
+  }
+
+  // Get database instance for debugging
+  getDatabase(): any {
+    return this.db;
   }
 }
 
