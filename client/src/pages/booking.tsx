@@ -37,7 +37,7 @@ export default function BookingPage() {
             <nav className="hidden md:flex space-x-8">
               <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Services</a>
               <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
-              <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</a>
+              <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
             </nav>
           </div>
         </div>

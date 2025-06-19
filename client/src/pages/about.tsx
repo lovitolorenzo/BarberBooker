@@ -42,7 +42,7 @@ export default function AboutPage() {
                 Book Now
               </Link>
               <a href="#" className="text-barbershop-gold">About</a>
-              <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</a>
+              <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
             </nav>
           </div>
         </div>
@@ -157,38 +157,13 @@ export default function AboutPage() {
       {/* Contact Info */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 barbershop-charcoal border-t border-barbershop-dark">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl font-bold text-barbershop-text mb-8">Visit Us Today</h3>
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="flex flex-col items-center">
-              <MapPin className="text-barbershop-gold h-8 w-8 mb-2" />
-              <h4 className="font-semibold text-barbershop-text mb-1">Location</h4>
-              <p className="text-barbershop-muted text-sm">
-                123 Main Street<br />
-                Downtown District<br />
-                New York, NY 10001
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Phone className="text-barbershop-gold h-8 w-8 mb-2" />
-              <h4 className="font-semibold text-barbershop-text mb-1">Phone</h4>
-              <p className="text-barbershop-muted text-sm">
-                (555) 123-CUTS<br />
-                (555) 123-2887
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Clock className="text-barbershop-gold h-8 w-8 mb-2" />
-              <h4 className="font-semibold text-barbershop-text mb-1">Hours</h4>
-              <p className="text-barbershop-muted text-sm">
-                Mon-Fri: 9AM-6PM<br />
-                Saturday: 9AM-5PM<br />
-                Sunday: 10AM-4PM
-              </p>
-            </div>
-          </div>
-          <Link href="/">
+          <h3 className="text-3xl font-bold text-barbershop-text mb-8">Get In Touch</h3>
+          <p className="text-barbershop-muted mb-8">
+            Ready to experience the finest barbering in the city? Contact us or visit our shop.
+          </p>
+          <Link href="/contact">
             <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
-              Book Your Appointment Now
+              Contact Us
             </Button>
           </Link>
         </div>
