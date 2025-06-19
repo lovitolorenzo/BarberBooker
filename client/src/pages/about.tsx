@@ -79,7 +79,7 @@ export default function AboutPage() {
             dedicated to helping you look and feel your absolute best.
           </p>
           <Link href="/">
-            <Button className="barbershop-gold text-black font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
+            <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
               Book Your Appointment
             </Button>
           </Link>
@@ -256,7 +256,7 @@ export default function AboutPage() {
             </div>
           </div>
           <Link href="/">
-            <Button className="barbershop-gold text-black font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
+            <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
               Book Your Appointment Now
             </Button>
           </Link>
