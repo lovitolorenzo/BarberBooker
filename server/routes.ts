@@ -65,10 +65,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all appointments (admin only)
+  app.get("/api/appointments/all", async (req, res) => {
+    try {
+      // TODO: Add authentication check for admin role
+      const appointments = await storage.getAllAppointments();
+      res.json(appointments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
   // Get a specific appointment
   app.get("/api/appointments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid appointment ID" });
+      }
+      
       const appointment = await storage.getAppointment(id);
       
       if (!appointment) {
@@ -85,6 +100,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/appointments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid appointment ID" });
+      }
+      
       const updateData = insertAppointmentSchema.partial().parse(req.body);
       
       const appointment = await storage.updateAppointment(id, updateData);
@@ -109,6 +128,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/appointments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid appointment ID" });
+      }
+      
       const success = await storage.deleteAppointment(id);
       
       if (!success) {

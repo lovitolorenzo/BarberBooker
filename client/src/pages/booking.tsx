@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Scissors } from "lucide-react";
-import { Link } from "wouter";
+import { Scissors, LogIn, LogOut, User } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
 import CalendarComponent from "@/components/calendar";
 import BookingForm from "@/components/booking-form";
 import ConfirmationModal from "@/components/confirmation-modal";
@@ -34,11 +35,24 @@ export default function BookingPage() {
               <Scissors className="text-barbershop-gold text-2xl" />
               <h1 className="text-2xl font-bold text-barbershop-text">Elite Barbershop</h1>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Services</a>
-              <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
-              <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
-            </nav>
+            <div className="flex items-center space-x-6">
+              <nav className="hidden md:flex space-x-8">
+                <span className="text-barbershop-gold">Book Now</span>
+                <Link href="/about" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">About</Link>
+                <Link href="/contact" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Contact</Link>
+                <Link href="/admin" className="text-barbershop-muted hover:text-barbershop-gold transition-colors">Admin</Link>
+              </nav>
+              <Link href="/login">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="barbershop-dark border-barbershop-charcoal text-barbershop-text hover:barbershop-charcoal"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
