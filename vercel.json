@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "framework": "vite",
-  "buildCommand": "npm install --save-dev @types/node && npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "cd client && npm install && npm install --save-dev tailwindcss postcss autoprefixer @types/node && npm run build",
+  "outputDirectory": "client/dist",
   "rewrites": [
     {
       "source": "/(.*)",
