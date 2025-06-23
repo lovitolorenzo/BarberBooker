@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { apiPost } from "@/config/api";
 
 export default function LoginPage() {
   const [firstName, setFirstName] = useState("");
@@ -24,12 +25,8 @@ export default function LoginPage() {
 
     try {
       // Call the authentication API
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, password }),
+      const response = await apiPost('/auth/login', {
+        firstName, lastName, password
       });
 
       const data = await response.json();

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: barberbooker-backend
+    env: node
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: NODE_ENV=production node dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: PORT
+        value: 10000
+    disk:
+      name: barberbooker-disk
+      mountPath: /opt/render/project/src
+      sizeGB: 1

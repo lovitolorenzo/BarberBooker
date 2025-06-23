@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/config/api";
 import { useTranslation } from "react-i18next";
 import { services, type ServiceKey, type Appointment, type InsertAppointment } from "@shared/schema";
 

@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "react-i18next";
-import { Scissors, User, Lock } from "lucide-react";
 import { useLocation, Link } from "wouter";
+import { useTranslation } from "react-i18next";
+import { apiPost } from "@/config/api";
+import { Scissors, User, Lock } from "lucide-react";
 
 export default function RegisterPage() {
 	const [firstName, setFirstName] = useState("");
@@ -55,16 +56,10 @@ export default function RegisterPage() {
 
 		try {
 			// Call the registration API
-			const response = await fetch("/api/auth/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					firstName,
-					lastName,
-					password,
-				}),
+			const response = await apiPost("/auth/register", {
+				firstName,
+				lastName,
+				password,
 			});
 
 			const data = await response.json();

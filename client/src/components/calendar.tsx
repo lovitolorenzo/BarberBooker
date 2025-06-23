@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { apiRequest } from "@/lib/queryClient";
+import { apiGet } from "@/config/api";
 import type { Appointment } from "@shared/schema";
 
 interface CalendarProps {
@@ -36,7 +37,7 @@ export default function CalendarComponent({
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/range', { startDate, endDate }],
     queryFn: async () => {
-      const response = await fetch(`/api/appointments/range?startDate=${startDate}&endDate=${endDate}`);
+      const response = await apiGet(`/api/appointments/range?startDate=${startDate}&endDate=${endDate}`);
       if (!response.ok) throw new Error('Failed to fetch appointments');
       return response.json();
     }

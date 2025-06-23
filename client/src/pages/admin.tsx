@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Users, Calendar, Phone, Mail, Clock, DollarSign, Scissors } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Calendar, Users, DollarSign, Clock, Search, Filter, Phone, Mail, Scissors } from "lucide-react";
 import Navbar from "@/components/navbar";
+import { useTranslation } from "react-i18next";
+import { apiGet } from "@/config/api";
+import { Link } from "wouter";
 import type { Appointment } from "@shared/schema";
 import { services, type ServiceKey } from "@shared/schema";
-import { useTranslation } from "react-i18next";
 
 export default function AdminPage() {
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
@@ -17,7 +19,7 @@ export default function AdminPage() {
   const { data: appointments = [], isLoading } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/all'],
     queryFn: async () => {
-      const response = await fetch('/api/appointments/all');
+      const response = await apiGet('/api/appointments/all');
       if (!response.ok) throw new Error('Failed to fetch appointments');
       return response.json();
     }

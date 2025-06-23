@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   BarChart, 
   Bar, 
@@ -7,30 +10,19 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
+  ResponsiveContainer, 
+  PieChart, 
+  Pie, 
+  Cell,
   LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
+  Line
 } from "recharts";
-import { 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Package, 
-  AlertTriangle,
-  Calendar,
-  Clock
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Users, TrendingUp, DollarSign, Clock, Package, AlertTriangle, Calendar } from "lucide-react";
 import Navbar from "@/components/navbar";
-import type { Appointment, Client, Product, ServiceProduct } from "@shared/schema";
-import { services, type ServiceKey } from "@shared/schema";
 import { useTranslation } from "react-i18next";
+import { apiGet } from "@/config/api";
+import { services, type ServiceKey } from "@shared/schema";
+import type { Appointment, Client, Product, ServiceProduct } from "@shared/schema";
 
 interface RevenueData {
   date: string;
@@ -85,7 +77,7 @@ export default function AnalyticsPage() {
   const { data: revenueData = [] } = useQuery<RevenueData[]>({
     queryKey: ['/api/analytics/revenue', start, end],
     queryFn: async () => {
-      const response = await fetch(`/api/analytics/revenue/${start}/${end}`);
+      const response = await apiGet(`/api/analytics/revenue/${start}/${end}`);
       if (!response.ok) throw new Error('Failed to fetch revenue data');
       return response.json();
     }
