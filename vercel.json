@@ -1,9 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm install --save-dev tailwindcss postcss autoprefixer @types/node && npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": "dist",
-  "root": "client",
+  "buildCommand": "bash ./vercel-build.sh",
+  "outputDirectory": "client/dist",
   "rewrites": [
     {
       "source": "/(.*)",
