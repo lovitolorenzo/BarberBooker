@@ -31,6 +31,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://barberbooker-backend.onrender.com"
+    "VITE_API_URL": "https://barberbooker.onrender.com"
   }
 }
