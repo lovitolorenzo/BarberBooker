@@ -1,3 +1,15 @@
+// Enable Vite env typing
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_API_URL: string;
+    readonly DEV: boolean;
+  }
+  
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
 // API Configuration for different environments
 export const API_CONFIG = {
   // Base URL for API calls
@@ -20,7 +32,9 @@ export async function apiRequest(
   data?: any,
   options?: RequestInit
 ): Promise<Response> {
-  const url = `${API_CONFIG.baseURL}${endpoint}`;
+  // Ensure endpoint starts with /api prefix
+  const apiEndpoint = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+  const url = `${API_CONFIG.baseURL}${apiEndpoint}`;
   
   const config: RequestInit = {
     method,
