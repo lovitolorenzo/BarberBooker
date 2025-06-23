@@ -17,8 +17,9 @@ const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Loading component to show while chunks are loading
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="text-barbershop-gold text-xl font-semibold">Loading...</div>
+  <div className="flex flex-col items-center justify-center h-screen bg-barbershop-dark bg-opacity-80">
+    <div className="w-10 h-10 border-4 border-barbershop-gold border-solid rounded-full border-t-transparent animate-spin mb-4"></div>
+    <div className="text-barbershop-gold text-xl font-semibold">Loading your experience...</div>
   </div>
 );
 
