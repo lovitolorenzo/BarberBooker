@@ -13,40 +13,39 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: |
             client/package-lock.json
-      
+
       - name: Install client dependencies
         working-directory: ./client
         run: npm ci
-        
+
       - name: Install dev dependencies
         working-directory: ./client
         run: npm install --save-dev tailwindcss postcss autoprefixer @types/node
-      
+
       - name: Build client
         working-directory: ./client
         run: npm run build:vercel
         env:
           VITE_API_URL: https://barberbooker.onrender.com
-          
+
       - name: Copy build files
         run: |
           mkdir -p dist
           cp -r client/dist/* dist/
-      
+
       # Deploy directly with the Vercel GitHub Action
       - name: Deploy to Vercel
         uses: vercel/action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-token: "ce7Vsibo0OvcLLiuhbCs4Elt"
           vercel-org-id: "team_kxsTVCyuW55slwJn7feCSDY4"
           vercel-project-id: "prj_CFFBg7RPteMY0cwHQhdwVjZ77sPw"
-          vercel-args: '--prod --yes'
+          vercel-args: "--prod --yes"
