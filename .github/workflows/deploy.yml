@@ -41,11 +41,8 @@ jobs:
           mkdir -p dist
           cp -r client/dist/* dist/
 
-      # Deploy directly with the Vercel GitHub Action
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
       - name: Deploy to Vercel
-        uses: vercel/action@v25
-        with:
-          vercel-token: "ce7Vsibo0OvcLLiuhbCs4Elt"
-          vercel-org-id: "team_kxsTVCyuW55slwJn7feCSDY4"
-          vercel-project-id: "prj_CFFBg7RPteMY0cwHQhdwVjZ77sPw"
-          vercel-args: "--prod --yes"
+        run: vercel deploy --prod --token="ce7Vsibo0OvcLLiuhbCs4Elt" --yes
