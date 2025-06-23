@@ -278,10 +278,6 @@
 				"customer": {
 					"title": "Accesso Cliente:",
 					"description": "John Smith / customer123"
-				},
-				"guest": {
-					"title": "Accesso Rapido:",
-					"description": "Usa il pulsante \"Accesso Ospite Rapido\" sopra"
 				}
 			}
 		},

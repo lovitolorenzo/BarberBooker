@@ -112,11 +112,13 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		}
 
 		const serviceInfo = services[selectedService];
+		// Usa il nome del servizio dalla traduzione invece del nome hardcoded
+		const serviceDisplayName = t(`services.${selectedService}.name`);
 		const appointmentData: InsertAppointment = {
 			customerFirstName: userFirstName,
 			customerLastName: userLastName,
 			customerPhone: data.customerPhone,
-			service: data.service,
+			service: serviceDisplayName,
 			notes: data.notes,
 			appointmentDate: selectedDate,
 			appointmentTime: selectedTime,
@@ -153,7 +155,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 							<SelectContent className="barbershop-dark border-barbershop-charcoal">
 								{Object.entries(services).map(([key, service]) => (
 									<SelectItem key={key} value={key} className="text-barbershop-text hover:barbershop-charcoal">
-										{service.name} - {service.duration}min - ${service.price}
+										{t(`services.${key}.name`)} - {service.duration}min - ${service.price}
 									</SelectItem>
 								))}
 							</SelectContent>
