@@ -191,11 +191,10 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</div>
 					) : (
 						<div className="space-y-2">
-							<div className="w-full p-4 border border-red-400 rounded-lg bg-red-50 flex flex-col items-center">
-								<p className="text-red-400 mb-3">{t("pleaseLogin")}</p>
+							<div className="w-full p-4 border border-barbershop-charcoal rounded-lg barbershop-dark flex flex-col items-center">
+								<p className="text-barbershop-text mb-3">{t("authenticationRequired.description")}</p>
 								<Button 
-									variant="outline" 
-									className="bg-barbershop-gold text-white border-none hover:bg-barbershop-gold/80"
+									className="barbershop-gold text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-all"
 									onClick={() => navigate('/login')}
 								>
 									<LogIn className="h-4 w-4 mr-2" />
