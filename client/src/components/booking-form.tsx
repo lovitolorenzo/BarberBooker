@@ -113,7 +113,11 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 
 		const serviceInfo = services[selectedService];
 		// Usa il nome del servizio dalla traduzione invece del nome hardcoded
-		const serviceDisplayName = t(`services.${selectedService}.name`);
+		// Usa le chiavi dirette dalla traduzione
+		let serviceDisplayName = '';
+		if (selectedService === 'haircut') serviceDisplayName = t('services.haircut');
+		else if (selectedService === 'beard') serviceDisplayName = t('services.beard');
+		else if (selectedService === 'full') serviceDisplayName = t('services.fullservice');
 		const appointmentData: InsertAppointment = {
 			customerFirstName: userFirstName,
 			customerLastName: userLastName,
@@ -153,11 +157,18 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 								<SelectValue placeholder={t("chooseService")} />
 							</SelectTrigger>
 							<SelectContent className="barbershop-dark border-barbershop-charcoal">
-								{Object.entries(services).map(([key, service]) => (
-									<SelectItem key={key} value={key} className="text-barbershop-text hover:barbershop-charcoal">
-										{t(`services.${key}.name`)} - {service.duration}min - ${service.price}
-									</SelectItem>
-								))}
+								{Object.entries(services).map(([key, service]) => {
+									// Usa le chiavi dirette dalla traduzione
+									let serviceName = '';
+									if (key === 'haircut') serviceName = t('services.haircut');
+									else if (key === 'beard') serviceName = t('services.beard');
+									else if (key === 'full') serviceName = t('services.fullservice');
+									return (
+										<SelectItem key={key} value={key} className="text-barbershop-text hover:barbershop-charcoal">
+											{serviceName} - {service.duration}min - ${service.price}
+										</SelectItem>
+									);
+								})}
 							</SelectContent>
 						</Select>
 						{form.formState.errors.service && (
