@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Calendar, CalendarCheck } from "lucide-react";
+import { Calendar, CalendarCheck, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/config/api";
 import { useTranslation } from "react-i18next";
 import { services, type ServiceKey, type Appointment, type InsertAppointment } from "@shared/schema";
+import { useLocation } from "wouter";
 
 interface BookingFormProps {
 	selectedDate: string | null;
@@ -38,6 +39,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 	const { userFirstName, userLastName } = useAuth();
 	const queryClient = useQueryClient();
 	const { t } = useTranslation();
+	const [_, navigate] = useLocation();
 
 	const form = useForm<BookingFormData>({
 		resolver: zodResolver(bookingSchema),
@@ -189,8 +191,16 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</div>
 					) : (
 						<div className="space-y-2">
-							<div className="w-full px-4 py-3 border border-red-400 rounded-lg text-red-400 bg-red-50">
-								{t("pleaseLogin")}
+							<div className="w-full p-4 border border-red-400 rounded-lg bg-red-50 flex flex-col items-center">
+								<p className="text-red-400 mb-3">{t("pleaseLogin")}</p>
+								<Button 
+									variant="outline" 
+									className="bg-barbershop-gold text-white border-none hover:bg-barbershop-gold/80"
+									onClick={() => navigate('/login')}
+								>
+									<LogIn className="h-4 w-4 mr-2" />
+									{t("nav.login")}
+								</Button>
 							</div>
 						</div>
 					)}
