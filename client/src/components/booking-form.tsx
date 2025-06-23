@@ -165,7 +165,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 									else if (key === 'full') serviceName = t('services.fullservice');
 									return (
 										<SelectItem key={key} value={key} className="text-barbershop-text hover:barbershop-charcoal">
-											{serviceName} - {service.duration}min - ${service.price}
+											{serviceName} - {service.duration}min - €{service.price}
 										</SelectItem>
 									);
 								})}
