@@ -17,5 +17,15 @@ npm install --save-dev tailwindcss postcss autoprefixer @types/node || { echo "F
 echo "Running build using build:vercel script..."
 npm run build:vercel || { echo "Build failed"; exit 1; }
 
-echo "Build completed successfully"
+# Move back to root and copy files to root dist directory
+echo "Setting up output directory structure"
+cd .. || { echo "Failed to navigate back to root"; exit 1; }
+
+# Create dist directory at root if it doesn't exist
+mkdir -p dist
+
+# Copy all files from client/dist to root dist
+cp -r client/dist/* dist/ || { echo "Failed to copy build files"; exit 1; }
+
+echo "Build completed successfully - files copied to root dist directory"
 exit 0
