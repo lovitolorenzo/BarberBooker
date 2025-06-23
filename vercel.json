@@ -1,7 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm install --save-dev tailwindcss postcss autoprefixer @types/node && npm run build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "npm install && npm install --save-dev tailwindcss postcss autoprefixer @types/node && npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "root": "client",
   "rewrites": [
     {
       "source": "/(.*)",

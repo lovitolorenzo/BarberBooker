@@ -1,11 +1,15 @@
-# Ignora tutti i file e directory al livello root eccetto specifici
+# Only include what we need for frontend deployment
 /dist/
 /node_modules/
 /server/
 /shared/
 /.git/
 /attached_assets/
+/*.js
+/*.json
+/*.md
+/*.txt
 
-# Non ignorare questi
-!client/
-!vercel.json
+# Explicitly include what we need
+!/client
+!/vercel.json
