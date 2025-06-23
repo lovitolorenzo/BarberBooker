@@ -1,12 +1,12 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 
-const viteLogger = createLogger();
+// Solo le definizioni dei tipi, non importa il modulo effettivo
+type ViteServer = any;
+type ViteLogger = any;
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -20,6 +20,11 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Importa vite solo quando necessario
+  const { createServer: createViteServer, createLogger } = await import('vite');
+  const viteConfig = await import('../vite.config');
+  const viteLogger = createLogger();
+  
   const serverOptions = {
     middlewareMode: true as const,
     hmr: { server },
@@ -27,11 +32,11 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
+    ...viteConfig.default,
     configFile: false,
     customLogger: {
       ...viteLogger,
-      error: (msg, options) => {
+      error: (msg: string, options: any) => {
         viteLogger.error(msg, options);
         process.exit(1);
       },
@@ -89,18 +94,26 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
-
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
+  // In produzione, serviamo i file statici dalla directory public
+  // Assumendo che i file frontend siano stati buildati in questa directory
+  const distPath = path.resolve(import.meta.dirname, "../dist/public");
+  
+  // In produzione, potrebbe non essere necessario questo controllo
+  // perché in un ambiente API-only non abbiamo bisogno di file statici
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    
+    // fall through to index.html if the file doesn't exist
+    app.use("*", (_req, res) => {
+      res.sendFile(path.resolve(distPath, "index.html"));
+    });
+  } else {
+    // Se siamo in produzione e non ci sono file statici,
+    // aggiungiamo una route di fallback per le richieste non-API
+    app.use("*", (req, res) => {
+      if (!req.path.startsWith("/api/")) {
+        res.status(404).json({ message: "Frontend not available. This is an API-only server." });
+      }
+    });
   }
-
-  app.use(express.static(distPath));
-
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
 }
