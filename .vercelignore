@@ -1,3 +1,11 @@
-*
+# Ignora tutti i file e directory al livello root eccetto specifici
+/dist/
+/node_modules/
+/server/
+/shared/
+/.git/
+/attached_assets/
+
+# Non ignorare questi
 !client/
 !vercel.json
