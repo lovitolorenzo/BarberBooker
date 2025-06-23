@@ -34,8 +34,8 @@ export default function Navbar() {
 	};
 
 	const navItems = [
-		{ href: "/", label: t("nav.booking") },
-		{ href: "/about", label: t("nav.about") },
+		{ href: "/", label: t("nav.about") },
+		{ href: "/booking", label: t("nav.booking") },
 		{ href: "/contact", label: t("nav.contact") },
 		...(isLoggedIn && (userRole === "admin" || userRole === "barber")
 			? [

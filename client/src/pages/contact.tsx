@@ -80,7 +80,7 @@ export default function ContactPage() {
 							<Phone className="mr-2 h-4 w-4" />
 							{t("contact.callNow")}
 						</Button>
-						<Link href="/about">
+						<Link href="/">
 							<Button
 								variant="outline"
 								className="barbershop-dark text-barbershop-text border-barbershop-charcoal hover:barbershop-charcoal transition-all"
