@@ -44,7 +44,7 @@ export default function AboutPage() {
           <p className="text-xl text-barbershop-muted mb-8 leading-relaxed">
             {t("hero.description")}
           </p>
-          <Link href="/">
+          <Link href="/booking">
             <Button className="barbershop-gold text-white font-semibold px-8 py-3 text-lg hover:opacity-90 transition-all">
               {t("hero.bookAppointment")}
             </Button>
