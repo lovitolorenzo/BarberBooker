@@ -44,7 +44,7 @@
 		"booking": "Prenotazione...",
 		"specialRequests": "Richieste Speciali (Opzionale)",
 		"anySpecificRequests": "Richieste specifiche o preferenze...",
-		"pleaseLogin": "Effettua l'accesso per prenotare",
+		"pleaseLogin": "Per prenotare è necessario effettuare l'accesso",
 		"loginRequired": "Devi essere loggato per prenotare",
 		"success": "Appuntamento prenotato con successo!",
 		"error": "Errore durante la prenotazione",
