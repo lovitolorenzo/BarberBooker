@@ -1,0 +1,107 @@
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Scissors, User, Crown, Check } from "lucide-react";
+
+const services = [
+	{
+		icon: Scissors,
+		title: "Taglio Signature",
+		description: "Taglio di precisione personalizzato per il tuo stile e forma del viso",
+		price: "€15",
+		features: ["Consulenza & Design", "Taglio di Precisione", "Styling & Rifinitura", "Trattamento Asciugamano Caldo"],
+	},
+	{
+		icon: User,
+		title: "Rasatura Classica",
+		description: "Rasatura tradizionale con asciugamano caldo e prodotti premium",
+		price: "€10",
+		features: [
+			"Asciugamano Caldo Pre-Rasatura",
+			"Applicazione Schiuma Premium",
+			"Rasatura con Rasoio a Lama",
+			"Trattamento After-Shave",
+		],
+	},
+	{
+		icon: Crown,
+		title: "Il Trattamento Reale",
+		description: "Esperienza completa di toelettatura con taglio, rasatura e styling",
+		price: "€45",
+		features: [
+			"Taglio Signature",
+			"Rasatura Classica",
+			"Rifinitura & Modellatura Barba",
+			"Massaggio del Cuoio Capelluto",
+		],
+	},
+];
+
+export default function ServicesSection() {
+	const scrollToContact = () => {
+		const element = document.getElementById("contact");
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth" });
+		}
+	};
+
+	return (
+		<section id="services" className="py-20 bg-barbershop-medium">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<motion.div
+					initial={{ opacity: 0, y: 30 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.8 }}
+					viewport={{ once: true }}
+					className="text-center mb-16"
+				>
+					<h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
+						Servizi <span className="text-barbershop-gold">Signature</span>
+					</h2>
+					<p className="text-xl text-barbershop-muted max-w-2xl mx-auto">
+						Ogni servizio è una testimonianza del nostro impegno per l'eccellenza e l'attenzione ai dettagli
+					</p>
+				</motion.div>
+
+				<div className="grid md:grid-cols-3 gap-8">
+					{services.map((service, index) => (
+						<motion.div
+							key={service.title}
+							initial={{ opacity: 0, y: 30 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.8, delay: index * 0.2 }}
+							viewport={{ once: true }}
+						>
+							<Card className="service-card bg-barbershop-light border-barbershop-light/30 shadow-2xl hover:transform hover:scale-105 transition-all duration-300 h-full">
+								<CardContent className="p-8">
+									<div className="text-center mb-6">
+										<service.icon className="text-barbershop-gold mx-auto mb-4" size={48} />
+										<h3 className="font-display text-2xl font-semibold mb-2 text-barbershop-text">{service.title}</h3>
+										<p className="text-barbershop-muted mb-4">{service.description}</p>
+										<div className="text-barbershop-gold text-2xl font-bold">{service.price}</div>
+									</div>
+
+									<ul className="space-y-2 text-sm text-barbershop-muted mb-6">
+										{service.features.map((feature) => (
+											<li key={feature} className="flex items-center">
+												<Check className="text-barbershop-gold mr-2" size={16} />
+												{feature}
+											</li>
+										))}
+									</ul>
+
+									<Button
+										className="w-full bg-barbershop-gold text-barbershop-dark hover:bg-barbershop-gold/90 transition-all duration-300"
+										onClick={scrollToContact}
+									>
+										Prenota Questo Servizio
+									</Button>
+								</CardContent>
+							</Card>
+						</motion.div>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}

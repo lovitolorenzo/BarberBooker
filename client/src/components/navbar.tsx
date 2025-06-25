@@ -49,10 +49,12 @@ export default function Navbar() {
 		<header className="barbershop-charcoal border-b border-barbershop-dark">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center py-6">
-					<div className="flex items-center space-x-3">
-						<Scissors className="text-barbershop-gold text-2xl" />
-						<h1 className="text-2xl font-bold text-barbershop-text">Barbershop</h1>
-					</div>
+					<Link href="/">
+						<div className="flex items-center space-x-3">
+							<Scissors className="text-barbershop-gold text-2xl" />
+							<h1 className="text-2xl font-bold text-barbershop-text">Barbershop</h1>
+						</div>
+					</Link>
 					<div className="flex items-center space-x-6">
 						<nav className="hidden md:flex space-x-8">
 							{navItems.map((item) => (
