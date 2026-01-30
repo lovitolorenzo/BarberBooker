@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Scissors, User, Crown, Check } from "lucide-react";
+import { User, Crown, Check } from "lucide-react";
+
+const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 const services = [
 	{
-		icon: Scissors,
+		icon: null,
+		useLogo: true,
 		title: "Taglio Signature",
 		description: "Taglio di precisione personalizzato per il tuo stile e forma del viso",
 		price: "€15",
@@ -13,6 +16,7 @@ const services = [
 	},
 	{
 		icon: User,
+		useLogo: false,
 		title: "Rasatura Classica",
 		description: "Rasatura tradizionale con asciugamano caldo e prodotti premium",
 		price: "€10",
@@ -25,6 +29,7 @@ const services = [
 	},
 	{
 		icon: Crown,
+		useLogo: false,
 		title: "Il Trattamento Reale",
 		description: "Esperienza completa di toelettatura con taglio, rasatura e styling",
 		price: "€45",
@@ -75,7 +80,11 @@ export default function ServicesSection() {
 							<Card className="service-card bg-barbershop-light border-barbershop-light/30 shadow-2xl hover:transform hover:scale-105 transition-all duration-300 h-full">
 								<CardContent className="p-8">
 									<div className="text-center mb-6">
-										<service.icon className="text-barbershop-gold mx-auto mb-4" size={48} />
+										{service.useLogo ? (
+											<img src={logoUrl} alt="Barbershop logo" className="h-12 w-12 rounded-full object-cover mx-auto mb-4" />
+										) : (
+											service.icon && <service.icon className="text-barbershop-gold mx-auto mb-4" size={48} />
+										)}
 										<h3 className="font-display text-2xl font-semibold mb-2 text-barbershop-text">{service.title}</h3>
 										<p className="text-barbershop-muted mb-4">{service.description}</p>
 										<div className="text-barbershop-gold text-2xl font-bold">{service.price}</div>

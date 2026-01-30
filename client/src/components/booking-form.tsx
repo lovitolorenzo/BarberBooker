@@ -53,6 +53,17 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 	const createAppointmentMutation = useMutation({
 		mutationFn: async (data: InsertAppointment) => {
 			const response = await apiRequest("POST", "/api/appointments", data);
+			if (!response.ok) {
+				let message = "";
+				try {
+					const errorData = await response.json();
+					message = errorData?.message || "";
+				} catch {
+					// ignore
+				}
+				throw new Error(message || `Request failed: ${response.status} ${response.statusText}`);
+			}
+
 			return response.json();
 		},
 		onSuccess: (appointment: Appointment) => {

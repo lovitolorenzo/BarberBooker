@@ -247,7 +247,8 @@ export class MongoStorage implements IStorage {
     console.log("✅ Service Products seeded");
 
     // 4. Seed Appointments (90 days of data)
-    const appointments = [];
+    type SeedAppointment = MongoAppointment & { customerEmail: string };
+    const appointments: SeedAppointment[] = [];
     const services = ["Haircut", "Beard Trim", "Hair Wash", "Full Service", "Mustache Trim"];
     const servicePrices = { "Haircut": 25, "Beard Trim": 15, "Hair Wash": 10, "Full Service": 45, "Mustache Trim": 8 };
     const statuses = ["confirmed", "completed", "cancelled", "no-show"];
@@ -302,8 +303,18 @@ export class MongoStorage implements IStorage {
     console.log(`✅ ${appointments.length} Appointments seeded`);
 
     // 5. Generate Clients from appointment data
-    const clientMap = new Map();
-    appointments.forEach(apt => {
+    type ClientAccumulator = {
+      email: string;
+      firstName: string;
+      lastName: string;
+      phone: string;
+      totalVisits: number;
+      totalSpent: number;
+      appointments: SeedAppointment[];
+    };
+
+    const clientMap: Map<string, ClientAccumulator> = new Map();
+    appointments.forEach((apt) => {
       const key = apt.customerEmail;
       if (!clientMap.has(key)) {
         clientMap.set(key, {
@@ -316,7 +327,7 @@ export class MongoStorage implements IStorage {
           appointments: []
         });
       }
-      const client = clientMap.get(key);
+      const client = clientMap.get(key)!;
       if (apt.status === "completed") {
         client.totalVisits++;
         client.totalSpent += apt.price;
@@ -324,11 +335,11 @@ export class MongoStorage implements IStorage {
       client.appointments.push(apt);
     });
 
-    const clients = Array.from(clientMap.values()).map(client => {
-      const sortedApts = client.appointments.sort((a: any, b: any) => 
+    const clients: Client[] = Array.from(clientMap.values()).map((client) => {
+      const sortedApts = client.appointments.sort((a, b) => 
         new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime()
       );
-      const services = [...new Set(client.appointments.map((apt: any) => apt.service))];
+      const services = Array.from(new Set(client.appointments.map((apt) => apt.service)));
       
       return {
         email: client.email,
@@ -349,10 +360,18 @@ export class MongoStorage implements IStorage {
     console.log(`✅ ${clients.length} Clients seeded`);
 
     // 6. Generate Analytics Data
-    const analyticsData = [];
-    const dateMap = new Map();
+    type AnalyticsAccumulator = {
+      revenue: number;
+      count: number;
+      noShows: number;
+      services: Record<string, number>;
+      hours: Record<string, number>;
+    };
+
+    const analyticsData: AnalyticsData[] = [];
+    const dateMap: Map<string, AnalyticsAccumulator> = new Map();
     
-    appointments.forEach(apt => {
+    appointments.forEach((apt) => {
       if (!dateMap.has(apt.appointmentDate)) {
         dateMap.set(apt.appointmentDate, {
           revenue: 0,
@@ -362,7 +381,7 @@ export class MongoStorage implements IStorage {
           hours: {}
         });
       }
-      const dayData = dateMap.get(apt.appointmentDate);
+      const dayData = dateMap.get(apt.appointmentDate)!;
       
       if (apt.status === "completed") {
         dayData.revenue += apt.price;
@@ -516,11 +535,29 @@ export class MongoStorage implements IStorage {
 
   async getUserByName(firstName: string, lastName: string): Promise<User | undefined> {
     try {
-      const user = await this.users.findOne({ 
-        firstName: firstName, 
-        lastName: lastName 
-      });
-      return user || undefined;
+      const firstNameTrimmed = firstName.trim();
+      const lastNameTrimmed = lastName.trim();
+
+      const user = await this.users.findOne(
+        {
+          firstName: firstNameTrimmed,
+          lastName: lastNameTrimmed,
+        },
+        {
+          collation: { locale: "en", strength: 2 },
+        }
+      );
+
+      if (user) return user;
+
+      const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+      const userFallback = await this.users.findOne({
+        firstName: { $regex: `^${escapeRegex(firstNameTrimmed)}$`, $options: "i" } as any,
+        lastName: { $regex: `^${escapeRegex(lastNameTrimmed)}$`, $options: "i" } as any,
+      } as any);
+
+      return userFallback || undefined;
     } catch (error) {
       console.error("Error getting user by name:", error);
       return undefined;

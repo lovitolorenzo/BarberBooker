@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Scissors, User, Lock } from "lucide-react";
+import { User, Lock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { apiPost } from "@/config/api";
+
+const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 export default function LoginPage() {
 	const [firstName, setFirstName] = useState("");
@@ -79,7 +81,7 @@ export default function LoginPage() {
 				<CardHeader className="text-center">
 					<div className="flex justify-center mb-4">
 						<div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center">
-							<Scissors className="text-white h-8 w-8" />
+							<img src={logoUrl} alt="Barbershop logo" className="h-10 w-10 rounded-full object-cover" />
 						</div>
 					</div>
 					<CardTitle className="text-2xl text-barbershop-text">{t("login.title")}</CardTitle>

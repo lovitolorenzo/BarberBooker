@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Scissors, LogIn, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import CalendarComponent from "@/components/calendar";

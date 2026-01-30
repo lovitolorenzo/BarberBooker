@@ -1,9 +1,11 @@
-import { Scissors, Award, Clock, Users, Star, MapPin, Phone, Mail } from "lucide-react";
+import { Award, Clock, Users, Star, MapPin, Phone, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/navbar";
+
+const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 export default function AboutPage() {
 	const { t } = useTranslation();
@@ -88,7 +90,7 @@ export default function AboutPage() {
 							<Card key={index} className="barbershop-card border-barbershop-dark">
 								<CardContent className="p-6 text-center">
 									<div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-										<Scissors className="text-black h-8 w-8" />
+										<img src={logoUrl} alt="Barbershop logo" className="h-10 w-10 rounded-full object-cover" />
 									</div>
 									<h4 className="text-xl font-semibold text-barbershop-text mb-2">{service.name}</h4>
 									<div className="text-barbershop-gold font-bold text-2xl mb-2">{service.price}</div>

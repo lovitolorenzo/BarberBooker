@@ -1,10 +1,12 @@
-import { Scissors, LogIn, LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./language-switcher";
+
+const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 export default function Navbar() {
 	const [location, setLocation] = useLocation();
@@ -51,7 +53,11 @@ export default function Navbar() {
 				<div className="flex justify-between items-center py-6">
 					<Link href="/">
 						<div className="flex items-center space-x-3">
-							<Scissors className="text-barbershop-gold text-2xl" />
+							<img
+								src={logoUrl}
+								alt="Barbershop logo"
+								className="h-9 w-9 rounded-full object-cover"
+							/>
 							<h1 className="text-2xl font-bold text-barbershop-text">Barbershop</h1>
 						</div>
 					</Link>

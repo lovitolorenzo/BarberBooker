@@ -86,7 +86,7 @@ export default function CalendarComponent({
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-    const days = [];
+    const days: JSX.Element[] = [];
     for (let i = 0; i < 42; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
@@ -95,7 +95,7 @@ export default function CalendarComponent({
       const isCurrentMonth = currentDate.getMonth() === month;
       const isToday = dateStr === formatDate(new Date());
       const isSelected = selectedDate === dateStr;
-      const isPast = currentDate < new Date().setHours(0, 0, 0, 0);
+      const isPast = currentDate.getTime() < new Date().setHours(0, 0, 0, 0);
 
       days.push(
         <Button

@@ -50,11 +50,7 @@ export async function apiRequest(
   }
 
   const response = await fetch(url, config);
-  
-  if (!response.ok) {
-    throw new Error(`API call failed: ${response.status} ${response.statusText}`);
-  }
-  
+
   return response;
 }
 
