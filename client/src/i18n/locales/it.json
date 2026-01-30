@@ -110,19 +110,19 @@
 	"services": {
 		"title": "I Nostri Servizi",
 		"classicHaircut": {
-			"name": "Taglio Classico",
+			"name": "Taglio",
 			"duration": "30 minuti",
-			"description": "Taglio professionale con forbici e styling"
+			"description": "Taglio senza shampoo"
 		},
 		"beardTrim": {
-			"name": "Rifinitura Barba",
+			"name": "Barba",
 			"duration": "15 minuti",
-			"description": "Modellatura di precisione e styling della barba"
+			"description": "A partire da €4"
 		},
 		"fullService": {
-			"name": "Servizio Completo",
-			"duration": "45 minuti",
-			"description": "Taglio completo e servizio barba"
+			"name": "Taglio e Shampoo",
+			"duration": "35 minuti",
+			"description": "Taglio completo con shampoo"
 		},
 		"haircut": "Taglio",
 		"beard": "Barba",
@@ -130,7 +130,7 @@
 		"styling": "Styling",
 		"wash": "Lavaggio",
 		"mustache": "Baffi",
-		"fullservice": "Servizio Completo",
+		"fullservice": "Taglio e Shampoo",
 		"selectedAppointment": "Appuntamento Selezionato"
 	},
 	"hero": {
@@ -167,9 +167,9 @@
 		"callNow": "Chiama Ora",
 		"learnMore": "Scopri di Più su di Noi",
 		"address": {
-			"street": "Via Roma 123",
-			"district": "Centro Storico",
-			"city": "Milano, MI 20100"
+			"street": "Via Sasso n.61",
+			"district": "Brienza (PZ)",
+			"city": "Basilicata, Italia 85050"
 		},
 		"phoneNumbers": {
 			"primary": "(+39) 02 1234567",

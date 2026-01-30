@@ -16,7 +16,7 @@ export default function Footer() {
 		{ name: "Contatti", section: "contact" },
 	];
 
-	const services = ["Taglio Signature", "Rasatura Classica", "Trattamento Reale", "Cura della Barba"];
+	const services = ["Taglio e Shampoo", "Taglio", "Barba"];
 
 	return (
 		<footer className="bg-barbershop-dark py-12 border-t border-barbershop-light/30">

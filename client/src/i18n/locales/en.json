@@ -123,22 +123,22 @@
 		"styling": "Styling",
 		"wash": "Wash",
 		"mustache": "Mustache",
-		"fullservice": "Full Service",
+		"fullservice": "Haircut + Shampoo",
 		"title": "Our Services",
 		"classicHaircut": {
-			"name": "Classic Haircut",
+			"name": "Haircut",
 			"duration": "30 minutes",
-			"description": "Professional scissor cut with styling"
+			"description": "Haircut (no shampoo)"
 		},
 		"beardTrim": {
-			"name": "Beard Trim",
+			"name": "Beard",
 			"duration": "15 minutes",
-			"description": "Precision beard shaping and styling"
+			"description": "Starting from €4"
 		},
 		"fullService": {
-			"name": "Full Service",
-			"duration": "45 minutes",
-			"description": "Complete haircut and beard service"
+			"name": "Haircut + Shampoo",
+			"duration": "35 minutes",
+			"description": "Haircut with shampoo"
 		}
 	},
 	"hero": {
@@ -325,9 +325,9 @@
 		"callNow": "Call Now",
 		"learnMore": "Learn More About Us",
 		"address": {
-			"street": "123 Main Street",
-			"district": "Downtown District",
-			"city": "New York, NY 10001"
+			"street": "Via Sasso n.61",
+			"district": "Brienza (PZ)",
+			"city": "Basilicata, Italy 85050"
 		},
 		"phoneNumbers": {
 			"primary": "(555) 123-4567",

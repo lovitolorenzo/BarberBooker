@@ -9,7 +9,7 @@ export default function ContactSection() {
 		{
 			icon: MapPin,
 			title: "Posizione",
-			details: ["Via Roma, 45", "Brienza (PZ)", "Basilicata, Italy 85050"],
+			details: ["Via Sasso n.61", "Brienza (PZ)", "Basilicata, Italia 85050"],
 		},
 		{
 			icon: Clock,
@@ -119,7 +119,7 @@ export default function ContactSection() {
 							<div className="absolute top-4 left-4 bg-barbershop-dark/90 backdrop-blur-sm rounded-lg p-3">
 								<div className="flex items-center space-x-2">
 									<MapPin className="text-barbershop-gold" size={20} />
-									<div className="text-barbershop-text text-sm font-medium">Brienza (PZ), Italy</div>
+									<div className="text-barbershop-text text-sm font-medium">Via Sasso n.61 - Brienza (PZ)</div>
 								</div>
 							</div>
 						</div>

@@ -14,19 +14,19 @@ export default function AboutPage() {
 		{
 			name: t("services.classicHaircut.name"),
 			duration: t("services.classicHaircut.duration"),
-			price: "€25",
+			price: "€12",
 			description: t("services.classicHaircut.description"),
 		},
 		{
 			name: t("services.beardTrim.name"),
 			duration: t("services.beardTrim.duration"),
-			price: "€15",
+			price: "da €4",
 			description: t("services.beardTrim.description"),
 		},
 		{
 			name: t("services.fullService.name"),
 			duration: t("services.fullService.duration"),
-			price: "€35",
+			price: "€14",
 			description: t("services.fullService.description"),
 		},
 	];
