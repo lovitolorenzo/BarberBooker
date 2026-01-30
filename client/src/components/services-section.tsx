@@ -81,7 +81,7 @@ export default function ServicesSection() {
 								<CardContent className="p-8">
 									<div className="text-center mb-6">
 										{service.useLogo ? (
-											<img src={logoUrl} alt="Barbershop logo" className="h-12 w-12 rounded-full object-cover mx-auto mb-4" />
+											<img src={logoUrl} alt="Barbershop logo" className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
 										) : (
 											service.icon && <service.icon className="text-barbershop-gold mx-auto mb-4" size={48} />
 										)}

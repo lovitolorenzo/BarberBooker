@@ -98,8 +98,8 @@ export default function RegisterPage() {
 			<Card className="w-full max-w-md barbershop-card border-barbershop-dark">
 				<CardHeader className="text-center">
 					<div className="flex justify-center mb-4">
-						<div className="w-16 h-16 barbershop-gold rounded-full flex items-center justify-center">
-							<img src={logoUrl} alt="Barbershop logo" className="h-10 w-10 rounded-full object-cover" />
+						<div className="w-20 h-20 barbershop-gold rounded-full flex items-center justify-center">
+							<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-full object-cover" />
 						</div>
 					</div>
 					<CardTitle className="text-2xl text-barbershop-text">Barbershop</CardTitle>

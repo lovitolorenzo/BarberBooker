@@ -56,7 +56,7 @@ export default function Navbar() {
 							<img
 								src={logoUrl}
 								alt="Barbershop logo"
-								className="h-9 w-9 rounded-full object-cover"
+								className="h-12 w-12 rounded-full object-cover"
 							/>
 							<h1 className="text-2xl font-bold text-barbershop-text">Barbershop</h1>
 						</div>
