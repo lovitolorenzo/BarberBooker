@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, Calendar, Scissors } from "lucide-react";
 import { Link } from "wouter";
 
+ const heroVideoUrl = new URL("../assets/3998516-uhd_4096_2160_25fps.mp4", import.meta.url).href;
+
 export default function HeroSection() {
 	const scrollToServices = () => {
 		const element = document.getElementById("services");
@@ -12,9 +14,21 @@ export default function HeroSection() {
 	};
 
 	return (
-		<section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-surface-primary to-surface-secondary">
+		<section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+			<div className="absolute inset-0 z-0">
+				<video
+					src={heroVideoUrl}
+					autoPlay
+					muted
+					loop
+					playsInline
+					preload="metadata"
+					className="absolute inset-0 h-full w-full object-cover"
+				/>
+				<div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/60 to-surface-secondary/90" />
+			</div>
 			{/* Decorative background elements */}
-			<div className="absolute inset-0 overflow-hidden">
+			<div className="absolute inset-0 overflow-hidden z-0">
 				<div className="absolute -top-40 -right-40 w-96 h-96 bg-accent-blue/5 rounded-full blur-3xl" />
 				<div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent-purple/5 rounded-full blur-3xl" />
 			</div>
