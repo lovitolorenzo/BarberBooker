@@ -1,33 +1,63 @@
 import { motion } from "framer-motion";
+import { useRef } from "react";
 
-const galleryImages = [
-  {
-    src: "https://images.unsplash.com/photo-1503951458645-643d53bfd90f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Barbiere al lavoro con rasoio tradizionale"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Strumenti da barbiere professionali vintage"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Forbici e pettini da barbiere di qualità"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Sedia da barbiere in pelle classica"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Setup completo per rasatura con pennello e schiuma"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1622287162716-f311baa1a2b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Interno elegante di barbiere tradizionale"
-  }
+const galleryMedia = [
+	{
+		type: "video" as const,
+		src: new URL("../assets/13637912_3840_2160_24fps.mp4", import.meta.url).href,
+		alt: "Dettagli del salone",
+	},
+	{
+		type: "video" as const,
+		src: new URL("../assets/3996975-uhd_4096_2160_25fps.mp4", import.meta.url).href,
+		alt: "Atmosfera e stile",
+	},
+	{
+		type: "video" as const,
+		src: new URL("../assets/3998511-uhd_4096_2160_25fps.mp4", import.meta.url).href,
+		alt: "Strumenti da barbiere",
+	},
+	{
+		type: "video" as const,
+		src: new URL("../assets/7686508-hd_1920_1080_24fps.mp4", import.meta.url).href,
+		alt: "Precisione e finitura",
+	},
+	{
+		type: "video" as const,
+		src: new URL("../assets/8252400-hd_1920_1080_30fps.mp4", import.meta.url).href,
+		alt: "Stile moderno",
+	},
+	{
+		type: "video" as const,
+		src: new URL("../assets/7697049-hd_1920_1080_30fps.mp4", import.meta.url).href,
+		alt: "Esperienza in salone",
+	},
 ];
 
 export default function GallerySection() {
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  const handleEnter = async (index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    try {
+      await video.play();
+    } catch {
+      // ignore autoplay/gesture restrictions
+    }
+  };
+
+  const handleLeave = (index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <section id="gallery" className="section-padding bg-surface-secondary">
       <div className="container-wide">
@@ -50,7 +80,7 @@ export default function GallerySection() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {galleryImages.map((image, index) => (
+          {galleryMedia.map((media, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -58,15 +88,31 @@ export default function GallerySection() {
               transition={{ duration: 0.5, delay: index * 0.08 }}
               viewport={{ once: true }}
               className="group relative overflow-hidden rounded-2xl aspect-square cursor-pointer hover-lift"
+              onMouseEnter={() => media.type === "video" && handleEnter(index)}
+              onMouseLeave={() => media.type === "video" && handleLeave(index)}
             >
-              <img 
-                src={image.src}
-                alt={image.alt}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              {media.type === "video" ? (
+                <video
+                  ref={(el) => {
+                    videoRefs.current[index] = el;
+                  }}
+                  src={media.src}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <img
+                  src={media.src}
+                  alt={media.alt}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <p className="text-white text-sm font-medium">{image.alt}</p>
+                <p className="text-white text-sm font-medium">{media.alt}</p>
               </div>
             </motion.div>
           ))}
