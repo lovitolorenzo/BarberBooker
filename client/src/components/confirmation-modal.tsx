@@ -75,52 +75,52 @@ export default function ConfirmationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="barbershop-card border-barbershop-dark shadow-2xl max-w-md">
-        <div className="text-center p-6">
-          <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Check className="text-white text-2xl h-8 w-8" />
+      <DialogContent className="bg-white/95 backdrop-blur-xl border-white/50 shadow-glass-lg max-w-md rounded-3xl p-0 overflow-hidden">
+        <div className="text-center p-8">
+          <div className="w-16 h-16 bg-accent-green rounded-full flex items-center justify-center mx-auto mb-5">
+            <Check className="text-white h-8 w-8" />
           </div>
-          <h3 className="text-xl font-semibold text-barbershop-text mb-2">
+          <h3 className="text-xl font-semibold text-text-primary mb-2">
             {t('confirmation.title')}
           </h3>
-          <p className="text-barbershop-muted mb-6">
+          <p className="text-text-secondary text-sm mb-6">
             {t('confirmation.description')}
           </p>
           
-          <div className="barbershop-dark rounded-lg p-4 mb-6 text-left">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-barbershop-muted">{t('confirmation.service')}:</span>
-                <span className="text-barbershop-text">{getServiceName(booking.service)}</span>
+          <div className="bg-surface-secondary rounded-2xl p-5 mb-6 text-left">
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-text-secondary">{t('confirmation.service')}:</span>
+                <span className="text-text-primary font-medium">{getServiceName(booking.service)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-barbershop-muted">{t('confirmation.date')}:</span>
-                <span className="text-barbershop-text">{formatDisplayDate(booking.appointmentDate)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-text-secondary">{t('confirmation.date')}:</span>
+                <span className="text-text-primary font-medium">{formatDisplayDate(booking.appointmentDate)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-barbershop-muted">{t('confirmation.time')}:</span>
-                <span className="text-barbershop-text">{formatTime(booking.appointmentTime)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-text-secondary">{t('confirmation.time')}:</span>
+                <span className="text-text-primary font-medium">{formatTime(booking.appointmentTime)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-barbershop-muted">{t('confirmation.customer')}:</span>
-                <span className="text-barbershop-text">
+              <div className="flex justify-between items-center">
+                <span className="text-text-secondary">{t('confirmation.customer')}:</span>
+                <span className="text-text-primary font-medium">
                   {booking.customerFirstName} {booking.customerLastName}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-barbershop-charcoal pt-2 mt-2">
-                <span className="text-barbershop-muted">{t('confirmation.total')}:</span>
-                <span className="text-barbershop-gold font-semibold">
+              <div className="flex justify-between items-center border-t border-border pt-3 mt-3">
+                <span className="text-text-secondary">{t('confirmation.total')}:</span>
+                <span className="text-accent-blue font-semibold text-base">
                   {formatPrice(booking.price)}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex gap-3">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1 barbershop-dark text-barbershop-text border-barbershop-charcoal hover:barbershop-charcoal transition-colors"
+              className="flex-1 bg-surface-secondary text-text-primary border-border hover:bg-surface-primary rounded-xl py-3 h-auto transition-all"
             >
               {t('common.close')}
             </Button>

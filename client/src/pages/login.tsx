@@ -76,68 +76,71 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen barbershop-bg flex items-center justify-center px-4">
-			<Card className="w-full max-w-md barbershop-card border-barbershop-dark">
-				<CardHeader className="text-center">
-					<div className="flex justify-center mb-4">
-						<div className="w-20 h-20 barbershop-gold rounded-full flex items-center justify-center">
-							<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-full object-cover" />
+		<div className="min-h-screen bg-gradient-to-b from-surface-primary to-surface-secondary flex items-center justify-center px-4 py-12">
+			<div className="w-full max-w-md">
+				<div className="glass-card-heavy rounded-3xl p-8 shadow-glass-lg">
+					{/* Header */}
+					<div className="text-center mb-8">
+						<div className="flex justify-center mb-4">
+							<div className="w-20 h-20 rounded-2xl bg-surface-secondary flex items-center justify-center shadow-soft">
+								<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-xl object-cover" />
+							</div>
 						</div>
+						<h1 className="text-2xl font-semibold text-text-primary">{t("login.title")}</h1>
+						<p className="text-text-secondary text-sm mt-1">{t("login.subtitle")}</p>
 					</div>
-					<CardTitle className="text-2xl text-barbershop-text">{t("login.title")}</CardTitle>
-					<p className="text-barbershop-muted">{t("login.subtitle")}</p>
-				</CardHeader>
-				<CardContent>
+
+					{/* Form */}
 					<form onSubmit={handleLogin} className="space-y-4">
 						<div className="space-y-2">
-							<Label htmlFor="firstName" className="text-barbershop-text">
+							<Label htmlFor="firstName" className="text-sm font-medium text-text-primary">
 								{t("login.firstName.label")}
 							</Label>
 							<div className="relative">
-								<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
+								<User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
 								<Input
 									id="firstName"
 									type="text"
 									value={firstName}
 									onChange={(e) => setFirstName(e.target.value)}
 									placeholder={t("login.firstName.placeholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
+									className="pl-11 input-glass rounded-xl h-12"
 									required
 								/>
 							</div>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="lastName" className="text-barbershop-text">
+							<Label htmlFor="lastName" className="text-sm font-medium text-text-primary">
 								{t("login.lastName.label")}
 							</Label>
 							<div className="relative">
-								<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
+								<User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
 								<Input
 									id="lastName"
 									type="text"
 									value={lastName}
 									onChange={(e) => setLastName(e.target.value)}
 									placeholder={t("login.lastName.placeholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
+									className="pl-11 input-glass rounded-xl h-12"
 									required
 								/>
 							</div>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="password" className="text-barbershop-text">
+							<Label htmlFor="password" className="text-sm font-medium text-text-primary">
 								{t("login.password.label")}
 							</Label>
 							<div className="relative">
-								<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
+								<Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
 								<Input
 									id="password"
 									type="password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
 									placeholder={t("login.password.placeholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
+									className="pl-11 input-glass rounded-xl h-12"
 									required
 								/>
 							</div>
@@ -146,36 +149,38 @@ export default function LoginPage() {
 						<Button
 							type="submit"
 							disabled={isLoading}
-							className="w-full barbershop-gold text-white font-semibold py-3 hover:opacity-90 transition-all"
+							className="w-full btn-accent py-4 h-auto text-base font-medium rounded-xl mt-2"
 						>
 							{isLoading ? t("login.button.loading") : t("login.button.label")}
 						</Button>
 					</form>
 
-					<div className="mt-6 barbershop-dark rounded-lg p-4">
-						<h3 className="text-sm font-medium text-barbershop-text mb-3">{t("login.demo.credentials.title")}</h3>
-						<div className="text-xs text-barbershop-muted space-y-2">
-							<div className="border-l-2 border-barbershop-gold pl-3">
-								<p className="font-medium text-barbershop-text">{t("login.demo.credentials.admin.title")}</p>
+					{/* Demo credentials */}
+					<div className="mt-6 bg-surface-secondary rounded-2xl p-4">
+						<h3 className="text-sm font-medium text-text-primary mb-3">{t("login.demo.credentials.title")}</h3>
+						<div className="text-xs text-text-secondary space-y-2">
+							<div className="border-l-2 border-accent-blue pl-3">
+								<p className="font-medium text-text-primary">{t("login.demo.credentials.admin.title")}</p>
 								<p>{t("login.demo.credentials.admin.description")}</p>
 							</div>
-							<div className="border-l-2 border-blue-500 pl-3">
-								<p className="font-medium text-barbershop-text">{t("login.demo.credentials.customer.title")}</p>
+							<div className="border-l-2 border-accent-green pl-3">
+								<p className="font-medium text-text-primary">{t("login.demo.credentials.customer.title")}</p>
 								<p>{t("login.demo.credentials.customer.description")}</p>
 							</div>
 						</div>
 					</div>
 
+					{/* Register link */}
 					<div className="mt-6 text-center">
-						<p className="text-barbershop-muted text-sm">
+						<p className="text-text-secondary text-sm">
 							{t("login.no.account.label")}{" "}
-							<Link href="/register" className="text-barbershop-gold hover:underline">
+							<Link href="/register" className="text-accent-blue font-medium hover:underline">
 								{t("login.no.account.link")}
 							</Link>
 						</p>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -113,12 +113,12 @@ export default function CalendarComponent({
           key={i}
           variant="ghost"
           className={`
-            h-10 w-full text-sm font-medium rounded-lg transition-all
-            ${isCurrentMonth ? 'text-barbershop-text' : 'text-barbershop-muted'}
-            ${isToday ? 'barbershop-gold text-black' : ''}
-            ${isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
-            ${!isToday && !isSelected && isCurrentMonth ? 'hover:barbershop-dark' : ''}
-            ${isPast || isBeyondWeek ? 'opacity-50 cursor-not-allowed' : ''}
+            h-10 w-full text-sm font-medium rounded-xl transition-all
+            ${isCurrentMonth ? 'text-text-primary' : 'text-text-secondary/40'}
+            ${isToday && !isSelected ? 'bg-accent-blue/10 text-accent-blue' : ''}
+            ${isSelected ? 'bg-accent-blue text-white hover:bg-accent-blue/90' : ''}
+            ${!isToday && !isSelected && isCurrentMonth ? 'hover:bg-surface-secondary' : ''}
+            ${isPast || isBeyondWeek ? 'opacity-40 cursor-not-allowed' : ''}
           `}
           disabled={isPast || !isCurrentMonth || isBeyondWeek}
           onClick={() => !isPast && isCurrentMonth && !isBeyondWeek && onDateSelect(dateStr)}
@@ -136,7 +136,7 @@ export default function CalendarComponent({
 
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-medium text-barbershop-text">{t('available_times')}</h3>
+        <h3 className="text-base font-medium text-text-primary">{t('available_times')}</h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {timeSlots.map(time => {
             const isBooked = isSlotBooked(selectedDate, time);
@@ -149,11 +149,11 @@ export default function CalendarComponent({
                 variant="outline"
                 size="sm"
                 className={`
-                  py-2 px-3 text-sm font-medium rounded-lg transition-all
-                  ${isSelected ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : ''}
-                  ${isBooked ? 'bg-gray-500 text-gray-300 cursor-not-allowed border-gray-500' : ''}
-                  ${isPast ? 'bg-gray-700 text-gray-500 cursor-not-allowed border-gray-700' : ''}
-                  ${!isSelected && !isBooked && !isPast ? 'bg-emerald-500 text-white hover:bg-emerald-600 border-emerald-500' : ''}
+                  py-2.5 px-3 text-sm font-medium rounded-xl transition-all border
+                  ${isSelected ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
+                  ${isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : ''}
+                  ${isPast ? 'bg-gray-50 text-gray-300 cursor-not-allowed border-gray-100' : ''}
+                  ${!isSelected && !isBooked && !isPast ? 'bg-accent-green/10 text-accent-green border-accent-green/30 hover:bg-accent-green hover:text-white hover:border-accent-green' : ''}
                 `}
                 disabled={isBooked || isPast}
                 onClick={() => !isBooked && !isPast && onTimeSelect(time)}
@@ -176,72 +176,70 @@ export default function CalendarComponent({
   };
 
   return (
-    <Card className="barbershop-card border-barbershop-dark shadow-xl">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-barbershop-text">{t('select_date_time')}</h2>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goToPreviousMonth}
-              className="p-2 text-barbershop-muted hover:text-barbershop-gold transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-lg font-medium text-barbershop-text px-4">
-              {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goToNextMonth}
-              className="p-2 text-barbershop-muted hover:text-barbershop-gold transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+    <div className="glass-card rounded-3xl p-6 shadow-glass">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-text-primary">{t('select_date_time')}</h2>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToPreviousMonth}
+            className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-all"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-medium text-text-primary px-3 min-w-[140px] text-center">
+            {currentMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToNextMonth}
+            className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-all"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="mb-6">
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {[t('sunday'), t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday')].map(day => (
+            <div key={day} className="text-center text-xs font-medium text-text-secondary py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {renderCalendar()}
+        </div>
+      </div>
+
+      {/* Time Slots */}
+      {selectedDate && renderTimeSlots()}
+
+      {/* Legend */}
+      <div className="mt-6 pt-6 border-t border-border">
+        <div className="flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-accent-green"></div>
+            <span className="text-text-secondary">{t('available')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-accent-blue"></div>
+            <span className="text-text-secondary">{t('selected')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+            <span className="text-text-secondary">{t('booked')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+            <span className="text-text-secondary">{t('past')}</span>
           </div>
         </div>
-
-        {/* Calendar Grid */}
-        <div className="mb-6">
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {[t('sunday'), t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday')].map(day => (
-              <div key={day} className="text-center text-sm font-medium text-barbershop-muted py-2">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1">
-            {renderCalendar()}
-          </div>
-        </div>
-
-        {/* Time Slots */}
-        {selectedDate && renderTimeSlots()}
-
-        {/* Legend */}
-        <div className="mt-6 pt-6 border-t border-barbershop-dark">
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded bg-emerald-500"></div>
-              <span className="text-barbershop-muted">{t('available')}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded bg-blue-500"></div>
-              <span className="text-barbershop-muted">{t('selected')}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded bg-gray-500"></div>
-              <span className="text-barbershop-muted">{t('booked')}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded bg-gray-700"></div>
-              <span className="text-barbershop-muted">{t('past')}</span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
 
 const galleryImages = [
   {
@@ -25,53 +24,49 @@ const galleryImages = [
   {
     src: "https://images.unsplash.com/photo-1622287162716-f311baa1a2b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
     alt: "Interno elegante di barbiere tradizionale"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1567129937968-cdad8f07e2f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Barbiere che taglia i capelli con precisione"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
-    alt: "Risultato finale di taglio professionale"
   }
 ];
 
 export default function GallerySection() {
   return (
-    <section id="gallery" className="py-20 bg-barbershop-medium">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="gallery" className="section-padding bg-surface-secondary">
+      <div className="container-wide">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
-            La Nostra <span className="text-barbershop-gold">Galleria</span>
+          <span className="inline-block px-4 py-1.5 rounded-full bg-accent-blue/10 text-accent-blue text-sm font-medium mb-4">
+            Galleria
+          </span>
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary mb-4">
+            Il nostro lavoro
           </h2>
-          <p className="text-xl text-barbershop-muted max-w-2xl mx-auto">
-            Scopri la trasformazione e l'arte che definiscono il nostro lavoro
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+            Scopri l'arte e la precisione che mettiamo in ogni taglio
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {galleryImages.map((image, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
               viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-lg aspect-square cursor-pointer"
+              className="group relative overflow-hidden rounded-2xl aspect-square cursor-pointer hover-lift"
             >
               <img 
                 src={image.src}
                 alt={image.alt}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-barbershop-dark/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <Search className="text-barbershop-gold" size={32} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <p className="text-white text-sm font-medium">{image.alt}</p>
               </div>
             </motion.div>
           ))}

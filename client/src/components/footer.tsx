@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, MapPin } from "lucide-react";
+import { Link } from "wouter";
+
+const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 export default function Footer() {
 	const scrollToSection = (sectionId: string) => {
@@ -16,88 +19,104 @@ export default function Footer() {
 		{ name: "Contatti", section: "contact" },
 	];
 
-	const services = ["Taglio e Shampoo", "Taglio", "Barba"];
-
 	return (
-		<footer className="bg-barbershop-dark py-12 border-t border-barbershop-light/30">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="grid md:grid-cols-4 gap-8">
+		<footer className="bg-surface-tertiary border-t border-border">
+			<div className="container-wide py-16">
+				<div className="grid md:grid-cols-4 gap-12">
+					{/* Brand */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						whileInView={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.6 }}
+						transition={{ duration: 0.5 }}
 						viewport={{ once: true }}
-						className="col-span-2"
+						className="md:col-span-2"
 					>
-						<div className="font-display text-3xl font-bold text-barbershop-gold mb-4">Barbershop</div>
-						<p className="text-barbershop-muted mb-6 max-w-md">
-							Dove la tradizione incontra la sofisticazione moderna. Vivi i migliori servizi di toelettatura in
-							un'atmosfera di eleganza senza tempo.
+						<div className="flex items-center gap-3 mb-4">
+							<img src={logoUrl} alt="Barbershop logo" className="h-10 w-10 rounded-full object-cover" />
+							<span className="font-display text-xl font-semibold text-text-primary">Barbershop</span>
+						</div>
+						<p className="text-text-secondary text-sm leading-relaxed mb-6 max-w-sm">
+							Un'esperienza di stile unica nel cuore della Basilicata. Qualità, professionalità e cura personale dal 2010.
 						</p>
-						<div className="flex space-x-4">
-							<button className="text-barbershop-muted hover:text-barbershop-gold transition-colors">
-								<Facebook size={24} />
-							</button>
-							<button className="text-barbershop-muted hover:text-barbershop-gold transition-colors">
-								<Instagram size={24} />
-							</button>
-							<button className="text-barbershop-muted hover:text-barbershop-gold transition-colors">
-								<Twitter size={24} />
-							</button>
+						<div className="flex items-center gap-3">
+							<a 
+								href="#" 
+								aria-label="Facebook"
+								className="w-10 h-10 rounded-full bg-surface-secondary flex items-center justify-center text-text-secondary hover:text-accent-blue hover:bg-accent-blue/10 transition-all"
+							>
+								<Facebook size={18} />
+							</a>
+							<a 
+								href="#" 
+								aria-label="Instagram"
+								className="w-10 h-10 rounded-full bg-surface-secondary flex items-center justify-center text-text-secondary hover:text-accent-blue hover:bg-accent-blue/10 transition-all"
+							>
+								<Instagram size={18} />
+							</a>
 						</div>
 					</motion.div>
 
+					{/* Quick Links */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						whileInView={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.6, delay: 0.1 }}
+						transition={{ duration: 0.5, delay: 0.1 }}
 						viewport={{ once: true }}
 					>
-						<h4 className="font-semibold text-lg mb-4 text-barbershop-text">Link Rapidi</h4>
-						<ul className="space-y-2 text-barbershop-muted">
+						<h4 className="font-semibold text-sm text-text-primary mb-4">Link Rapidi</h4>
+						<ul className="space-y-3">
 							{quickLinks.map((link) => (
 								<li key={link.name}>
 									<button
 										onClick={() => scrollToSection(link.section)}
-										className="hover:text-barbershop-gold transition-colors"
+										className="text-sm text-text-secondary hover:text-accent-blue transition-colors"
 									>
 										{link.name}
 									</button>
 								</li>
 							))}
+							<li>
+								<Link href="/booking" className="text-sm text-text-secondary hover:text-accent-blue transition-colors">
+									Prenota
+								</Link>
+							</li>
 						</ul>
 					</motion.div>
 
+					{/* Location */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						whileInView={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.6, delay: 0.2 }}
+						transition={{ duration: 0.5, delay: 0.2 }}
 						viewport={{ once: true }}
 					>
-						<h4 className="font-semibold text-lg mb-4 text-barbershop-text">Servizi</h4>
-						<ul className="space-y-2 text-barbershop-muted">
-							{services.map((service) => (
-								<li key={service}>
-									<button
-										onClick={() => scrollToSection("services")}
-										className="hover:text-barbershop-gold transition-colors"
-									>
-										{service}
-									</button>
-								</li>
-							))}
-						</ul>
+						<h4 className="font-semibold text-sm text-text-primary mb-4">Dove Siamo</h4>
+						<div className="flex items-start gap-2 text-sm text-text-secondary">
+							<MapPin size={16} className="mt-0.5 flex-shrink-0 text-accent-blue" />
+							<div>
+								<p>Via Sasso n.61</p>
+								<p>85050 Brienza (PZ)</p>
+								<p>Italia</p>
+							</div>
+						</div>
 					</motion.div>
 				</div>
 
+				{/* Bottom bar */}
 				<motion.div
 					initial={{ opacity: 0 }}
 					whileInView={{ opacity: 1 }}
-					transition={{ duration: 0.6, delay: 0.3 }}
+					transition={{ duration: 0.5, delay: 0.3 }}
 					viewport={{ once: true }}
-					className="border-t border-barbershop-light/30 mt-8 pt-8 text-center text-barbershop-muted"
+					className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
 				>
-					<p>&copy; 2024 Barbershop. Tutti i diritti riservati.</p>
+					<p className="text-xs text-text-secondary">
+						© {new Date().getFullYear()} Barbershop. Tutti i diritti riservati.
+					</p>
+					<div className="flex gap-6 text-xs text-text-secondary">
+						<a href="#" className="hover:text-text-primary transition-colors">Privacy</a>
+						<a href="#" className="hover:text-text-primary transition-colors">Termini</a>
+					</div>
 				</motion.div>
 			</div>
 		</footer>

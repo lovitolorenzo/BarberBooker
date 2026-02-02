@@ -162,141 +162,135 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		(isAdmin ? (adminCustomerFirstName && adminCustomerLastName) : (userFirstName && userLastName));
 
 	return (
-		<Card className="barbershop-card border-barbershop-dark shadow-xl">
-			<CardContent className="p-6">
-				<h2 className="text-xl font-semibold text-barbershop-text mb-6">{t("bookAppointment")}</h2>
+		<div className="glass-card rounded-3xl p-6 shadow-glass">
+			<h2 className="text-xl font-semibold text-text-primary mb-6">{t("bookAppointment")}</h2>
 
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-					{/* Service Selection */}
-					<div className="space-y-2">
-						<Label htmlFor="service" className="text-sm font-medium text-barbershop-text">
-							{t("selectService")}
-						</Label>
-						<Select onValueChange={handleServiceChange}>
-							<SelectTrigger className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text focus:ring-2 focus:ring-barbershop-gold focus:border-transparent">
-								<SelectValue placeholder={t("chooseService")} />
-							</SelectTrigger>
-							<SelectContent className="barbershop-dark border-barbershop-charcoal">
-								{Object.entries(services).map(([key, service]) => {
-									// Usa le chiavi dirette dalla traduzione
-									let serviceName = '';
-									if (key === 'haircut') serviceName = t('services.haircut');
-									else if (key === 'beard') serviceName = t('services.beard');
-									else if (key === 'full') serviceName = t('services.fullservice');
-									return (
-										<SelectItem key={key} value={key} className="text-barbershop-text hover:barbershop-charcoal">
-											{serviceName} - {service.duration}min - €{service.price}
-										</SelectItem>
-									);
-								})}
-							</SelectContent>
-						</Select>
-						{form.formState.errors.service && (
-							<p className="text-red-400 text-sm">{form.formState.errors.service.message}</p>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+				{/* Service Selection */}
+				<div className="space-y-2">
+					<Label htmlFor="service" className="text-sm font-medium text-text-primary">
+						{t("selectService")}
+					</Label>
+					<Select onValueChange={handleServiceChange}>
+						<SelectTrigger className="w-full px-4 py-3 bg-white/60 border border-border rounded-xl text-text-primary focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all">
+							<SelectValue placeholder={t("chooseService")} />
+						</SelectTrigger>
+						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
+							{Object.entries(services).map(([key, service]) => {
+								let serviceName = '';
+								if (key === 'haircut') serviceName = t('services.haircut');
+								else if (key === 'beard') serviceName = t('services.beard');
+								else if (key === 'full') serviceName = t('services.fullservice');
+								return (
+									<SelectItem key={key} value={key} className="text-text-primary hover:bg-surface-secondary rounded-lg">
+										{serviceName} - {service.duration}min - €{service.price}
+									</SelectItem>
+								);
+							})}
+						</SelectContent>
+					</Select>
+					{form.formState.errors.service && (
+						<p className="text-accent-red text-sm">{form.formState.errors.service.message}</p>
+					)}
+				</div>
+
+				{/* Selected Date/Time Display */}
+				{selectedDate && selectedTime && (
+					<div className="bg-accent-blue/5 rounded-2xl p-4 border border-accent-blue/20">
+						<div className="flex items-center gap-2 mb-2">
+							<Calendar className="h-4 w-4 text-accent-blue" />
+							<span className="text-sm font-medium text-text-primary">{t("selectedAppointment")}</span>
+						</div>
+						<div className="text-text-secondary text-sm">
+							{formatDisplayDate(selectedDate)} at {formatTime(selectedTime)}
+						</div>
+						{selectedService && (
+							<div className="text-xs text-text-secondary mt-1">
+								{t("duration")} {services[selectedService].duration} {t("minutes")}
+							</div>
 						)}
 					</div>
+				)}
 
-					{/* Selected Date/Time Display */}
-					{selectedDate && selectedTime && (
-						<div className="barbershop-dark rounded-lg p-4 border border-barbershop-charcoal">
-							<div className="flex items-center space-x-2 mb-2">
-								<Calendar className="h-4 w-4 text-barbershop-gold" />
-								<span className="text-sm font-medium text-barbershop-text">{t("selectedAppointment")}</span>
-							</div>
-							<div className="text-barbershop-muted">
-								{formatDisplayDate(selectedDate)} at {formatTime(selectedTime)}
-							</div>
-							{selectedService && (
-								<div className="text-sm text-barbershop-muted mt-1">
-									{t("duration")} {services[selectedService].duration} {t("minutes")}
-								</div>
-							)}
+				{/* Customer Information */}
+				{isAdmin ? (
+					<div className="space-y-3">
+						<Label className="text-sm font-medium text-text-primary">{t("bookingFor")} (Admin)</Label>
+						<div className="grid grid-cols-2 gap-3">
+							<Input
+								type="text"
+								placeholder={t("firstName")}
+								value={adminCustomerFirstName}
+								onChange={(e) => setAdminCustomerFirstName(e.target.value)}
+								className="input-glass rounded-xl"
+							/>
+							<Input
+								type="text"
+								placeholder={t("lastName")}
+								value={adminCustomerLastName}
+								onChange={(e) => setAdminCustomerLastName(e.target.value)}
+								className="input-glass rounded-xl"
+							/>
 						</div>
-					)}
-
-					{/* Customer Information */}
-					{isAdmin ? (
-						/* Admin: campi per inserire nome cliente */
-						<div className="space-y-4">
-							<Label className="text-sm font-medium text-barbershop-text">{t("bookingFor")} (Admin)</Label>
-							<div className="grid grid-cols-2 gap-3">
-								<Input
-									type="text"
-									placeholder={t("firstName")}
-									value={adminCustomerFirstName}
-									onChange={(e) => setAdminCustomerFirstName(e.target.value)}
-									className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-								/>
-								<Input
-									type="text"
-									placeholder={t("lastName")}
-									value={adminCustomerLastName}
-									onChange={(e) => setAdminCustomerLastName(e.target.value)}
-									className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-								/>
-							</div>
-						</div>
-					) : userFirstName && userLastName ? (
-						<div className="space-y-2">
-							<Label className="text-sm font-medium text-barbershop-text">{t("bookingFor")}</Label>
-							<div className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text bg-barbershop-dark">
-								{userFirstName} {userLastName}
-							</div>
-						</div>
-					) : (
-						<div className="space-y-2">
-							<div className="w-full p-4 border border-barbershop-charcoal rounded-lg barbershop-dark flex flex-col items-center">
-								<p className="text-barbershop-text mb-3">{t("authenticationRequired.description")}</p>
-								<Button 
-									className="barbershop-gold text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-all"
-									onClick={() => navigate('/login')}
-								>
-									<LogIn className="h-4 w-4 mr-2" />
-									{t("nav.login")}
-								</Button>
-							</div>
-						</div>
-					)}
-
-					<div className="space-y-2">
-						<Label htmlFor="phone" className="text-sm font-medium text-barbershop-text">
-							{t("phoneNumber")}
-						</Label>
-						<Input
-							{...form.register("customerPhone")}
-							type="tel"
-							placeholder="(+39) 1234567"
-							className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
-						/>
-						{form.formState.errors.customerPhone && (
-							<p className="text-red-400 text-sm">{form.formState.errors.customerPhone.message}</p>
-						)}
 					</div>
-
-					{/* Special Requests */}
+				) : userFirstName && userLastName ? (
 					<div className="space-y-2">
-						<Label htmlFor="notes" className="text-sm font-medium text-barbershop-text">
-							{t("specialRequests")}
-						</Label>
-						<Textarea
-							{...form.register("notes")}
-							rows={3}
-							placeholder={t("anySpecificRequests")}
-							className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent resize-none"
-						/>
+						<Label className="text-sm font-medium text-text-primary">{t("bookingFor")}</Label>
+						<div className="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-text-primary">
+							{userFirstName} {userLastName}
+						</div>
 					</div>
+				) : (
+					<div className="bg-accent-orange/5 border border-accent-orange/20 rounded-2xl p-5 flex flex-col items-center text-center">
+						<p className="text-text-secondary text-sm mb-4">{t("authenticationRequired.description")}</p>
+						<Button 
+							className="btn-accent"
+							onClick={() => navigate('/login')}
+						>
+							<LogIn className="h-4 w-4 mr-2" />
+							{t("nav.login")}
+						</Button>
+					</div>
+				)}
 
-					{/* Submit Button */}
-					<Button
-						type="submit"
-						disabled={!isFormValid || createAppointmentMutation.isPending}
-						className="w-full barbershop-gold text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 focus:ring-2 focus:ring-barbershop-gold focus:ring-offset-2 focus:ring-offset-barbershop-card transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						<CalendarCheck className="mr-2 h-4 w-4" />
-						{createAppointmentMutation.isPending ? t("booking") : t("bookAppointment")}
-					</Button>
-				</form>
-			</CardContent>
-		</Card>
+				<div className="space-y-2">
+					<Label htmlFor="phone" className="text-sm font-medium text-text-primary">
+						{t("phoneNumber")}
+					</Label>
+					<Input
+						{...form.register("customerPhone")}
+						type="tel"
+						placeholder="(+39) 1234567"
+						className="input-glass rounded-xl"
+					/>
+					{form.formState.errors.customerPhone && (
+						<p className="text-accent-red text-sm">{form.formState.errors.customerPhone.message}</p>
+					)}
+				</div>
+
+				{/* Special Requests */}
+				<div className="space-y-2">
+					<Label htmlFor="notes" className="text-sm font-medium text-text-primary">
+						{t("specialRequests")}
+					</Label>
+					<Textarea
+						{...form.register("notes")}
+						rows={3}
+						placeholder={t("anySpecificRequests")}
+						className="input-glass rounded-xl resize-none"
+					/>
+				</div>
+
+				{/* Submit Button */}
+				<Button
+					type="submit"
+					disabled={!isFormValid || createAppointmentMutation.isPending}
+					className="w-full btn-accent py-4 h-auto text-base font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					<CalendarCheck className="mr-2 h-5 w-5" />
+					{createAppointmentMutation.isPending ? t("booking") : t("bookAppointment")}
+				</Button>
+			</form>
+		</div>
 	);
 }

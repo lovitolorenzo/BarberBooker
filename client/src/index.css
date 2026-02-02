@@ -3,57 +3,50 @@
 @tailwind utilities;
 
 :root {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 220 75% 65%;
-  --primary-foreground: 220 100% 10%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
-  --radius: 0.5rem;
+  /* Apple-inspired light theme */
+  --background: 0 0% 98%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 0 0% 15%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 15%;
+  --radius: 1rem;
 
-  /* Custom barbershop colors */
-  --barbershop-bg: 15 15% 6%;
-  --barbershop-charcoal: 0 0% 10%;
-  --barbershop-dark: 0 0% 18%;
-  --barbershop-gold: 220 75% 65%;
-  --barbershop-card: 0 0% 12%;
-  --barbershop-text: 210 40% 98%;
-  --barbershop-muted: 215 20% 65%;
-}
-
-.dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 47 96% 53%;
-  --primary-foreground: 26 14% 9%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  /* Glass-morphism design system */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.85);
+  --glass-bg-light: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --glass-blur: 20px;
+  
+  /* Refined color palette */
+  --surface-primary: #fafafa;
+  --surface-secondary: #f5f5f7;
+  --surface-tertiary: #ffffff;
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #6e6e73;
+  --accent-blue: #0071e3;
+  --accent-green: #34c759;
+  --accent-orange: #ff9500;
+  --accent-red: #ff3b30;
+  --accent-purple: #af52de;
+  --divider: rgba(0, 0, 0, 0.06);
 }
 
 @layer base {
@@ -61,42 +54,209 @@
     @apply border-border;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply font-sans antialiased;
-    background-color: hsl(var(--barbershop-bg));
-    color: hsl(var(--barbershop-text));
+    @apply antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Glass card effect */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-card-heavy {
+    background: var(--glass-bg-heavy);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: var(--glass-shadow-lg);
+  }
+
+  .glass-nav {
+    background: rgba(251, 251, 253, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--divider);
+  }
+
+  /* Soft button styles */
+  .btn-primary {
+    @apply px-6 py-3 rounded-full font-medium transition-all duration-300;
+    background: var(--text-primary);
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-full font-medium transition-all duration-300;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--divider);
+    color: var(--text-primary);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+  }
+
+  .btn-accent {
+    @apply px-6 py-3 rounded-full font-medium transition-all duration-300;
+    background: var(--accent-blue);
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3);
+  }
+
+  .btn-accent:hover {
+    background: #0077ed;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
+  }
+
+  /* Input styles */
+  .input-glass {
+    @apply w-full px-4 py-3 rounded-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--divider);
+    color: var(--text-primary);
+  }
+
+  .input-glass::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .input-glass:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+  }
+
+  /* Section styles */
+  .section-padding {
+    @apply py-20 md:py-32;
+  }
+
+  .container-narrow {
+    @apply max-w-5xl mx-auto px-6;
+  }
+
+  .container-wide {
+    @apply max-w-7xl mx-auto px-6;
   }
 }
 
 @layer utilities {
+  /* Text styles */
+  .text-gradient {
+    background: linear-gradient(90deg, var(--text-primary) 0%, var(--text-tertiary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Animation utilities */
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Legacy compatibility classes (mapped to new system) */
   .barbershop-bg {
-    background-color: hsl(var(--barbershop-bg));
+    background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
   }
-  .barbershop-charcoal {
-    background-color: hsl(var(--barbershop-charcoal));
-  }
-  .barbershop-dark {
-    background-color: hsl(var(--barbershop-dark));
-  }
-  .barbershop-gold {
-    background-color: hsl(var(--barbershop-gold));
-  }
+
   .barbershop-card {
-    background-color: hsl(var(--barbershop-card));
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
   }
+
+  .barbershop-charcoal {
+    background: var(--surface-secondary);
+  }
+
+  .barbershop-dark {
+    background: var(--surface-secondary);
+  }
+
+  .barbershop-gold {
+    background: var(--accent-blue);
+  }
+
   .text-barbershop-text {
-    color: hsl(var(--barbershop-text));
+    color: var(--text-primary);
   }
+
   .text-barbershop-muted {
-    color: hsl(var(--barbershop-muted));
+    color: var(--text-secondary);
   }
+
   .text-barbershop-gold {
-    color: hsl(var(--barbershop-gold));
+    color: var(--accent-blue);
   }
+
   .border-barbershop-dark {
-    border-color: hsl(var(--barbershop-dark));
+    border-color: var(--divider);
   }
+
   .border-barbershop-charcoal {
-    border-color: hsl(var(--barbershop-charcoal));
+    border-color: var(--divider);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

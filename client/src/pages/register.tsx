@@ -94,86 +94,91 @@ export default function RegisterPage() {
 	};
 
 	return (
-		<div className="min-h-screen barbershop-bg flex items-center justify-center px-4">
-			<Card className="w-full max-w-md barbershop-card border-barbershop-dark">
-				<CardHeader className="text-center">
-					<div className="flex justify-center mb-4">
-						<div className="w-20 h-20 barbershop-gold rounded-full flex items-center justify-center">
-							<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-full object-cover" />
+		<div className="min-h-screen bg-gradient-to-b from-surface-primary to-surface-secondary flex items-center justify-center px-4 py-12">
+			<div className="w-full max-w-md">
+				<div className="glass-card-heavy rounded-3xl p-8 shadow-glass-lg">
+					{/* Header */}
+					<div className="text-center mb-8">
+						<div className="flex justify-center mb-4">
+							<div className="w-20 h-20 rounded-2xl bg-surface-secondary flex items-center justify-center shadow-soft">
+								<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-xl object-cover" />
+							</div>
 						</div>
+						<h1 className="text-2xl font-semibold text-text-primary">Barbershop</h1>
+						<p className="text-text-secondary text-sm mt-1">{t("register.createAccount")}</p>
 					</div>
-					<CardTitle className="text-2xl text-barbershop-text">Barbershop</CardTitle>
-					<p className="text-barbershop-muted">{t("register.createAccount")}</p>
-				</CardHeader>
-				<CardContent>
+
+					{/* Form */}
 					<form onSubmit={handleRegister} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="firstName" className="text-barbershop-text">
-								{t("register.firstName")}
-							</Label>
-							<div className="relative">
-								<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
-								<Input
-									id="firstName"
-									type="text"
-									value={firstName}
-									onChange={(e) => setFirstName(e.target.value)}
-									placeholder={t("register.firstNamePlaceholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
-									required
-								/>
+						<div className="grid grid-cols-2 gap-3">
+							<div className="space-y-2">
+								<Label htmlFor="firstName" className="text-sm font-medium text-text-primary">
+									{t("register.firstName")}
+								</Label>
+								<div className="relative">
+									<User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
+									<Input
+										id="firstName"
+										type="text"
+										value={firstName}
+										onChange={(e) => setFirstName(e.target.value)}
+										placeholder={t("register.firstNamePlaceholder")}
+										className="pl-11 input-glass rounded-xl h-12"
+										required
+									/>
+								</div>
+							</div>
+
+							<div className="space-y-2">
+								<Label htmlFor="lastName" className="text-sm font-medium text-text-primary">
+									{t("register.lastName")}
+								</Label>
+								<div className="relative">
+									<User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
+									<Input
+										id="lastName"
+										type="text"
+										value={lastName}
+										onChange={(e) => setLastName(e.target.value)}
+										placeholder={t("register.lastNamePlaceholder")}
+										className="pl-11 input-glass rounded-xl h-12"
+										required
+									/>
+								</div>
 							</div>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="lastName" className="text-barbershop-text">
-								{t("register.lastName")}
-							</Label>
-							<div className="relative">
-								<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
-								<Input
-									id="lastName"
-									type="text"
-									value={lastName}
-									onChange={(e) => setLastName(e.target.value)}
-									placeholder={t("register.lastNamePlaceholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
-									required
-								/>
-							</div>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="password" className="text-barbershop-text">
+							<Label htmlFor="password" className="text-sm font-medium text-text-primary">
 								{t("register.password")}
 							</Label>
 							<div className="relative">
-								<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
+								<Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
 								<Input
 									id="password"
 									type="password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
 									placeholder={t("register.passwordPlaceholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
+									className="pl-11 input-glass rounded-xl h-12"
 									required
 								/>
 							</div>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="confirmPassword" className="text-barbershop-text">
+							<Label htmlFor="confirmPassword" className="text-sm font-medium text-text-primary">
 								{t("register.confirmPassword")}
 							</Label>
 							<div className="relative">
-								<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-barbershop-muted h-4 w-4" />
+								<Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
 								<Input
 									id="confirmPassword"
 									type="password"
 									value={confirmPassword}
 									onChange={(e) => setConfirmPassword(e.target.value)}
 									placeholder={t("register.confirmPasswordPlaceholder")}
-									className="pl-10 barbershop-dark border-barbershop-charcoal text-barbershop-text"
+									className="pl-11 input-glass rounded-xl h-12"
 									required
 								/>
 							</div>
@@ -182,22 +187,23 @@ export default function RegisterPage() {
 						<Button
 							type="submit"
 							disabled={isLoading}
-							className="w-full barbershop-gold text-white font-semibold py-3 hover:opacity-90 transition-all"
+							className="w-full btn-accent py-4 h-auto text-base font-medium rounded-xl mt-2"
 						>
 							{isLoading ? t("register.creating") : t("register.createAccountButton")}
 						</Button>
 					</form>
 
+					{/* Login link */}
 					<div className="mt-6 text-center">
-						<p className="text-barbershop-muted text-sm">
+						<p className="text-text-secondary text-sm">
 							{t("register.alreadyHaveAccount")}{" "}
-							<Link href="/login" className="text-barbershop-gold hover:underline">
+							<Link href="/login" className="text-accent-blue font-medium hover:underline">
 								{t("register.signInHere")}
 							</Link>
 						</p>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -9,7 +9,7 @@ import Footer from "@/components/footer";
 
 export default function Home() {
 	return (
-		<div className="bg-barbershop-dark text-barbershop-text">
+		<div className="min-h-screen">
 			<Navbar />
 
 			<HeroSection />
