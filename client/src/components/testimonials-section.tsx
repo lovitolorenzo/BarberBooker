@@ -3,21 +3,21 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
 	{
-		name: "Marco Rossi",
-		title: "Cliente da 5 anni",
-		text: "Esperienza assolutamente eccellente. L'attenzione ai dettagli e la professionalità sono impareggiabili.",
+		name: "Luca De Santis",
+		title: "Cliente da 3 anni",
+		text: "Taglio preciso e barba rifinita alla perfezione. Ambiente curato, puntualità e un'attenzione ai dettagli che fa davvero la differenza.",
 		rating: 5,
 	},
 	{
-		name: "Giuseppe Ferrari",
+		name: "Davide Romano",
 		title: "Cliente abituale",
-		text: "L'esperienza della rasatura classica qui è incredibile. Prodotti premium e tecnica magistrale.",
+		text: "Rasatura tradizionale impeccabile: mano sicura, prodotti ottimi e un risultato pulito che dura giorni. Consigliatissimo.",
 		rating: 5,
 	},
 	{
-		name: "Antonio Bianchi",
-		title: "Cliente soddisfatto",
-		text: "Stabilisce lo standard per la cura maschile. L'atmosfera, il servizio, i risultati - tutto è di primo livello.",
+		name: "Matteo Greco",
+		title: "Nuovo cliente",
+		text: "Prima volta e mi sono sentito subito a mio agio. Consulenza sullo stile, taglio moderno e finitura perfetta: servizio davvero di livello.",
 		rating: 5,
 	},
 ];
