@@ -36,7 +36,11 @@ type BookingFormData = z.infer<typeof bookingSchema>;
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
 	const [selectedService, setSelectedService] = useState<ServiceKey | null>(null);
 	const { toast } = useToast();
-	const { userFirstName, userLastName } = useAuth();
+	const { userFirstName, userLastName, userRole } = useAuth();
+	const isAdmin = userRole === 'admin';
+	// State per admin che prenota a nome di altri clienti
+	const [adminCustomerFirstName, setAdminCustomerFirstName] = useState('');
+	const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
 	const queryClient = useQueryClient();
 	const { t } = useTranslation();
 	const [_, navigate] = useLocation();
@@ -113,10 +117,14 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			return;
 		}
 
-		if (!userFirstName || !userLastName) {
+		// Per admin: usa i nomi inseriti manualmente, altrimenti usa i dati dell'utente loggato
+		const finalFirstName = isAdmin ? adminCustomerFirstName : userFirstName;
+		const finalLastName = isAdmin ? adminCustomerLastName : userLastName;
+
+		if (!finalFirstName || !finalLastName) {
 			toast({
-				title: t("authenticationRequired.title"),
-				description: t("authenticationRequired.description"),
+				title: isAdmin ? t("missingInformation.title") : t("authenticationRequired.title"),
+				description: isAdmin ? t("missingInformation.description") : t("authenticationRequired.description"),
 				variant: "destructive",
 			});
 			return;
@@ -130,8 +138,8 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		else if (selectedService === 'beard') serviceDisplayName = t('services.beard');
 		else if (selectedService === 'full') serviceDisplayName = t('services.fullservice');
 		const appointmentData: InsertAppointment = {
-			customerFirstName: userFirstName,
-			customerLastName: userLastName,
+			customerFirstName: finalFirstName,
+			customerLastName: finalLastName,
 			customerPhone: data.customerPhone,
 			service: serviceDisplayName,
 			notes: data.notes,
@@ -150,7 +158,8 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		form.setValue("service", value);
 	};
 
-	const isFormValid = selectedDate && selectedTime && selectedService && userFirstName && userLastName;
+	const isFormValid = selectedDate && selectedTime && selectedService && 
+		(isAdmin ? (adminCustomerFirstName && adminCustomerLastName) : (userFirstName && userLastName));
 
 	return (
 		<Card className="barbershop-card border-barbershop-dark shadow-xl">
@@ -206,7 +215,28 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					)}
 
 					{/* Customer Information */}
-					{userFirstName && userLastName ? (
+					{isAdmin ? (
+						/* Admin: campi per inserire nome cliente */
+						<div className="space-y-4">
+							<Label className="text-sm font-medium text-barbershop-text">{t("bookingFor")} (Admin)</Label>
+							<div className="grid grid-cols-2 gap-3">
+								<Input
+									type="text"
+									placeholder={t("firstName")}
+									value={adminCustomerFirstName}
+									onChange={(e) => setAdminCustomerFirstName(e.target.value)}
+									className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
+								/>
+								<Input
+									type="text"
+									placeholder={t("lastName")}
+									value={adminCustomerLastName}
+									onChange={(e) => setAdminCustomerLastName(e.target.value)}
+									className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text placeholder-barbershop-muted focus:ring-2 focus:ring-barbershop-gold focus:border-transparent"
+								/>
+							</div>
+						</div>
+					) : userFirstName && userLastName ? (
 						<div className="space-y-2">
 							<Label className="text-sm font-medium text-barbershop-text">{t("bookingFor")}</Label>
 							<div className="w-full px-4 py-3 barbershop-dark border border-barbershop-charcoal rounded-lg text-barbershop-text bg-barbershop-dark">

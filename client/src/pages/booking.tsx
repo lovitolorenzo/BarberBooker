@@ -16,7 +16,7 @@ export default function BookingPage() {
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [, setLocation] = useLocation();
-  const { isLoggedIn, userEmail, userFirstName, userLastName, logout } = useAuth();
+  const { isLoggedIn, userEmail, userFirstName, userLastName, userRole, logout } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -53,6 +53,7 @@ export default function BookingPage() {
             selectedTime={selectedTime}
             onDateSelect={setSelectedDate}
             onTimeSelect={setSelectedTime}
+            isAdmin={userRole === 'admin'}
           />
           
           <BookingForm

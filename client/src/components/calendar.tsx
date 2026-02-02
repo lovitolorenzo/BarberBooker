@@ -13,6 +13,7 @@ interface CalendarProps {
   selectedTime: string | null;
   onDateSelect: (date: string) => void;
   onTimeSelect: (time: string) => void;
+  isAdmin?: boolean;
 }
 
 const timeSlots = [
@@ -25,7 +26,8 @@ export default function CalendarComponent({
   selectedDate, 
   selectedTime, 
   onDateSelect, 
-  onTimeSelect 
+  onTimeSelect,
+  isAdmin = false
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const { t } = useTranslation();
@@ -96,6 +98,15 @@ export default function CalendarComponent({
       const isToday = dateStr === formatDate(new Date());
       const isSelected = selectedDate === dateStr;
       const isPast = currentDate.getTime() < new Date().setHours(0, 0, 0, 0);
+      
+      // Per i clienti (non admin): possono prenotare solo fino a sabato della settimana corrente
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = domenica, 6 = sabato
+      const daysUntilSaturday = dayOfWeek === 0 ? 6 : 6 - dayOfWeek;
+      const endOfWeek = new Date(today);
+      endOfWeek.setDate(today.getDate() + daysUntilSaturday);
+      endOfWeek.setHours(23, 59, 59, 999);
+      const isBeyondWeek = !isAdmin && currentDate.getTime() > endOfWeek.getTime();
 
       days.push(
         <Button
@@ -107,10 +118,10 @@ export default function CalendarComponent({
             ${isToday ? 'barbershop-gold text-black' : ''}
             ${isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
             ${!isToday && !isSelected && isCurrentMonth ? 'hover:barbershop-dark' : ''}
-            ${isPast ? 'opacity-50 cursor-not-allowed' : ''}
+            ${isPast || isBeyondWeek ? 'opacity-50 cursor-not-allowed' : ''}
           `}
-          disabled={isPast || !isCurrentMonth}
-          onClick={() => !isPast && isCurrentMonth && onDateSelect(dateStr)}
+          disabled={isPast || !isCurrentMonth || isBeyondWeek}
+          onClick={() => !isPast && isCurrentMonth && !isBeyondWeek && onDateSelect(dateStr)}
         >
           {currentDate.getDate()}
         </Button>
