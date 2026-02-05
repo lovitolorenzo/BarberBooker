@@ -6,6 +6,7 @@ interface AuthState {
   userEmail: string | null;
   userFirstName: string | null;
   userLastName: string | null;
+  userPhone: string | null;
 }
 
 export function useAuth() {
@@ -15,6 +16,7 @@ export function useAuth() {
     userEmail: null,
     userFirstName: null,
     userLastName: null,
+    userPhone: null,
   });
 
   // Check authentication status on mount and storage changes
@@ -24,6 +26,7 @@ export function useAuth() {
       const userEmail = localStorage.getItem('userEmail');
       const userFirstName = localStorage.getItem('userFirstName');
       const userLastName = localStorage.getItem('userLastName');
+      const userPhone = localStorage.getItem('userPhone');
       
       setAuthState({
         isLoggedIn: !!(userRole && userEmail),
@@ -31,6 +34,7 @@ export function useAuth() {
         userEmail,
         userFirstName,
         userLastName,
+        userPhone,
       });
     };
 
@@ -54,6 +58,7 @@ export function useAuth() {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userFirstName');
     localStorage.removeItem('userLastName');
+    localStorage.removeItem('userPhone');
     
     setAuthState({
       isLoggedIn: false,
@@ -61,6 +66,7 @@ export function useAuth() {
       userEmail: null,
       userFirstName: null,
       userLastName: null,
+      userPhone: null,
     });
 
     // Dispatch custom event to notify other components

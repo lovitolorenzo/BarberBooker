@@ -24,9 +24,7 @@ interface BookingFormProps {
 }
 
 const bookingSchema = z.object({
-	customerPhone: z
-		.string()
-		.regex(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, "Please enter a valid phone number"),
+	customerPhone: z.string().optional(),
 	service: z.string().min(1, "Please select a service"),
 	notes: z.string().optional(),
 });
@@ -36,11 +34,12 @@ type BookingFormData = z.infer<typeof bookingSchema>;
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
 	const [selectedService, setSelectedService] = useState<ServiceKey | null>(null);
 	const { toast } = useToast();
-	const { userFirstName, userLastName, userRole } = useAuth();
+	const { userFirstName, userLastName, userRole, userPhone } = useAuth();
 	const isAdmin = userRole === 'admin';
 	// State per admin che prenota a nome di altri clienti
 	const [adminCustomerFirstName, setAdminCustomerFirstName] = useState('');
 	const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
+	const [adminCustomerPhone, setAdminCustomerPhone] = useState('');
 	const queryClient = useQueryClient();
 	const { t } = useTranslation();
 	const [_, navigate] = useLocation();
@@ -53,6 +52,8 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			notes: "",
 		},
 	});
+
+	const phoneRegex = /^\+?[0-9\s().-]{6,}$/;
 
 	const createAppointmentMutation = useMutation({
 		mutationFn: async (data: InsertAppointment) => {
@@ -120,11 +121,21 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		// Per admin: usa i nomi inseriti manualmente, altrimenti usa i dati dell'utente loggato
 		const finalFirstName = isAdmin ? adminCustomerFirstName : userFirstName;
 		const finalLastName = isAdmin ? adminCustomerLastName : userLastName;
+		const finalPhone = isAdmin ? adminCustomerPhone : userPhone;
 
 		if (!finalFirstName || !finalLastName) {
 			toast({
 				title: isAdmin ? t("missingInformation.title") : t("authenticationRequired.title"),
 				description: isAdmin ? t("missingInformation.description") : t("authenticationRequired.description"),
+				variant: "destructive",
+			});
+			return;
+		}
+
+		if (!finalPhone || !phoneRegex.test(finalPhone)) {
+			toast({
+				title: t("missingInformation.title"),
+				description: t("booking.phoneRequired"),
 				variant: "destructive",
 			});
 			return;
@@ -140,7 +151,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		const appointmentData: InsertAppointment = {
 			customerFirstName: finalFirstName,
 			customerLastName: finalLastName,
-			customerPhone: data.customerPhone,
+			customerPhone: finalPhone,
 			service: serviceDisplayName,
 			notes: data.notes,
 			appointmentDate: selectedDate,
@@ -158,8 +169,10 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		form.setValue("service", value);
 	};
 
-	const isFormValid = selectedDate && selectedTime && selectedService && 
-		(isAdmin ? (adminCustomerFirstName && adminCustomerLastName) : (userFirstName && userLastName));
+	const isFormValid = selectedDate && selectedTime && selectedService &&
+		(isAdmin
+			? (adminCustomerFirstName && adminCustomerLastName && adminCustomerPhone)
+			: (userFirstName && userLastName && userPhone));
 
 	return (
 		<div className="glass-card rounded-3xl p-6 shadow-glass">
@@ -232,6 +245,15 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 								className="input-glass rounded-xl"
 							/>
 						</div>
+						<div>
+							<Input
+								type="tel"
+								placeholder={t("phoneNumber")}
+								value={adminCustomerPhone}
+								onChange={(e) => setAdminCustomerPhone(e.target.value)}
+								className="input-glass rounded-xl"
+							/>
+						</div>
 					</div>
 				) : userFirstName && userLastName ? (
 					<div className="space-y-2">
@@ -252,21 +274,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</Button>
 					</div>
 				)}
-
-				<div className="space-y-2">
-					<Label htmlFor="phone" className="text-sm font-medium text-text-primary">
-						{t("phoneNumber")}
-					</Label>
-					<Input
-						{...form.register("customerPhone")}
-						type="tel"
-						placeholder="(+39) 1234567"
-						className="input-glass rounded-xl"
-					/>
-					{form.formState.errors.customerPhone && (
-						<p className="text-accent-red text-sm">{form.formState.errors.customerPhone.message}</p>
-					)}
-				</div>
 
 				{/* Special Requests */}
 				<div className="space-y-2">

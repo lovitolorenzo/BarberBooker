@@ -41,6 +41,7 @@ export interface User {
   email?: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   password?: string;
   profileImageUrl?: string;
   role?: string;
@@ -116,6 +117,7 @@ export const insertUserSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  phone: z.string().optional(),
   password: z.string().optional(), // Add password field
   profileImageUrl: z.string().optional(),
   role: z.string().optional(),

@@ -2,31 +2,32 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { apiPost } from "@/config/api";
-import { User, Lock } from "lucide-react";
+import { User, Lock, Phone } from "lucide-react";
 
 const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
 export default function RegisterPage() {
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
+	const [phone, setPhone] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setLocation] = useLocation();
 	const { toast } = useToast();
 	const { t } = useTranslation();
+	const phoneRegex = /^\+?[0-9\s().-]{6,}$/;
 
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		// Validation
-		if (!firstName || !lastName || !password) {
+		if (!firstName || !lastName || !phone || !password) {
 			toast({
 				title: t("register.failed"),
 				description: t("register.fillAllFields"),
@@ -56,11 +57,22 @@ export default function RegisterPage() {
 			return;
 		}
 
+		if (!phoneRegex.test(phone)) {
+			toast({
+				title: t("register.failed"),
+				description: t("register.phoneInvalid"),
+				variant: "destructive",
+			});
+			setIsLoading(false);
+			return;
+		}
+
 		try {
 			// Call the registration API
 			const response = await apiPost("/auth/register", {
 				firstName,
 				lastName,
+				phone,
 				password,
 			});
 
@@ -145,6 +157,24 @@ export default function RegisterPage() {
 										required
 									/>
 								</div>
+							</div>
+						</div>
+
+						<div className="space-y-2">
+							<Label htmlFor="phone" className="text-sm font-medium text-text-primary">
+								{t("register.phone")}
+							</Label>
+							<div className="relative">
+								<Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
+								<Input
+									id="phone"
+									type="tel"
+									value={phone}
+									onChange={(e) => setPhone(e.target.value)}
+									placeholder={t("register.phonePlaceholder")}
+									className="pl-11 input-glass rounded-xl h-12"
+									required
+								/>
 							</div>
 						</div>
 

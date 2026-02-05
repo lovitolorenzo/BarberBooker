@@ -40,6 +40,7 @@ export default function LoginPage() {
 				localStorage.setItem("userEmail", data.user.email);
 				localStorage.setItem("userFirstName", data.user.firstName || "");
 				localStorage.setItem("userLastName", data.user.lastName || "");
+				localStorage.setItem("userPhone", data.user.phone || "");
 
 				// Dispatch auth change event to update other components
 				window.dispatchEvent(new Event("auth-change"));

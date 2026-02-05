@@ -196,6 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: (user as any).phone,
         role: user.role
       };
 
@@ -212,10 +213,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { firstName, lastName, password } = req.body;
+      const { firstName, lastName, password, phone } = req.body;
       
-      if (!firstName || !lastName || !password) {
-        return res.status(400).json({ message: "First name, last name and password are required" });
+      if (!firstName || !lastName || !password || !phone) {
+        return res.status(400).json({ message: "First name, last name, phone and password are required" });
       }
 
       if (password.length < 6) {
@@ -233,6 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: `customer-${Date.now()}`, // Generate unique ID
         firstName,
         lastName,
+        phone,
         password, // In production, this should be hashed
         role: "customer", // Default role for new registrations
       });
@@ -242,6 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: newUser.id,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
+        phone: (newUser as any).phone,
         role: newUser.role
       };
 
