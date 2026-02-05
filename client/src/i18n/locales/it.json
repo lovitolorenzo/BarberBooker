@@ -268,19 +268,6 @@
 			"title": "Accesso Fallito",
 			"description": "Credenziali non valide"
 		},
-		"demo": {
-			"credentials": {
-				"title": "Credenziali Demo:",
-				"admin": {
-					"title": "Accesso Admin:",
-					"description": "Admin User / admin123"
-				},
-				"customer": {
-					"title": "Accesso Cliente:",
-					"description": "John Smith / customer123"
-				}
-			}
-		},
 		"no": {
 			"account": {
 				"label": "Non hai un account?",

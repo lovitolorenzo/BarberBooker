@@ -250,23 +250,6 @@
 			"title": "Login Failed",
 			"description": "Invalid credentials"
 		},
-		"demo": {
-			"credentials": {
-				"title": "Demo Credentials:",
-				"admin": {
-					"title": "Admin Access:",
-					"description": "Admin User / admin123"
-				},
-				"customer": {
-					"title": "Customer Access:",
-					"description": "John Smith / customer123"
-				},
-				"guest": {
-					"title": "Quick Guest:",
-					"description": "Use the \"Quick Guest Login\" button above"
-				}
-			}
-		},
 		"no": {
 			"account": {
 				"label": "Don't have an account?",

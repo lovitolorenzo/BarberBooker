@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { User, Lock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -154,21 +153,6 @@ export default function LoginPage() {
 							{isLoading ? t("login.button.loading") : t("login.button.label")}
 						</Button>
 					</form>
-
-					{/* Demo credentials */}
-					<div className="mt-6 bg-surface-secondary rounded-2xl p-4">
-						<h3 className="text-sm font-medium text-text-primary mb-3">{t("login.demo.credentials.title")}</h3>
-						<div className="text-xs text-text-secondary space-y-2">
-							<div className="border-l-2 border-accent-blue pl-3">
-								<p className="font-medium text-text-primary">{t("login.demo.credentials.admin.title")}</p>
-								<p>{t("login.demo.credentials.admin.description")}</p>
-							</div>
-							<div className="border-l-2 border-accent-green pl-3">
-								<p className="font-medium text-text-primary">{t("login.demo.credentials.customer.title")}</p>
-								<p>{t("login.demo.credentials.customer.description")}</p>
-							</div>
-						</div>
-					</div>
 
 					{/* Register link */}
 					<div className="mt-6 text-center">
