@@ -29,6 +29,12 @@ const bookingSchema = z.object({
 	notes: z.string().optional(),
 });
 
+const bookingServiceCatalog: Record<ServiceKey, { title: string; priceLabel: string }> = {
+	full: { title: "Taglio e Shampoo", priceLabel: "€14" },
+	haircut: { title: "Taglio", priceLabel: "€12" },
+	beard: { title: "Barba", priceLabel: "da €4" },
+};
+
 type BookingFormData = z.infer<typeof bookingSchema>;
 
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
@@ -142,12 +148,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		}
 
 		const serviceInfo = services[selectedService];
-		// Usa il nome del servizio dalla traduzione invece del nome hardcoded
-		// Usa le chiavi dirette dalla traduzione
-		let serviceDisplayName = '';
-		if (selectedService === 'haircut') serviceDisplayName = t('services.haircut');
-		else if (selectedService === 'beard') serviceDisplayName = t('services.beard');
-		else if (selectedService === 'full') serviceDisplayName = t('services.fullservice');
+		const serviceDisplayName = bookingServiceCatalog[selectedService].title;
 		const appointmentData: InsertAppointment = {
 			customerFirstName: finalFirstName,
 			customerLastName: finalLastName,
@@ -190,13 +191,10 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</SelectTrigger>
 						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
 							{Object.entries(services).map(([key, service]) => {
-								let serviceName = '';
-								if (key === 'haircut') serviceName = t('services.haircut');
-								else if (key === 'beard') serviceName = t('services.beard');
-								else if (key === 'full') serviceName = t('services.fullservice');
+								const catalog = bookingServiceCatalog[key as ServiceKey];
 								return (
 									<SelectItem key={key} value={key} className="text-text-primary hover:bg-surface-secondary rounded-lg">
-										{serviceName} - {service.duration}min - €{service.price}
+										{catalog.title} - {service.duration}min - {catalog.priceLabel}
 									</SelectItem>
 								);
 							})}

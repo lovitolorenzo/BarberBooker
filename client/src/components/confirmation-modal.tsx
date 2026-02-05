@@ -70,7 +70,12 @@ export default function ConfirmationModal({
   };
 
   const formatPrice = (priceInCents: number) => {
-    return `$${(priceInCents / 100).toFixed(0)}`;
+    const locale = i18n.language === 'it' ? 'it-IT' : 'en-US';
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    }).format(priceInCents / 100);
   };
 
   return (
