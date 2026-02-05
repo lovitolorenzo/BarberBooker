@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Play } from "lucide-react";
 
 const galleryMedia = [
 	{
@@ -34,8 +36,23 @@ const galleryMedia = [
 	},
 ];
 
+const fallbackPosterUrl = new URL(
+	"../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg",
+	import.meta.url,
+).href;
+
 export default function GallerySection() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [canHover, setCanHover] = useState(false);
+  const [activeVideoIndex, setActiveVideoIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    try {
+      setCanHover(window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    } catch {
+      setCanHover(false);
+    }
+  }, []);
 
   const handleEnter = async (index: number) => {
     const video = videoRefs.current[index];
@@ -88,8 +105,9 @@ export default function GallerySection() {
               transition={{ duration: 0.5, delay: index * 0.08 }}
               viewport={{ once: true }}
               className="group relative overflow-hidden rounded-2xl aspect-square cursor-pointer hover-lift"
-              onMouseEnter={() => media.type === "video" && handleEnter(index)}
-              onMouseLeave={() => media.type === "video" && handleLeave(index)}
+              onMouseEnter={() => canHover && media.type === "video" && handleEnter(index)}
+              onMouseLeave={() => canHover && media.type === "video" && handleLeave(index)}
+              onClick={() => !canHover && media.type === "video" && setActiveVideoIndex(index)}
             >
               {media.type === "video" ? (
                 <video
@@ -97,10 +115,11 @@ export default function GallerySection() {
                     videoRefs.current[index] = el;
                   }}
                   src={media.src}
+                  poster={fallbackPosterUrl}
                   muted
                   loop
                   playsInline
-                  preload="metadata"
+                  preload={canHover ? "metadata" : "none"}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
@@ -114,9 +133,40 @@ export default function GallerySection() {
               <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <p className="text-white text-sm font-medium">{media.alt}</p>
               </div>
+              {media.type === "video" && (
+                <div className="absolute top-3 right-3">
+                  <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-md border border-white/50 shadow-soft flex items-center justify-center">
+                    <Play className="h-4 w-4 text-text-primary" />
+                  </div>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
+
+        <Dialog
+          open={activeVideoIndex !== null}
+          onOpenChange={(open) => {
+            if (!open) setActiveVideoIndex(null);
+          }}
+        >
+          <DialogContent className="bg-white/95 backdrop-blur-xl border-white/50 shadow-glass-lg max-w-3xl rounded-3xl p-0 overflow-hidden">
+            {activeVideoIndex !== null && (
+              <div className="p-4 md:p-6">
+                <div className="mb-3">
+                  <div className="text-sm font-medium text-text-primary">{galleryMedia[activeVideoIndex].alt}</div>
+                </div>
+                <video
+                  src={galleryMedia[activeVideoIndex].src}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full rounded-2xl bg-black"
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );
