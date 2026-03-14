@@ -35,8 +35,8 @@ export default function BookingPage() {
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out.",
+      title: t("auth.logoutSuccessTitle"),
+      description: t("auth.logoutSuccessDescription"),
     });
     setLocation("/");
   };
@@ -48,8 +48,8 @@ export default function BookingPage() {
       {/* Main Content */}
       <main className="container-wide py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">{t('booking.title') || 'Prenota Appuntamento'}</h1>
-          <p className="text-text-secondary">{t('booking.subtitle') || 'Seleziona data e ora per il tuo appuntamento'}</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-2">{t("booking.title", { defaultValue: "Prenota Appuntamento" })}</h1>
+          <p className="text-text-secondary">{t("booking.subtitle", { defaultValue: "Seleziona data e ora per il tuo appuntamento" })}</p>
         </div>
         
         <div className="grid lg:grid-cols-2 gap-8">

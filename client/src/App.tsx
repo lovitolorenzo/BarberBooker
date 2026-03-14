@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense, lazy } from "react";
+import { useTranslation } from "react-i18next";
 
 // Use React.lazy for code splitting
 const BookingPage = lazy(() => import("@/pages/booking"));
@@ -16,12 +17,15 @@ const RegisterPage = lazy(() => import("@/pages/register"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Loading component to show while chunks are loading
-const LoadingFallback = () => (
-	<div className="flex flex-col items-center justify-center h-screen bg-barbershop-dark bg-opacity-80">
-		<div className="w-10 h-10 border-4 border-barbershop-gold border-solid rounded-full border-t-transparent animate-spin mb-4"></div>
-		<div className="text-barbershop-gold text-xl font-semibold">Loading your experience...</div>
-	</div>
-);
+const LoadingFallback = () => {
+	const { t } = useTranslation();
+	return (
+		<div className="flex flex-col items-center justify-center h-screen bg-barbershop-dark bg-opacity-80">
+			<div className="w-10 h-10 border-4 border-barbershop-gold border-solid rounded-full border-t-transparent animate-spin mb-4"></div>
+			<div className="text-barbershop-gold text-xl font-semibold">{t("common.loadingExperience")}</div>
+		</div>
+	);
+};
 
 function Router() {
 	return (

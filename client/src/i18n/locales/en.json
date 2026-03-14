@@ -26,10 +26,14 @@
 		"loginError": "Invalid username or password",
 		"registerError": "Registration error",
 		"passwordMismatch": "Passwords do not match",
-		"fillAllFields": "Please fill all fields"
+		"fillAllFields": "Please fill all fields",
+		"logoutSuccessTitle": "Logged Out",
+		"logoutSuccessDescription": "You have been successfully logged out."
 	},
 	"booking": {
 		"title": "Book your appointment",
+		"subtitle": "Select date and time for your appointment",
+		"adminSuffix": "(Admin)",
 		"selectDate": "Select Date & Time",
 		"selectService": "Select Service",
 		"chooseService": "Choose a service...",
@@ -182,6 +186,7 @@
 	},
 	"common": {
 		"loading": "Loading...",
+		"loadingExperience": "Loading your experience...",
 		"error": "Error",
 		"success": "Success",
 		"cancel": "Cancel",

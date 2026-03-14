@@ -226,18 +226,18 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 				{/* Customer Information */}
 				{isAdmin ? (
 					<div className="space-y-3">
-						<Label className="text-sm font-medium text-text-primary">{t("bookingFor")} (Admin)</Label>
+						<Label className="text-sm font-medium text-text-primary">{t("bookingFor")} {t("booking.adminSuffix")}</Label>
 						<div className="grid grid-cols-2 gap-3">
 							<Input
 								type="text"
-								placeholder={t("firstName")}
+								placeholder={t("auth.firstName")}
 								value={adminCustomerFirstName}
 								onChange={(e) => setAdminCustomerFirstName(e.target.value)}
 								className="input-glass rounded-xl"
 							/>
 							<Input
 								type="text"
-								placeholder={t("lastName")}
+								placeholder={t("auth.lastName")}
 								value={adminCustomerLastName}
 								onChange={(e) => setAdminCustomerLastName(e.target.value)}
 								className="input-glass rounded-xl"

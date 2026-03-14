@@ -26,10 +26,14 @@
 		"loginError": "Nome utente o password non validi",
 		"registerError": "Errore durante la registrazione",
 		"passwordMismatch": "Le password non coincidono",
-		"fillAllFields": "Compila tutti i campi"
+		"fillAllFields": "Compila tutti i campi",
+		"logoutSuccessTitle": "Disconnesso",
+		"logoutSuccessDescription": "Logout effettuato con successo."
 	},
 	"booking": {
 		"title": "Prenota il tuo appuntamento",
+		"subtitle": "Seleziona data e ora per il tuo appuntamento",
+		"adminSuffix": "(Admin)",
 		"selectDate": "Seleziona Data e Ora",
 		"selectService": "Seleziona Servizio",
 		"chooseService": "Scegli un servizio...",
@@ -200,6 +204,7 @@
 	},
 	"common": {
 		"loading": "Caricamento...",
+		"loadingExperience": "Caricamento della tua esperienza...",
 		"error": "Errore",
 		"success": "Successo",
 		"cancel": "Annulla",
