@@ -8,6 +8,7 @@ const isProd = process.env.NODE_ENV === "production";
 // Configurazione ottimizzata per Vercel
 export default defineConfig({
   plugins: [react()],
+  publicDir: "public",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
