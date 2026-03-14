@@ -133,7 +133,7 @@
 		},
 		"beardTrim": {
 			"name": "Beard",
-			"duration": "15 minutes",
+			"duration": "10 minutes",
 			"description": "Starting from €4"
 		},
 		"fullService": {

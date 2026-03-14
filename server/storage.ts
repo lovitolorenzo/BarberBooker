@@ -89,7 +89,9 @@ export class MongoStorage implements IStorage {
     try {
       await this.client.connect();
       console.log("Connected to MongoDB");
-      await this.seedMockData();
+      if (process.env.SEED_MOCK_DATA === "true") {
+        await this.seedMockData();
+      }
     } catch (error) {
       console.error("Failed to connect to MongoDB:", error);
     }
