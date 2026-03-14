@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
     <div className="min-h-screen barbershop-bg text-barbershop-text">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">{t('navbar.analytics')}</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('nav.analytics')}</h1>
 
         {/* Date Range Selector */}
         <div className="flex space-x-2 mb-8">
