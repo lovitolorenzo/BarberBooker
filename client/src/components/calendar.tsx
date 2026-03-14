@@ -16,11 +16,35 @@ interface CalendarProps {
   isAdmin?: boolean;
 }
 
-const timeSlots = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-  '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
-];
+const getTimeSlotsForDate = (dateStr: string | null): string[] => {
+  if (!dateStr) {
+    // Default slots for weekdays
+    return [
+      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+      '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+    ];
+  }
+  
+  const date = new Date(dateStr + 'T00:00:00');
+  const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+  
+  // Saturday has extended hours: 08:00 - 19:00
+  if (dayOfWeek === 6) {
+    return [
+      '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+      '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'
+    ];
+  }
+  
+  // Regular hours for other days: 09:00 - 18:00
+  return [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+  ];
+};
 
 export default function CalendarComponent({ 
   selectedDate, 
@@ -133,6 +157,8 @@ export default function CalendarComponent({
 
   const renderTimeSlots = () => {
     if (!selectedDate) return null;
+
+    const timeSlots = getTimeSlotsForDate(selectedDate);
 
     return (
       <div className="space-y-4">

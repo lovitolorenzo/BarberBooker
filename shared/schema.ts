@@ -169,7 +169,7 @@ export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 // Service definitions
 export const services = {
   haircut: { name: 'Haircut', duration: 30, price: 12 },
-  beard: { name: 'Beard', duration: 15, price: 4 },
+  beard: { name: 'Beard', duration: 10, price: 4 },
   full: { name: 'Haircut + Shampoo', duration: 35, price: 14 }
 } as const;
 
