@@ -296,6 +296,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create admin user endpoint
+  app.post("/api/admin/create-admin-user", async (req, res) => {
+    try {
+      // Check if admin already exists
+      const existingAdmin = await storage.getUserByName('Lorenzo', 'Lovito');
+      
+      if (existingAdmin) {
+        return res.status(409).json({ 
+          message: "Admin user already exists",
+          user: {
+            firstName: existingAdmin.firstName,
+            lastName: existingAdmin.lastName,
+            role: existingAdmin.role
+          }
+        });
+      }
+      
+      // Create admin user
+      const adminUser = await storage.createUser({
+        id: `admin-${Date.now()}`,
+        firstName: 'Lorenzo',
+        lastName: 'Lovito',
+        email: 'lovitolorenzo23@gmail.com',
+        phone: '',
+        password: 'Yogurt25!',
+        role: 'admin'
+      });
+      
+      res.status(201).json({ 
+        message: "Admin user created successfully",
+        user: {
+          firstName: adminUser.firstName,
+          lastName: adminUser.lastName,
+          email: adminUser.email,
+          role: adminUser.role
+        }
+      });
+    } catch (error) {
+      console.error("Error creating admin user:", error);
+      res.status(500).json({ message: "Failed to create admin user" });
+    }
+  });
+
   // Get a specific appointment
   app.get("/api/appointments/:id", async (req, res) => {
     try {
