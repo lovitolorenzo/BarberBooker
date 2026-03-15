@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Appointment } from "@shared/schema";
-import { services, type ServiceKey } from "@shared/schema";
 import AddToCalendar from "./add-to-calendar";
 
 interface ConfirmationModalProps {

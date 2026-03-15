@@ -1,20 +1,31 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Users, DollarSign, Clock, Search, Filter, Phone, Mail, Scissors } from "lucide-react";
+import { Calendar, Users, DollarSign, Clock, Phone, Mail, Scissors } from "lucide-react";
 import Navbar from "@/components/navbar";
 import { useTranslation } from "react-i18next";
-import { apiGet } from "@/config/api";
-import { Link } from "wouter";
-import type { Appointment } from "@shared/schema";
-import { services, type ServiceKey } from "@shared/schema";
+import { apiGet, apiRequest } from "@/config/api";
+import type { Appointment, InsertServiceConfig, ServiceConfig, UpdateServiceConfig } from "@shared/schema";
+import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminPage() {
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const { userRole } = useAuth();
+  const { toast } = useToast();
+  const isAdmin = userRole === "admin";
+  const [newServiceKey, setNewServiceKey] = useState("");
+  const [newServiceName, setNewServiceName] = useState("");
+  const [newServiceDuration, setNewServiceDuration] = useState("");
+  const [newServicePrice, setNewServicePrice] = useState("");
+  const [newServiceSortOrder, setNewServiceSortOrder] = useState("0");
+  const [newServiceEnabled, setNewServiceEnabled] = useState(true);
 
   const { data: appointments = [], isLoading } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/all'],
@@ -23,6 +34,88 @@ export default function AdminPage() {
       if (!response.ok) throw new Error('Failed to fetch appointments');
       return response.json();
     }
+  });
+
+  const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
+    queryKey: ["/api/admin/services"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const response = await apiGet("/api/admin/services");
+      if (!response.ok) throw new Error("Failed to fetch services");
+      return response.json();
+    },
+  });
+
+  const createServiceMutation = useMutation({
+    mutationFn: async (payload: InsertServiceConfig) => {
+      const response = await apiRequest("POST", "/api/admin/services", payload);
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to create service");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/services"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/services"] });
+      setNewServiceKey("");
+      setNewServiceName("");
+      setNewServiceDuration("");
+      setNewServicePrice("");
+      setNewServiceSortOrder("0");
+      setNewServiceEnabled(true);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateServiceMutation = useMutation({
+    mutationFn: async ({ key, update }: { key: string; update: UpdateServiceConfig }) => {
+      const response = await apiRequest("PUT", `/api/admin/services/${key}`, update);
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to update service");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/services"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/services"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteServiceMutation = useMutation({
+    mutationFn: async (key: string) => {
+      const response = await apiRequest("DELETE", `/api/admin/services/${key}`);
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to delete service");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/services"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/services"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const today = new Date().toISOString().split('T')[0];
@@ -73,15 +166,56 @@ export default function AdminPage() {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  const getServiceName = (serviceKey: string) => {
+  const getServiceName = (serviceKeyOrName: string) => {
+    const normalized = serviceKeyOrName?.toLowerCase?.() || serviceKeyOrName;
     const serviceTranslations: { [key: string]: string } = {
-      'haircut': t('haircut'),
-      'beard': t('beard'), 
-      'shave': t('shave'),
-      'styling': t('styling'),
-      'wash': t('wash')
+      haircut: t("haircut"),
+      beard: t("beard"),
+      full: t("styling"),
+      shave: t("shave"),
+      wash: t("wash"),
     };
-    return serviceTranslations[serviceKey] || services[serviceKey as ServiceKey]?.name || serviceKey;
+    const configuredService = serviceConfigs.find(
+      (service) => service.key === serviceKeyOrName || service.name === serviceKeyOrName
+    );
+    return configuredService?.name || serviceTranslations[normalized] || serviceKeyOrName;
+  };
+
+  const parsePriceToCents = (value: string) => {
+    const normalized = value.replace(",", ".").trim();
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? Math.round(parsed * 100) : NaN;
+  };
+
+  const handleCreateService = () => {
+    const duration = Number(newServiceDuration);
+    const price = parsePriceToCents(newServicePrice);
+    const sortOrder = Number(newServiceSortOrder);
+
+    if (!newServiceKey.trim() || !newServiceName.trim()) {
+      return;
+    }
+
+    if (!Number.isInteger(duration) || duration <= 0) {
+      return;
+    }
+
+    if (!Number.isInteger(price) || price < 0) {
+      return;
+    }
+
+    if (!Number.isInteger(sortOrder)) {
+      return;
+    }
+
+    createServiceMutation.mutate({
+      key: newServiceKey.trim(),
+      name: newServiceName.trim(),
+      duration,
+      price,
+      enabled: newServiceEnabled,
+      sortOrder,
+    });
   };
 
   const formatPrice = (priceInCents: number) => {
@@ -161,6 +295,127 @@ export default function AdminPage() {
           </Card>
         </div>
 
+        {isAdmin && (
+          <Card className="barbershop-card border-barbershop-dark mb-8">
+            <CardHeader>
+              <CardTitle className="text-barbershop-text">Gestione Servizi</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
+                <Input
+                  value={newServiceKey}
+                  onChange={(e) => setNewServiceKey(e.target.value)}
+                  placeholder="key"
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+                <Input
+                  value={newServiceName}
+                  onChange={(e) => setNewServiceName(e.target.value)}
+                  placeholder="Nome"
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+                <Input
+                  value={newServiceDuration}
+                  onChange={(e) => setNewServiceDuration(e.target.value)}
+                  placeholder="Durata"
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+                <Input
+                  value={newServicePrice}
+                  onChange={(e) => setNewServicePrice(e.target.value)}
+                  placeholder="Prezzo €"
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+                <Input
+                  value={newServiceSortOrder}
+                  onChange={(e) => setNewServiceSortOrder(e.target.value)}
+                  placeholder="Ordine"
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+                <div className="flex items-center justify-between rounded-md border border-barbershop-charcoal px-3 py-2 barbershop-dark">
+                  <span className="text-sm text-barbershop-muted">Attivo</span>
+                  <Switch checked={newServiceEnabled} onCheckedChange={setNewServiceEnabled} />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleCreateService}
+                  disabled={createServiceMutation.isPending}
+                  className="barbershop-gold text-white"
+                >
+                  {createServiceMutation.isPending ? "Salvataggio..." : "Aggiungi servizio"}
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {serviceConfigs.map((service) => (
+                  <div
+                    key={service.key}
+                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                  >
+                    <div className="text-sm font-medium text-barbershop-text">{service.key}</div>
+                    <Input
+                      defaultValue={service.name}
+                      onBlur={(e) => {
+                        if (e.target.value !== service.name) {
+                          updateServiceMutation.mutate({ key: service.key, update: { name: e.target.value } });
+                        }
+                      }}
+                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                    />
+                    <Input
+                      defaultValue={String(service.duration)}
+                      onBlur={(e) => {
+                        const duration = Number(e.target.value);
+                        if (Number.isInteger(duration) && duration > 0 && duration !== service.duration) {
+                          updateServiceMutation.mutate({ key: service.key, update: { duration } });
+                        }
+                      }}
+                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                    />
+                    <Input
+                      defaultValue={(service.price / 100).toFixed(2)}
+                      onBlur={(e) => {
+                        const price = parsePriceToCents(e.target.value);
+                        if (Number.isInteger(price) && price >= 0 && price !== service.price) {
+                          updateServiceMutation.mutate({ key: service.key, update: { price } });
+                        }
+                      }}
+                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                    />
+                    <Input
+                      defaultValue={String(service.sortOrder)}
+                      onBlur={(e) => {
+                        const sortOrder = Number(e.target.value);
+                        if (Number.isInteger(sortOrder) && sortOrder !== service.sortOrder) {
+                          updateServiceMutation.mutate({ key: service.key, update: { sortOrder } });
+                        }
+                      }}
+                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                    />
+                    <div className="flex items-center justify-between gap-3">
+                      <Switch
+                        checked={service.enabled}
+                        onCheckedChange={(enabled) =>
+                          updateServiceMutation.mutate({ key: service.key, update: { enabled } })
+                        }
+                      />
+                      <Button
+                        variant="destructive"
+                        onClick={() => deleteServiceMutation.mutate(service.key)}
+                        disabled={deleteServiceMutation.isPending}
+                      >
+                        Elimina
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filters */}
         <div className="flex space-x-2 mb-6">
           {[
@@ -204,7 +459,7 @@ export default function AdminPage() {
               <div className="space-y-4">
                 {filteredAppointments.map((appointment) => (
                   <div
-                    key={appointment._id || Math.random()}
+                    key={appointment._id || `${appointment.customerPhone}-${appointment.appointmentDate}-${appointment.appointmentTime}`}
                     className="barbershop-dark rounded-lg p-4 border border-barbershop-charcoal"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -236,7 +491,7 @@ export default function AdminPage() {
                           <div className="flex items-center space-x-2">
                             <Scissors className="h-4 w-4 text-barbershop-gold" />
                             <span className="text-barbershop-muted">
-                              {getServiceName(appointment.service)}
+                              {getServiceName(appointment.serviceKey || appointment.service)}
                             </span>
                           </div>
                           

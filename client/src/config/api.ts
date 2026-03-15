@@ -42,6 +42,7 @@ export async function apiRequest(
       ...API_CONFIG.defaultHeaders,
       ...options?.headers,
     },
+    credentials: "include",
     ...options,
   };
 

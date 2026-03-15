@@ -35,14 +35,6 @@ export default function LoginPage() {
 			const data = await response.json();
 
 			if (response.ok) {
-				// Store user info in localStorage
-				localStorage.setItem("userRole", data.user.role);
-				localStorage.setItem("userEmail", data.user.email);
-				localStorage.setItem("userFirstName", data.user.firstName || "");
-				localStorage.setItem("userLastName", data.user.lastName || "");
-				localStorage.setItem("userPhone", data.user.phone || "");
-
-				// Dispatch auth change event to update other components
 				window.dispatchEvent(new Event("auth-change"));
 
 				toast({

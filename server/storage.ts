@@ -1,4 +1,5 @@
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
+import { loadEnvFile } from "./load-env";
 import { 
   type Appointment, 
   type MongoAppointment, 
@@ -11,9 +12,15 @@ import {
   type InsertProduct,
   type ServiceProduct,
   type InsertServiceProduct,
+  type ServiceConfig,
+  type InsertServiceConfig,
+  type UpdateServiceConfig,
   type AnalyticsData,
-  type InsertAnalytics
+  type InsertAnalytics,
+  services
 } from "@shared/schema";
+
+loadEnvFile();
 
 export interface IStorage {
   // Appointment operations
@@ -50,6 +57,13 @@ export interface IStorage {
   getAllServiceProducts(): Promise<ServiceProduct[]>;
   createServiceProduct(serviceProduct: InsertServiceProduct): Promise<ServiceProduct>;
 
+  // Service Config operations
+  getServiceConfigs(options?: { includeDisabled?: boolean }): Promise<ServiceConfig[]>;
+  getServiceConfigByKey(key: string): Promise<ServiceConfig | undefined>;
+  createServiceConfig(serviceConfig: InsertServiceConfig): Promise<ServiceConfig>;
+  updateServiceConfig(key: string, update: UpdateServiceConfig): Promise<ServiceConfig | undefined>;
+  deleteServiceConfig(key: string): Promise<boolean>;
+
   // Analytics operations
   getAnalyticsByDate(date: string): Promise<AnalyticsData | undefined>;
   getAnalyticsByDateRange(startDate: string, endDate: string): Promise<AnalyticsData[]>;
@@ -70,6 +84,7 @@ export class MongoStorage implements IStorage {
   private clients: Collection<Client>;
   private products: Collection<Product>;
   private serviceProducts: Collection<ServiceProduct>;
+  private serviceConfigs: Collection<ServiceConfig>;
   private analytics: Collection<AnalyticsData>;
 
   constructor() {
@@ -81,6 +96,7 @@ export class MongoStorage implements IStorage {
     this.clients = this.db.collection<Client>("clients");
     this.products = this.db.collection<Product>("products");
     this.serviceProducts = this.db.collection<ServiceProduct>("serviceProducts");
+    this.serviceConfigs = this.db.collection<ServiceConfig>("serviceConfigs");
     this.analytics = this.db.collection<AnalyticsData>("analytics");
     this.connect();
   }
@@ -89,11 +105,56 @@ export class MongoStorage implements IStorage {
     try {
       await this.client.connect();
       console.log("Connected to MongoDB");
+
+      try {
+        await this.serviceConfigs.createIndex({ key: 1 } as any, { unique: true });
+      } catch (error) {
+        console.error("Error creating serviceConfigs index:", error);
+      }
+
+      await this.seedDefaultServiceConfigsIfEmpty();
+
       if (process.env.SEED_MOCK_DATA === "true") {
         await this.seedMockData();
       }
     } catch (error) {
       console.error("Failed to connect to MongoDB:", error);
+    }
+  }
+
+  private convertToServiceConfig(doc: ServiceConfig): ServiceConfig {
+    return {
+      ...doc,
+      _id: (doc as any)._id?.toString?.() ?? (doc as any)._id,
+    } as ServiceConfig;
+  }
+
+  private async seedDefaultServiceConfigsIfEmpty() {
+    try {
+      const existingServices = await this.serviceConfigs
+        .find({}, { projection: { key: 1 } } as any)
+        .toArray();
+      const existingKeys = new Set(existingServices.map((service: any) => service.key));
+
+      const now = new Date();
+      const defaults: Omit<ServiceConfig, "_id">[] = Object.entries(services).map(([key, service], index) => ({
+        key,
+        name: service.name,
+        duration: service.duration,
+        price: Math.round(service.price * 100),
+        enabled: true,
+        sortOrder: index,
+        createdAt: now,
+        updatedAt: now,
+      }));
+
+      const missingDefaults = defaults.filter((service) => !existingKeys.has(service.key));
+
+      if (missingDefaults.length > 0) {
+        await this.serviceConfigs.insertMany(missingDefaults as any);
+      }
+    } catch (error) {
+      console.error("Error seeding default service configs:", error);
     }
   }
 
@@ -748,6 +809,86 @@ export class MongoStorage implements IStorage {
     } catch (error) {
       console.error("Error creating service product:", error);
       throw error;
+    }
+  }
+
+  // Service Config operations
+  async getServiceConfigs(options?: { includeDisabled?: boolean }): Promise<ServiceConfig[]> {
+    try {
+      const includeDisabled = options?.includeDisabled ?? false;
+      const query = includeDisabled ? {} : { enabled: true };
+      const results = await this.serviceConfigs
+        .find(query as any)
+        .sort({ sortOrder: 1, key: 1 } as any)
+        .toArray();
+      return results.map((doc) => this.convertToServiceConfig(doc));
+    } catch (error) {
+      console.error("Error getting service configs:", error);
+      return [];
+    }
+  }
+
+  async getServiceConfigByKey(key: string): Promise<ServiceConfig | undefined> {
+    try {
+      const result = await this.serviceConfigs.findOne({ key } as any);
+      return result ? this.convertToServiceConfig(result) : undefined;
+    } catch (error) {
+      console.error("Error getting service config by key:", error);
+      return undefined;
+    }
+  }
+
+  async createServiceConfig(serviceConfig: InsertServiceConfig): Promise<ServiceConfig> {
+    try {
+      const existing = await this.serviceConfigs.findOne({ key: serviceConfig.key } as any);
+      if (existing) {
+        throw new Error("Service key already exists");
+      }
+
+      const now = new Date();
+      const doc: Omit<ServiceConfig, "_id"> = {
+        ...serviceConfig,
+        enabled: serviceConfig.enabled ?? true,
+        sortOrder: serviceConfig.sortOrder ?? 0,
+        createdAt: now,
+        updatedAt: now,
+      };
+      const result = await this.serviceConfigs.insertOne(doc as any);
+      return this.convertToServiceConfig({ ...(doc as any), _id: result.insertedId.toString() });
+    } catch (error) {
+      console.error("Error creating service config:", error);
+      throw error;
+    }
+  }
+
+  async updateServiceConfig(key: string, update: UpdateServiceConfig): Promise<ServiceConfig | undefined> {
+    try {
+      if (update.key && update.key !== key) {
+        const existing = await this.serviceConfigs.findOne({ key: update.key } as any);
+        if (existing) {
+          throw new Error("Service key already exists");
+        }
+      }
+
+      const result = await this.serviceConfigs.findOneAndUpdate(
+        { key } as any,
+        { $set: { ...update, updatedAt: new Date() } } as any,
+        { returnDocument: "after" }
+      );
+      return result ? this.convertToServiceConfig(result as any) : undefined;
+    } catch (error) {
+      console.error("Error updating service config:", error);
+      throw error;
+    }
+  }
+
+  async deleteServiceConfig(key: string): Promise<boolean> {
+    try {
+      const result = await this.serviceConfigs.deleteOne({ key } as any);
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error("Error deleting service config:", error);
+      return false;
     }
   }
 

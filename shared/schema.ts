@@ -7,6 +7,7 @@ export interface MongoAppointment {
   customerLastName: string;
   customerEmail?: string;
   customerPhone: string;
+  serviceKey?: string;
   service: string;
   appointmentDate: string;
   appointmentTime: string;
@@ -24,6 +25,7 @@ export interface Appointment {
   customerLastName: string;
   customerEmail?: string;
   customerPhone: string;
+  serviceKey?: string;
   service: string;
   appointmentDate: string;
   appointmentTime: string;
@@ -85,6 +87,18 @@ export interface ServiceProduct {
   costPerService: number;
 }
 
+export interface ServiceConfig {
+  _id?: string;
+  key: string;
+  name: string;
+  duration: number;
+  price: number;
+  enabled: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AnalyticsData {
   _id?: string;
   date: string;
@@ -102,6 +116,7 @@ export const insertAppointmentSchema = z.object({
   customerLastName: z.string().min(1, "Last name is required"),
   customerEmail: z.string().email().optional(),
   customerPhone: z.string().min(1, "Phone number is required"),
+  serviceKey: z.string().min(1).optional(),
   service: z.string().min(1, "Service selection is required"),
   appointmentDate: z.string().min(1, "Date is required"),
   appointmentTime: z.string().min(1, "Time is required"),
@@ -150,6 +165,19 @@ export const insertServiceProductSchema = z.object({
   costPerService: z.number().min(0),
 });
 
+export const insertServiceConfigSchema = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1),
+  duration: z.number().int().min(1),
+  price: z.number().int().min(0),
+  enabled: z.boolean().default(true),
+  sortOrder: z.number().int().default(0),
+});
+
+export const updateServiceConfigSchema = insertServiceConfigSchema.partial().extend({
+  key: z.string().min(1).optional(),
+});
+
 export const insertAnalyticsSchema = z.object({
   date: z.string(),
   dailyRevenue: z.number().min(0),
@@ -165,6 +193,8 @@ export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type InsertServiceProduct = z.infer<typeof insertServiceProductSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type InsertServiceConfig = z.infer<typeof insertServiceConfigSchema>;
+export type UpdateServiceConfig = z.infer<typeof updateServiceConfigSchema>;
 
 // Service definitions
 export const services = {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiGet, apiPost } from '@/config/api';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -21,45 +22,58 @@ export function useAuth() {
 
   // Check authentication status on mount and storage changes
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const userRole = localStorage.getItem('userRole');
-      const userEmail = localStorage.getItem('userEmail');
-      const userFirstName = localStorage.getItem('userFirstName');
-      const userLastName = localStorage.getItem('userLastName');
-      const userPhone = localStorage.getItem('userPhone');
-      
-      setAuthState({
-        isLoggedIn: !!(userRole && userEmail),
-        userRole,
-        userEmail,
-        userFirstName,
-        userLastName,
-        userPhone,
-      });
+    const checkAuthStatus = async () => {
+      try {
+        const response = await apiGet('/auth/me');
+
+        if (!response.ok) {
+          throw new Error('Not authenticated');
+        }
+
+        const data = await response.json();
+        const user = data?.user;
+
+        setAuthState({
+          isLoggedIn: !!user,
+          userRole: user?.role || null,
+          userEmail: user?.email || null,
+          userFirstName: user?.firstName || null,
+          userLastName: user?.lastName || null,
+          userPhone: user?.phone || null,
+        });
+      } catch {
+        setAuthState({
+          isLoggedIn: false,
+          userRole: null,
+          userEmail: null,
+          userFirstName: null,
+          userLastName: null,
+          userPhone: null,
+        });
+      }
     };
 
     // Check initial status
-    checkAuthStatus();
+    void checkAuthStatus();
 
-    // Listen for storage changes (including from other tabs)
-    window.addEventListener('storage', checkAuthStatus);
-    
-    // Custom event for logout
-    window.addEventListener('auth-change', checkAuthStatus);
+    const handleAuthChange = () => {
+      void checkAuthStatus();
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
 
     return () => {
-      window.removeEventListener('storage', checkAuthStatus);
-      window.removeEventListener('auth-change', checkAuthStatus);
+      window.removeEventListener('auth-change', handleAuthChange);
     };
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userFirstName');
-    localStorage.removeItem('userLastName');
-    localStorage.removeItem('userPhone');
-    
+  const logout = async () => {
+    try {
+      await apiPost('/auth/logout');
+    } catch {
+      // ignore
+    }
+
     setAuthState({
       isLoggedIn: false,
       userRole: null,

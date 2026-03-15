@@ -1,10 +1,87 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAppointmentSchema } from "@shared/schema";
+import { insertAppointmentSchema, insertServiceConfigSchema, updateServiceConfigSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const getSessionUser = (req: Request) => (req as any).session?.user as
+    | { id?: string; role?: string; email?: string; firstName?: string; lastName?: string }
+    | undefined;
+
+  const requireStaff = (req: Request, res: Response, next: NextFunction) => {
+    const user = getSessionUser(req);
+    if (!user || (user.role !== "admin" && user.role !== "barber")) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  };
+
+  const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+    const user = getSessionUser(req);
+    if (!user || user.role !== "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  };
+
+  app.get("/api/services", async (_req, res) => {
+    try {
+      const services = await storage.getServiceConfigs({ includeDisabled: false });
+      res.json(services);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch services" });
+    }
+  });
+
+  app.get("/api/admin/services", requireAdmin, async (_req, res) => {
+    try {
+      const services = await storage.getServiceConfigs({ includeDisabled: true });
+      res.json(services);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch services" });
+    }
+  });
+
+  app.post("/api/admin/services", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertServiceConfigSchema.parse(req.body);
+      const created = await storage.createServiceConfig(validated);
+      res.status(201).json(created);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid service config", errors: error.errors });
+      }
+      res.status(400).json({ message: error?.message || "Failed to create service" });
+    }
+  });
+
+  app.put("/api/admin/services/:key", requireAdmin, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const validated = updateServiceConfigSchema.parse(req.body);
+      const updated = await storage.updateServiceConfig(key, validated);
+      if (!updated) return res.status(404).json({ message: "Service not found" });
+      res.json(updated);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid service config", errors: error.errors });
+      }
+      res.status(400).json({ message: error?.message || "Failed to update service" });
+    }
+  });
+
+  app.delete("/api/admin/services/:key", requireAdmin, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const deleted = await storage.deleteServiceConfig(key);
+      if (!deleted) return res.status(404).json({ message: "Service not found" });
+      res.json({ message: "Service deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete service" });
+    }
+  });
+
   // Get appointments for a specific date
   app.get("/api/appointments/date/:date", async (req, res) => {
     try {
@@ -39,6 +116,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", async (req, res) => {
     try {
       const validatedData = insertAppointmentSchema.parse(req.body);
+
+      if (validatedData.serviceKey) {
+        const service = await storage.getServiceConfigByKey(validatedData.serviceKey);
+        if (!service || !service.enabled) {
+          return res.status(400).json({ message: "Invalid service" });
+        }
+        validatedData.service = service.name;
+        validatedData.duration = service.duration;
+        validatedData.price = service.price;
+      }
       
       // Check if the time slot is already booked
       const existingAppointments = await storage.getAppointmentsByDate(validatedData.appointmentDate);
@@ -66,9 +153,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all appointments (admin only)
-  app.get("/api/appointments/all", async (req, res) => {
+  app.get("/api/appointments/all", requireStaff, async (_req, res) => {
     try {
-      // TODO: Add authentication check for admin role
       const appointments = await storage.getAllAppointments();
       res.json(appointments);
     } catch (error) {
@@ -77,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analytics routes
-  app.get("/api/analytics/clients", async (req, res) => {
+  app.get("/api/analytics/clients", requireStaff, async (_req, res) => {
     try {
       const clients = await storage.getAllClients();
       res.json(clients);
@@ -86,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/products", async (req, res) => {
+  app.get("/api/analytics/products", requireStaff, async (_req, res) => {
     try {
       const products = await storage.getAllProducts();
       res.json(products);
@@ -95,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/products/low-stock", async (req, res) => {
+  app.get("/api/analytics/products/low-stock", requireStaff, async (_req, res) => {
     try {
       const lowStockProducts = await storage.getLowStockProducts();
       res.json(lowStockProducts);
@@ -104,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/service-products", async (req, res) => {
+  app.get("/api/analytics/service-products", requireStaff, async (_req, res) => {
     try {
       const serviceProducts = await storage.getAllServiceProducts();
       res.json(serviceProducts);
@@ -113,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/revenue/:startDate/:endDate", async (req, res) => {
+  app.get("/api/analytics/revenue/:startDate/:endDate", requireStaff, async (req, res) => {
     try {
       const { startDate, endDate } = req.params;
       const appointments = await storage.getAppointmentsByDateRange(startDate, endDate);
@@ -131,7 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         acc[date].revenue += appointment.price;
         acc[date].appointments += 1;
-        acc[date].services[appointment.service] = (acc[date].services[appointment.service] || 0) + 1;
+        const serviceKeyOrName = (appointment as any).serviceKey || appointment.service;
+        acc[date].services[serviceKeyOrName] = (acc[date].services[serviceKeyOrName] || 0) + 1;
         
         return acc;
       }, {} as any);
@@ -200,6 +287,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
 
+      (req as any).session.user = userResponse;
+
       console.log("Login successful for:", `${firstName} ${lastName}`);
       res.json({ 
         message: "Login successful", 
@@ -256,6 +345,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
     }
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    const sessionUser = (req as any).session?.user;
+
+    if (!sessionUser) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    res.json({ user: sessionUser });
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    const sessionObj = (req as any).session;
+    if (!sessionObj) {
+      return res.json({ message: "Logged out" });
+    }
+
+    sessionObj.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.json({ message: "Logged out" });
+    });
   });
 
   // Debug endpoint to check database status

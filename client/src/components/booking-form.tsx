@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,9 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { apiRequest } from "@/config/api";
+import { apiGet, apiRequest } from "@/config/api";
 import { useTranslation } from "react-i18next";
-import { services, type ServiceKey, type Appointment, type InsertAppointment } from "@shared/schema";
+import type { Appointment, InsertAppointment, ServiceConfig } from "@shared/schema";
 import { useLocation } from "wouter";
 
 interface BookingFormProps {
@@ -29,16 +29,12 @@ const bookingSchema = z.object({
 	notes: z.string().optional(),
 });
 
-const bookingServiceCatalog: Record<ServiceKey, { title: string; priceLabel: string }> = {
-	full: { title: "Taglio e Shampoo", priceLabel: "€14" },
-	haircut: { title: "Taglio", priceLabel: "€12" },
-	beard: { title: "Barba", priceLabel: "da €4" },
-};
+const formatPriceLabel = (priceInCents: number) => `€${Math.round(priceInCents / 100)}`;
 
 type BookingFormData = z.infer<typeof bookingSchema>;
 
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
-	const [selectedService, setSelectedService] = useState<ServiceKey | null>(null);
+	const [selectedServiceKey, setSelectedServiceKey] = useState<string | null>(null);
 	const { toast } = useToast();
 	const { userFirstName, userLastName, userRole, userPhone } = useAuth();
 	const isAdmin = userRole === 'admin';
@@ -49,6 +45,19 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 	const queryClient = useQueryClient();
 	const { t } = useTranslation();
 	const [_, navigate] = useLocation();
+
+	const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
+		queryKey: ["/api/services"],
+		queryFn: async () => {
+			const response = await apiGet("/api/services");
+			if (!response.ok) throw new Error("Failed to fetch services");
+			return response.json();
+		},
+	});
+
+	const selectedService = selectedServiceKey
+		? serviceConfigs.find((s) => s.key === selectedServiceKey)
+		: undefined;
 
 	const form = useForm<BookingFormData>({
 		resolver: zodResolver(bookingSchema),
@@ -81,7 +90,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
 			onBookingConfirmed(appointment);
 			form.reset();
-			setSelectedService(null);
+			setSelectedServiceKey(null);
 			toast({
 				title: t("bookingConfirmed.title"),
 				description: t("bookingConfirmed.description"),
@@ -115,7 +124,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 	};
 
 	const onSubmit = (data: BookingFormData) => {
-		if (!selectedDate || !selectedTime || !selectedService) {
+		if (!selectedDate || !selectedTime || !selectedServiceKey) {
 			toast({
 				title: t("missingInformation.title"),
 				description: t("missingInformation.description"),
@@ -147,18 +156,28 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			return;
 		}
 
-		const serviceInfo = services[selectedService];
-		const serviceDisplayName = bookingServiceCatalog[selectedService].title;
+		const serviceInfo = selectedService;
+		if (!serviceInfo) {
+			toast({
+				title: t("missingInformation.title"),
+				description: t("missingInformation.description"),
+				variant: "destructive",
+			});
+			return;
+		}
+
+		const serviceDisplayName = t(serviceInfo.key) || serviceInfo.name;
 		const appointmentData: InsertAppointment = {
 			customerFirstName: finalFirstName,
 			customerLastName: finalLastName,
 			customerPhone: finalPhone,
+			serviceKey: serviceInfo.key,
 			service: serviceDisplayName,
 			notes: data.notes,
 			appointmentDate: selectedDate,
 			appointmentTime: selectedTime,
 			duration: serviceInfo.duration,
-			price: serviceInfo.price * 100, // Convert to cents
+			price: serviceInfo.price,
 			status: "confirmed",
 		};
 
@@ -166,11 +185,11 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 	};
 
 	const handleServiceChange = (value: string) => {
-		setSelectedService(value as ServiceKey);
+		setSelectedServiceKey(value);
 		form.setValue("service", value);
 	};
 
-	const isFormValid = selectedDate && selectedTime && selectedService &&
+	const isFormValid = selectedDate && selectedTime && selectedServiceKey &&
 		(isAdmin
 			? (adminCustomerFirstName && adminCustomerLastName && adminCustomerPhone)
 			: (userFirstName && userLastName && userPhone));
@@ -190,11 +209,11 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 							<SelectValue placeholder={t("chooseService")} />
 						</SelectTrigger>
 						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
-							{Object.entries(services).map(([key, service]) => {
-								const catalog = bookingServiceCatalog[key as ServiceKey];
+							{serviceConfigs.map((service) => {
+								const title = t(service.key) || service.name;
 								return (
-									<SelectItem key={key} value={key} className="text-text-primary hover:bg-surface-secondary rounded-lg">
-										{catalog.title} - {service.duration}min - {catalog.priceLabel}
+									<SelectItem key={service.key} value={service.key} className="text-text-primary hover:bg-surface-secondary rounded-lg">
+										{title} - {service.duration}min - {formatPriceLabel(service.price)}
 									</SelectItem>
 								);
 							})}
@@ -217,7 +236,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</div>
 						{selectedService && (
 							<div className="text-xs text-text-secondary mt-1">
-								{t("duration")} {services[selectedService].duration} {t("minutes")}
+								{t("duration")} {selectedService.duration} {t("minutes")}
 							</div>
 						)}
 					</div>
