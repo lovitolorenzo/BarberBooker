@@ -1,4 +1,4 @@
-# Barbershop Booking System
+# Duo Lab Booking System
 
 ## Overview
 

@@ -140,12 +140,12 @@
 	},
 	"hero": {
 		"title": "Eccellenza Artigianale dal 2009",
-		"description": "Al Barbershop, combiniamo l'artigianato tradizionale con tecniche moderne per offrire la migliore esperienza di toelettatura della città. I nostri barbieri esperti si dedicano ad aiutarti a sembrare e sentirti al meglio.",
+		"description": "Al Duo Lab, combiniamo l'artigianato tradizionale con tecniche moderne per offrire la migliore esperienza di toelettatura della città. I nostri barbieri esperti si dedicano ad aiutarti a sembrare e sentirti al meglio.",
 		"bookAppointment": "Prenota il Tuo Appuntamento"
 	},
 	"ourStory": {
 		"title": "La Nostra Storia",
-		"founded": "Fondato nel 2009 dal maestro barbiere Gabriele Dilaurenza, Barbershop è nato dalla visione di creare uno spazio dove le tecniche tradizionali di barbiere incontrano stile e comfort contemporanei.",
+		"founded": "Fondato nel 2009 dal maestro barbiere Gabriele Dilaurenza, Duo Lab è nato dalla visione di creare uno spazio dove le tecniche tradizionali di barbiere incontrano stile e comfort contemporanei.",
 		"grown": "Quello che iniziò come un'operazione a singola postazione è cresciuto fino a diventare la destinazione principale della città per la toelettatura maschile, costruita su una base di qualità, coerenza e servizio clienti eccezionale.",
 		"today": "Oggi serviamo centinaia di clienti soddisfatti che si fidano di noi per il loro stile personale, dai professionisti agli artisti, ognuno riceve la stessa attenzione ai dettagli e artigianalità.",
 		"yearsExperience": "Anni di Esperienza",
@@ -245,7 +245,7 @@
 		"english": "English"
 	},
 	"login": {
-		"title": "Barbershop",
+		"title": "Duo Lab",
 		"subtitle": "Accedi al tuo account",
 		"firstName": {
 			"label": "Nome",

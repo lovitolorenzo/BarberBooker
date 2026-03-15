@@ -119,7 +119,7 @@ export default function ContactSection() {
 								allowFullScreen
 								loading="lazy"
 								referrerPolicy="no-referrer-when-downgrade"
-								title="Barbershop Location in Brienza, Italy"
+								title="Duo Lab Location in Brienza, Italy"
 							></iframe>
 							<div className="absolute top-4 left-4 glass-card-heavy rounded-xl p-3">
 								<div className="flex items-center gap-2">

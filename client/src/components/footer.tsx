@@ -32,8 +32,8 @@ export default function Footer() {
 						className="md:col-span-2"
 					>
 						<div className="flex items-center gap-3 mb-4">
-							<img src={logoUrl} alt="Barbershop logo" className="h-10 w-10 rounded-full object-cover" />
-							<span className="font-display text-xl font-semibold text-text-primary">Barbershop</span>
+							<img src={logoUrl} alt="Duo Lab logo" className="h-10 w-10 rounded-full object-cover" />
+							<span className="font-display text-xl font-semibold text-text-primary">Duo Lab</span>
 						</div>
 						<p className="text-text-secondary text-sm leading-relaxed mb-6 max-w-sm">
 							Un'esperienza di stile unica nel cuore della Basilicata. Qualità, professionalità e cura personale dal 2010.
@@ -111,7 +111,7 @@ export default function Footer() {
 					className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
 				>
 					<p className="text-xs text-text-secondary">
-						© {new Date().getFullYear()} Barbershop. Tutti i diritti riservati.
+						© {new Date().getFullYear()} Duo Lab. Tutti i diritti riservati.
 					</p>
 					<div className="flex gap-6 text-xs text-text-secondary">
 						<a href="#" className="hover:text-text-primary transition-colors">Privacy</a>

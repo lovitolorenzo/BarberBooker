@@ -90,7 +90,7 @@ export default function AboutPage() {
 							<Card key={index} className="barbershop-card border-barbershop-dark">
 								<CardContent className="p-6 text-center">
 									<div className="w-20 h-20 barbershop-gold rounded-full flex items-center justify-center mx-auto mb-4">
-										<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-full object-cover" />
+										<img src={logoUrl} alt="Duo Lab logo" className="h-14 w-14 rounded-full object-cover" />
 									</div>
 									<h4 className="text-xl font-semibold text-barbershop-text mb-2">{service.name}</h4>
 									<div className="text-barbershop-gold font-bold text-2xl mb-2">{service.price}</div>

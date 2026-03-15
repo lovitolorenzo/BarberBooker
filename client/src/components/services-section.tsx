@@ -78,7 +78,7 @@ export default function ServicesSection() {
 								<div className="text-center mb-6">
 									{service.useLogo ? (
 										<div className="w-16 h-16 rounded-2xl bg-surface-secondary flex items-center justify-center mx-auto mb-4 shadow-soft">
-											<img src={logoUrl} alt="Barbershop logo" className="h-12 w-12 rounded-xl object-cover" />
+											<img src={logoUrl} alt="Duo Lab logo" className="h-12 w-12 rounded-xl object-cover" />
 										</div>
 									) : (
 										<div className="w-16 h-16 rounded-2xl bg-accent-blue/10 flex items-center justify-center mx-auto mb-4">

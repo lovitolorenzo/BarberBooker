@@ -75,7 +75,7 @@ export default function LoginPage() {
 					<div className="text-center mb-8">
 						<div className="flex justify-center mb-4">
 							<div className="w-20 h-20 rounded-2xl bg-surface-secondary flex items-center justify-center shadow-soft">
-								<img src={logoUrl} alt="Barbershop logo" className="h-14 w-14 rounded-xl object-cover" />
+								<img src={logoUrl} alt="Duo Lab logo" className="h-14 w-14 rounded-xl object-cover" />
 							</div>
 						</div>
 						<h1 className="text-2xl font-semibold text-text-primary">{t("login.title")}</h1>

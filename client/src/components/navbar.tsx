@@ -57,10 +57,10 @@ export default function Navbar() {
 						<div className="flex items-center space-x-3 cursor-pointer">
 							<img
 								src={logoUrl}
-								alt="Barbershop logo"
+								alt="Duo Lab logo"
 								className="h-10 w-10 rounded-full object-cover shadow-soft"
 							/>
-							<h1 className="text-xl font-semibold text-text-primary tracking-tight">Barbershop</h1>
+							<h1 className="text-xl font-semibold text-text-primary tracking-tight">Duo Lab</h1>
 						</div>
 					</Link>
 					

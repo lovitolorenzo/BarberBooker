@@ -148,12 +148,12 @@
 	},
 	"hero": {
 		"title": "Crafting Excellence Since 2009",
-		"description": "At Barbershop, we combine traditional craftsmanship with modern techniques to deliver the finest grooming experience in the city. Our skilled barbers are dedicated to helping you look and feel your absolute best.",
+		"description": "At Duo Lab, we combine traditional craftsmanship with modern techniques to deliver the finest grooming experience in the city. Our skilled barbers are dedicated to helping you look and feel your absolute best.",
 		"bookAppointment": "Book Your Appointment"
 	},
 	"ourStory": {
 		"title": "Our Story",
-		"founded": "Founded in 2009 by master barber Gabriele Dilaurenza, Barbershop began as a vision to create a space where traditional barbering techniques meet contemporary style and comfort.",
+		"founded": "Founded in 2009 by master barber Gabriele Dilaurenza, Duo Lab began as a vision to create a space where traditional barbering techniques meet contemporary style and comfort.",
 		"grown": "What started as a single chair operation has grown into the city's premier destination for men's grooming, built on a foundation of quality, consistency, and exceptional customer service.",
 		"today": "Today, we serve hundreds of satisfied clients who trust us with their personal style, from business professionals to artists, each receiving the same attention to detail and craftsmanship.",
 		"yearsExperience": "Years Experience",
@@ -227,7 +227,7 @@
 		"english": "English"
 	},
 	"login": {
-		"title": "Barbershop",
+		"title": "Duo Lab",
 		"subtitle": "Sign in to your account",
 		"firstName": {
 			"label": "First Name",

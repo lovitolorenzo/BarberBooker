@@ -62,14 +62,14 @@ export function generateIcsFile(event: CalendarEvent): string {
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//BarberBooker//EN',
+    'PRODID:-//Duo Lab//EN',
     'BEGIN:VEVENT',
     `DTSTART:${startDate}`,
     `DTEND:${endDate}`,
     `SUMMARY:${event.title}`,
     `DESCRIPTION:${event.description}`,
     ...(event.location ? [`LOCATION:${event.location}`] : []),
-    `UID:${Date.now()}@barberbooker.com`,
+    `UID:${Date.now()}@duolab.com`,
     'END:VEVENT',
     'END:VCALENDAR'
   ].join('\r\n');

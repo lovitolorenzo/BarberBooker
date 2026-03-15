@@ -47,7 +47,7 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
       `Price: $${(booking.price / 100).toFixed(0)}`,
       ...(booking.notes ? [`${t('confirmation.notes')}: ${booking.notes}`] : []),
       '',
-      'Booked via BarberBooker'
+      'Booked via Duo Lab'
     ].join('\n');
 
     return {
@@ -55,7 +55,7 @@ export default function AddToCalendar({ booking, className = "" }: AddToCalendar
       description,
       startDate,
       endDate,
-      location: "BarberShop" // Could be made configurable
+      location: "Duo Lab" // Could be made configurable
     };
   };
 
