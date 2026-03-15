@@ -20,7 +20,6 @@ export default function AdminPage() {
   const { userRole } = useAuth();
   const { toast } = useToast();
   const isAdmin = userRole === "admin";
-  const [newServiceKey, setNewServiceKey] = useState("");
   const [newServiceName, setNewServiceName] = useState("");
   const [newServiceDuration, setNewServiceDuration] = useState("");
   const [newServicePrice, setNewServicePrice] = useState("");
@@ -58,7 +57,6 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/services"] });
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
-      setNewServiceKey("");
       setNewServiceName("");
       setNewServiceDuration("");
       setNewServicePrice("");
@@ -187,12 +185,23 @@ export default function AdminPage() {
     return Number.isFinite(parsed) ? Math.round(parsed * 100) : NaN;
   };
 
+  const generateServiceKey = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
   const handleCreateService = () => {
     const duration = Number(newServiceDuration);
     const price = parsePriceToCents(newServicePrice);
     const sortOrder = Number(newServiceSortOrder);
+    const name = newServiceName.trim();
+    const generatedKey = generateServiceKey(name);
 
-    if (!newServiceKey.trim() || !newServiceName.trim()) {
+    if (!name || !generatedKey) {
       return;
     }
 
@@ -209,8 +218,8 @@ export default function AdminPage() {
     }
 
     createServiceMutation.mutate({
-      key: newServiceKey.trim(),
-      name: newServiceName.trim(),
+      key: generatedKey,
+      name,
       duration,
       price,
       enabled: newServiceEnabled,
@@ -301,29 +310,23 @@ export default function AdminPage() {
               <CardTitle className="text-barbershop-text">Gestione Servizi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
-                <Input
-                  value={newServiceKey}
-                  onChange={(e) => setNewServiceKey(e.target.value)}
-                  placeholder="key"
-                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
                 <Input
                   value={newServiceName}
                   onChange={(e) => setNewServiceName(e.target.value)}
-                  placeholder="Nome"
+                  placeholder="Nome servizio"
                   className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
                 />
                 <Input
                   value={newServiceDuration}
                   onChange={(e) => setNewServiceDuration(e.target.value)}
-                  placeholder="Durata"
+                  placeholder="Durata (min)"
                   className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
                 />
                 <Input
                   value={newServicePrice}
                   onChange={(e) => setNewServicePrice(e.target.value)}
-                  placeholder="Prezzo €"
+                  placeholder="Prezzo (€)"
                   className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
                 />
                 <Input
@@ -352,9 +355,8 @@ export default function AdminPage() {
                 {serviceConfigs.map((service) => (
                   <div
                     key={service.key}
-                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
                   >
-                    <div className="text-sm font-medium text-barbershop-text">{service.key}</div>
                     <Input
                       defaultValue={service.name}
                       onBlur={(e) => {
