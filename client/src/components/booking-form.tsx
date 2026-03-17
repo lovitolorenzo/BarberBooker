@@ -210,9 +210,13 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					<Label htmlFor="service" className="text-sm font-medium text-text-primary">
 						{t("selectService")}
 					</Label>
-					<Select onValueChange={handleServiceChange}>
+					<Select value={selectedServiceKey ?? undefined} onValueChange={handleServiceChange}>
 						<SelectTrigger className="w-full px-4 py-3 bg-white/60 border border-border rounded-xl text-text-primary focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all">
-							<SelectValue placeholder={t("chooseService")} />
+							<SelectValue
+								placeholder={t("chooseService")}
+							>
+								{selectedService ? `${getServiceDisplayName(selectedService)} - ${selectedService.duration}min - ${formatPriceLabel(selectedService.price)}` : undefined}
+							</SelectValue>
 						</SelectTrigger>
 						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
 							{serviceConfigs.map((service) => {
