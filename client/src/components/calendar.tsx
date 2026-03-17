@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { apiGet } from "@/config/api";
-import type { Appointment } from "@shared/schema";
+import type { Appointment, BusinessHoursConfig } from "@shared/schema";
 
 interface CalendarProps {
   selectedDate: string | null;
@@ -16,34 +14,40 @@ interface CalendarProps {
   isAdmin?: boolean;
 }
 
-const getTimeSlotsForDate = (dateStr: string | null): string[] => {
-  if (!dateStr) {
-    // Default slots for weekdays
-    return [
-      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-      '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
-    ];
+const parseTimeToMinutes = (time: string) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+const formatMinutesToTime = (totalMinutes: number) => {
+  const hours = Math.floor(totalMinutes / 60)
+    .toString()
+    .padStart(2, "0");
+  const minutes = (totalMinutes % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+const getTimeSlotsForDate = (dateStr: string | null, businessHours?: BusinessHoursConfig): string[] => {
+  if (!dateStr || !businessHours) {
+    return [];
   }
-  
-  const date = new Date(dateStr + 'T00:00:00');
-  const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
-  
-  // Saturday has extended hours: 08:00 - 19:00
-  if (dayOfWeek === 6) {
-    return [
-      '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-      '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'
-    ];
+
+  const date = new Date(`${dateStr}T00:00:00`);
+  const dayConfig = businessHours.days.find((day) => day.dayOfWeek === date.getDay());
+
+  if (!dayConfig || !dayConfig.enabled) {
+    return [];
   }
-  
-  // Regular hours for other days: 09:00 - 18:00
-  return [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
-  ];
+
+  const slots: string[] = [];
+  const openMinutes = parseTimeToMinutes(dayConfig.openTime);
+  const closeMinutes = parseTimeToMinutes(dayConfig.closeTime);
+
+  for (let current = openMinutes; current < closeMinutes; current += businessHours.slotIntervalMinutes) {
+    slots.push(formatMinutesToTime(current));
+  }
+
+  return slots;
 };
 
 export default function CalendarComponent({ 
@@ -65,6 +69,15 @@ export default function CalendarComponent({
     queryFn: async () => {
       const response = await apiGet(`/api/appointments/range?startDate=${startDate}&endDate=${endDate}`);
       if (!response.ok) throw new Error('Failed to fetch appointments');
+      return response.json();
+    }
+  });
+
+  const { data: businessHours } = useQuery<BusinessHoursConfig>({
+    queryKey: ["/api/business-hours"],
+    queryFn: async () => {
+      const response = await apiGet("/api/business-hours");
+      if (!response.ok) throw new Error("Failed to fetch business hours");
       return response.json();
     }
   });
@@ -122,6 +135,8 @@ export default function CalendarComponent({
       const isToday = dateStr === formatDate(new Date());
       const isSelected = selectedDate === dateStr;
       const isPast = currentDate.getTime() < new Date().setHours(0, 0, 0, 0);
+      const dayConfig = businessHours?.days.find((day) => day.dayOfWeek === currentDate.getDay());
+      const isClosedDay = !dayConfig?.enabled;
       
       // Per i clienti (non admin): possono prenotare solo fino a sabato della settimana corrente
       const today = new Date();
@@ -142,10 +157,10 @@ export default function CalendarComponent({
             ${isToday && !isSelected ? 'bg-accent-blue/10 text-accent-blue' : ''}
             ${isSelected ? 'bg-accent-blue text-white hover:bg-accent-blue/90' : ''}
             ${!isToday && !isSelected && isCurrentMonth ? 'hover:bg-surface-secondary' : ''}
-            ${isPast || isBeyondWeek ? 'opacity-40 cursor-not-allowed' : ''}
+            ${isPast || isBeyondWeek || isClosedDay ? 'opacity-40 cursor-not-allowed' : ''}
           `}
-          disabled={isPast || !isCurrentMonth || isBeyondWeek}
-          onClick={() => !isPast && isCurrentMonth && !isBeyondWeek && onDateSelect(dateStr)}
+          disabled={isPast || !isCurrentMonth || isBeyondWeek || isClosedDay}
+          onClick={() => !isPast && isCurrentMonth && !isBeyondWeek && !isClosedDay && onDateSelect(dateStr)}
         >
           {currentDate.getDate()}
         </Button>
@@ -158,7 +173,18 @@ export default function CalendarComponent({
   const renderTimeSlots = () => {
     if (!selectedDate) return null;
 
-    const timeSlots = getTimeSlotsForDate(selectedDate);
+    const timeSlots = getTimeSlotsForDate(selectedDate, businessHours);
+
+    if (timeSlots.length === 0) {
+      return (
+        <div className="space-y-4">
+          <h3 className="text-base font-medium text-text-primary">{t('available_times')}</h3>
+          <p className="text-sm text-text-secondary">
+            {t("booking.noSlotsForDay", { defaultValue: "Nessun orario disponibile per questo giorno" })}
+          </p>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-4">

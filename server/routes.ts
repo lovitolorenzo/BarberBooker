@@ -1,8 +1,38 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAppointmentSchema, insertServiceConfigSchema, updateServiceConfigSchema } from "@shared/schema";
+import {
+  insertAppointmentSchema,
+  insertBusinessHoursConfigSchema,
+  insertServiceConfigSchema,
+  updateServiceConfigSchema,
+} from "@shared/schema";
 import { z } from "zod";
+
+const parseTimeToMinutes = (time: string) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+const formatMinutesToTime = (totalMinutes: number) => {
+  const hours = Math.floor(totalMinutes / 60)
+    .toString()
+    .padStart(2, "0");
+  const minutes = (totalMinutes % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+const generateTimeSlots = (openTime: string, closeTime: string, slotIntervalMinutes: number) => {
+  const slots: string[] = [];
+  const openMinutes = parseTimeToMinutes(openTime);
+  const closeMinutes = parseTimeToMinutes(closeTime);
+
+  for (let current = openMinutes; current < closeMinutes; current += slotIntervalMinutes) {
+    slots.push(formatMinutesToTime(current));
+  }
+
+  return slots;
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const getSessionUser = (req: Request) => (req as any).session?.user as
@@ -82,6 +112,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/business-hours", async (_req, res) => {
+    try {
+      const config = await storage.getBusinessHoursConfig("default");
+      res.json(config);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch business hours" });
+    }
+  });
+
+  app.get("/api/admin/business-hours", requireAdmin, async (_req, res) => {
+    try {
+      const config = await storage.getBusinessHoursConfig("default");
+      res.json(config);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch business hours" });
+    }
+  });
+
+  app.put("/api/admin/business-hours", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertBusinessHoursConfigSchema.parse({
+        ...req.body,
+        key: "default",
+      });
+      const updated = await storage.upsertBusinessHoursConfig("default", validated);
+      res.json(updated);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid business hours config", errors: error.errors });
+      }
+      res.status(400).json({ message: error?.message || "Failed to update business hours" });
+    }
+  });
+
   // Get appointments for a specific date
   app.get("/api/appointments/date/:date", async (req, res) => {
     try {
@@ -116,6 +180,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", async (req, res) => {
     try {
       const validatedData = insertAppointmentSchema.parse(req.body);
+
+      const businessHours = await storage.getBusinessHoursConfig("default");
+      if (!businessHours) {
+        return res.status(500).json({ message: "Business hours are not configured" });
+      }
+
+      const appointmentDate = new Date(`${validatedData.appointmentDate}T00:00:00`);
+      const businessDay = businessHours.days.find((day) => day.dayOfWeek === appointmentDate.getDay());
+
+      if (!businessDay || !businessDay.enabled) {
+        return res.status(400).json({ message: "The shop is closed on the selected day" });
+      }
+
+      const allowedSlots = generateTimeSlots(
+        businessDay.openTime,
+        businessDay.closeTime,
+        businessHours.slotIntervalMinutes
+      );
+
+      if (!allowedSlots.includes(validatedData.appointmentTime)) {
+        return res.status(400).json({ message: "The selected time is outside business hours" });
+      }
 
       if (validatedData.serviceKey) {
         const service = await storage.getServiceConfigByKey(validatedData.serviceKey);

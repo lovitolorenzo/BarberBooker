@@ -15,9 +15,14 @@ import {
   type ServiceConfig,
   type InsertServiceConfig,
   type UpdateServiceConfig,
+  type BusinessHoursConfig,
+  type InsertBusinessHoursConfig,
+  type UpdateBusinessHoursConfig,
   type AnalyticsData,
   type InsertAnalytics,
-  services
+  services,
+  defaultBusinessHoursDays,
+  defaultSlotIntervalMinutes
 } from "@shared/schema";
 
 loadEnvFile();
@@ -64,6 +69,9 @@ export interface IStorage {
   updateServiceConfig(key: string, update: UpdateServiceConfig): Promise<ServiceConfig | undefined>;
   deleteServiceConfig(key: string): Promise<boolean>;
 
+  getBusinessHoursConfig(key?: string): Promise<BusinessHoursConfig | undefined>;
+  upsertBusinessHoursConfig(key: string, config: InsertBusinessHoursConfig | UpdateBusinessHoursConfig): Promise<BusinessHoursConfig>;
+
   // Analytics operations
   getAnalyticsByDate(date: string): Promise<AnalyticsData | undefined>;
   getAnalyticsByDateRange(startDate: string, endDate: string): Promise<AnalyticsData[]>;
@@ -85,6 +93,7 @@ export class MongoStorage implements IStorage {
   private products: Collection<Product>;
   private serviceProducts: Collection<ServiceProduct>;
   private serviceConfigs: Collection<ServiceConfig>;
+  private businessHoursConfigs: Collection<BusinessHoursConfig>;
   private analytics: Collection<AnalyticsData>;
 
   constructor() {
@@ -97,6 +106,7 @@ export class MongoStorage implements IStorage {
     this.products = this.db.collection<Product>("products");
     this.serviceProducts = this.db.collection<ServiceProduct>("serviceProducts");
     this.serviceConfigs = this.db.collection<ServiceConfig>("serviceConfigs");
+    this.businessHoursConfigs = this.db.collection<BusinessHoursConfig>("businessHoursConfigs");
     this.analytics = this.db.collection<AnalyticsData>("analytics");
     this.connect();
   }
@@ -112,7 +122,14 @@ export class MongoStorage implements IStorage {
         console.error("Error creating serviceConfigs index:", error);
       }
 
+      try {
+        await this.businessHoursConfigs.createIndex({ key: 1 } as any, { unique: true });
+      } catch (error) {
+        console.error("Error creating businessHoursConfigs index:", error);
+      }
+
       await this.seedDefaultServiceConfigsIfEmpty();
+      await this.seedDefaultBusinessHoursIfEmpty();
 
       if (process.env.SEED_MOCK_DATA === "true") {
         await this.seedMockData();
@@ -127,6 +144,13 @@ export class MongoStorage implements IStorage {
       ...doc,
       _id: (doc as any)._id?.toString?.() ?? (doc as any)._id,
     } as ServiceConfig;
+  }
+
+  private convertToBusinessHoursConfig(doc: BusinessHoursConfig): BusinessHoursConfig {
+    return {
+      ...doc,
+      _id: (doc as any)._id?.toString?.() ?? (doc as any)._id,
+    } as BusinessHoursConfig;
   }
 
   private async seedDefaultServiceConfigsIfEmpty() {
@@ -158,6 +182,26 @@ export class MongoStorage implements IStorage {
     }
   }
 
+  private async seedDefaultBusinessHoursIfEmpty() {
+    try {
+      const existingConfig = await this.businessHoursConfigs.findOne({ key: "default" } as any);
+      if (existingConfig) {
+        return;
+      }
+
+      const now = new Date();
+      await this.businessHoursConfigs.insertOne({
+        key: "default",
+        slotIntervalMinutes: defaultSlotIntervalMinutes,
+        days: defaultBusinessHoursDays,
+        createdAt: now,
+        updatedAt: now,
+      } as any);
+    } catch (error) {
+      console.error("Error seeding default business hours:", error);
+    }
+  }
+
   private async seedMockData() {
     console.log("🌱 Starting comprehensive database seeding...");
     
@@ -168,6 +212,7 @@ export class MongoStorage implements IStorage {
       this.clients.deleteMany({}),
       this.products.deleteMany({}),
       this.serviceProducts.deleteMany({}),
+      this.businessHoursConfigs.deleteMany({}),
       this.analytics.deleteMany({})
     ]);
     console.log("🗑️ Database cleared");
@@ -889,6 +934,61 @@ export class MongoStorage implements IStorage {
     } catch (error) {
       console.error("Error deleting service config:", error);
       return false;
+    }
+  }
+
+  async getBusinessHoursConfig(key = "default"): Promise<BusinessHoursConfig | undefined> {
+    try {
+      const result = await this.businessHoursConfigs.findOne({ key } as any);
+      return result ? this.convertToBusinessHoursConfig(result) : undefined;
+    } catch (error) {
+      console.error("Error getting business hours config:", error);
+      return undefined;
+    }
+  }
+
+  async upsertBusinessHoursConfig(
+    key: string,
+    config: InsertBusinessHoursConfig | UpdateBusinessHoursConfig
+  ): Promise<BusinessHoursConfig> {
+    try {
+      const existing = await this.businessHoursConfigs.findOne({ key } as any);
+      const now = new Date();
+      const result = await this.businessHoursConfigs.findOneAndUpdate(
+        { key } as any,
+        {
+          $set: {
+            ...config,
+            key,
+            updatedAt: now,
+          },
+          $setOnInsert: {
+            createdAt: now,
+          },
+        } as any,
+        {
+          upsert: true,
+          returnDocument: "after",
+        }
+      );
+
+      if (result) {
+        return this.convertToBusinessHoursConfig(result as any);
+      }
+
+      const fallback = await this.businessHoursConfigs.findOne({ key } as any);
+      if (!fallback) {
+        throw new Error("Failed to upsert business hours config");
+      }
+
+      if (!existing) {
+        return this.convertToBusinessHoursConfig(fallback);
+      }
+
+      return this.convertToBusinessHoursConfig(fallback);
+    } catch (error) {
+      console.error("Error upserting business hours config:", error);
+      throw error;
     }
   }
 

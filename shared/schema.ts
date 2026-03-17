@@ -99,6 +99,22 @@ export interface ServiceConfig {
   updatedAt: Date;
 }
 
+export interface BusinessHoursDay {
+  dayOfWeek: number;
+  enabled: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
+export interface BusinessHoursConfig {
+  _id?: string;
+  key: string;
+  slotIntervalMinutes: number;
+  days: BusinessHoursDay[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AnalyticsData {
   _id?: string;
   date: string;
@@ -178,6 +194,26 @@ export const updateServiceConfigSchema = insertServiceConfigSchema.partial().ext
   key: z.string().min(1).optional(),
 });
 
+const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const businessHoursDaySchema = z.object({
+  dayOfWeek: z.number().int().min(0).max(6),
+  enabled: z.boolean().default(true),
+  openTime: z.string().regex(timeRegex),
+  closeTime: z.string().regex(timeRegex),
+});
+
+export const insertBusinessHoursConfigSchema = z.object({
+  key: z.string().default("default"),
+  slotIntervalMinutes: z.number().int().min(5).max(120).default(30),
+  days: z.array(businessHoursDaySchema).length(7),
+});
+
+export const updateBusinessHoursConfigSchema = insertBusinessHoursConfigSchema.partial().extend({
+  key: z.string().optional(),
+  days: z.array(businessHoursDaySchema).length(7).optional(),
+});
+
 export const insertAnalyticsSchema = z.object({
   date: z.string(),
   dailyRevenue: z.number().min(0),
@@ -195,6 +231,20 @@ export type InsertServiceProduct = z.infer<typeof insertServiceProductSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 export type InsertServiceConfig = z.infer<typeof insertServiceConfigSchema>;
 export type UpdateServiceConfig = z.infer<typeof updateServiceConfigSchema>;
+export type InsertBusinessHoursConfig = z.infer<typeof insertBusinessHoursConfigSchema>;
+export type UpdateBusinessHoursConfig = z.infer<typeof updateBusinessHoursConfigSchema>;
+
+export const defaultBusinessHoursDays: BusinessHoursDay[] = [
+  { dayOfWeek: 0, enabled: true, openTime: "10:00", closeTime: "16:00" },
+  { dayOfWeek: 1, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 2, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 3, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 4, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 5, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 6, enabled: true, openTime: "09:00", closeTime: "17:00" },
+];
+
+export const defaultSlotIntervalMinutes = 30;
 
 // Service definitions
 export const services = {

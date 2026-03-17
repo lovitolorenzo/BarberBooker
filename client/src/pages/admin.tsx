@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,13 @@ import { Calendar, Users, DollarSign, Clock, Phone, Mail, Scissors } from "lucid
 import Navbar from "@/components/navbar";
 import { useTranslation } from "react-i18next";
 import { apiGet, apiRequest } from "@/config/api";
-import type { Appointment, InsertServiceConfig, ServiceConfig, UpdateServiceConfig } from "@shared/schema";
+import type {
+  Appointment,
+  BusinessHoursConfig,
+  InsertServiceConfig,
+  ServiceConfig,
+  UpdateServiceConfig,
+} from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +31,7 @@ export default function AdminPage() {
   const [newServicePrice, setNewServicePrice] = useState("");
   const [newServiceSortOrder, setNewServiceSortOrder] = useState("0");
   const [newServiceEnabled, setNewServiceEnabled] = useState(true);
+  const [editableBusinessHours, setEditableBusinessHours] = useState<BusinessHoursConfig | null>(null);
 
   const { data: appointments = [], isLoading } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/all'],
@@ -44,6 +51,22 @@ export default function AdminPage() {
       return response.json();
     },
   });
+
+  const { data: businessHoursConfig } = useQuery<BusinessHoursConfig>({
+    queryKey: ["/api/admin/business-hours"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const response = await apiGet("/api/admin/business-hours");
+      if (!response.ok) throw new Error("Failed to fetch business hours");
+      return response.json();
+    },
+  });
+
+  useEffect(() => {
+    if (businessHoursConfig) {
+      setEditableBusinessHours(businessHoursConfig);
+    }
+  }, [businessHoursConfig]);
 
   const createServiceMutation = useMutation({
     mutationFn: async (payload: InsertServiceConfig) => {
@@ -116,6 +139,36 @@ export default function AdminPage() {
     },
   });
 
+  const updateBusinessHoursMutation = useMutation({
+    mutationFn: async (payload: BusinessHoursConfig) => {
+      const response = await apiRequest("PUT", "/api/admin/business-hours", {
+        slotIntervalMinutes: payload.slotIntervalMinutes,
+        days: payload.days,
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to update business hours");
+      }
+      return response.json();
+    },
+    onSuccess: (updated: BusinessHoursConfig) => {
+      setEditableBusinessHours(updated);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/business-hours"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/business-hours"] });
+      toast({
+        title: "Successo",
+        description: "Orari di apertura aggiornati",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const today = new Date().toISOString().split('T')[0];
   
   const filteredAppointments = appointments.filter(appointment => {
@@ -164,6 +217,16 @@ export default function AdminPage() {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
+  const weekdayLabels = [
+    "Domenica",
+    "Lunedì",
+    "Martedì",
+    "Mercoledì",
+    "Giovedì",
+    "Venerdì",
+    "Sabato",
+  ];
+
   const getServiceName = (serviceKeyOrName: string) => {
     const normalized = serviceKeyOrName?.toLowerCase?.() || serviceKeyOrName;
     const serviceTranslations: { [key: string]: string } = {
@@ -193,6 +256,22 @@ export default function AdminPage() {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
+
+  const updateBusinessDay = (
+    dayOfWeek: number,
+    field: "enabled" | "openTime" | "closeTime",
+    value: boolean | string
+  ) => {
+    setEditableBusinessHours((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        days: current.days.map((day) =>
+          day.dayOfWeek === dayOfWeek ? { ...day, [field]: value } : day
+        ),
+      };
+    });
+  };
 
   const handleCreateService = () => {
     const duration = Number(newServiceDuration);
@@ -413,6 +492,77 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {isAdmin && editableBusinessHours && (
+          <Card className="barbershop-card border-barbershop-dark mb-8">
+            <CardHeader>
+              <CardTitle className="text-barbershop-text">Orari di Apertura</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 items-center">
+                <span className="text-sm text-barbershop-muted">Intervallo slot (minuti)</span>
+                <Input
+                  type="number"
+                  min="5"
+                  step="5"
+                  value={String(editableBusinessHours.slotIntervalMinutes)}
+                  onChange={(e) =>
+                    setEditableBusinessHours({
+                      ...editableBusinessHours,
+                      slotIntervalMinutes: Number(e.target.value) || editableBusinessHours.slotIntervalMinutes,
+                    })
+                  }
+                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                />
+              </div>
+
+              <div className="space-y-3">
+                {editableBusinessHours.days
+                  .slice()
+                  .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+                  .map((day) => (
+                    <div
+                      key={day.dayOfWeek}
+                      className="grid grid-cols-1 md:grid-cols-[180px_120px_1fr_1fr] gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                    >
+                      <span className="text-sm text-barbershop-text">{weekdayLabels[day.dayOfWeek]}</span>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm text-barbershop-muted">Aperto</span>
+                        <Switch
+                          checked={day.enabled}
+                          onCheckedChange={(enabled) => updateBusinessDay(day.dayOfWeek, "enabled", enabled)}
+                        />
+                      </div>
+                      <Input
+                        type="time"
+                        value={day.openTime}
+                        disabled={!day.enabled}
+                        onChange={(e) => updateBusinessDay(day.dayOfWeek, "openTime", e.target.value)}
+                        className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                      />
+                      <Input
+                        type="time"
+                        value={day.closeTime}
+                        disabled={!day.enabled}
+                        onChange={(e) => updateBusinessDay(day.dayOfWeek, "closeTime", e.target.value)}
+                        className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                      />
+                    </div>
+                  ))}
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => updateBusinessHoursMutation.mutate(editableBusinessHours)}
+                  disabled={updateBusinessHoursMutation.isPending}
+                  className="barbershop-gold text-white"
+                >
+                  {updateBusinessHoursMutation.isPending ? "Salvataggio..." : "Salva orari"}
+                </Button>
               </div>
             </CardContent>
           </Card>

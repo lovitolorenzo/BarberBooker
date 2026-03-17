@@ -1,12 +1,39 @@
 import { MapPin, Phone, Clock, Mail } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/navbar";
+import { apiGet } from "@/config/api";
+import type { BusinessHoursConfig } from "@shared/schema";
 
 export default function ContactPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+
+	const { data: businessHours } = useQuery<BusinessHoursConfig>({
+		queryKey: ["/api/business-hours"],
+		queryFn: async () => {
+			const response = await apiGet("/api/business-hours");
+			if (!response.ok) throw new Error("Failed to fetch business hours");
+			return response.json();
+		},
+	});
+
+	const dayLabels =
+		i18n.language === "it"
+			? ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
+			: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+	const scheduleLines =
+		businessHours?.days
+			.slice()
+			.sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+			.map((day) =>
+				day.enabled
+					? `${dayLabels[day.dayOfWeek]}: ${day.openTime}-${day.closeTime}`
+					: `${dayLabels[day.dayOfWeek]}: ${i18n.language === "it" ? "Chiuso" : "Closed"}`
+			) ?? [t("contact.schedule.weekdays"), t("contact.schedule.saturday"), t("contact.schedule.sunday")];
 
 	return (
 		<div className="min-h-screen barbershop-bg text-barbershop-text">
@@ -60,9 +87,9 @@ export default function ContactPage() {
 							</div>
 							<h3 className="text-xl font-semibold text-barbershop-text mb-4">{t("contact.hours")}</h3>
 							<div className="text-barbershop-muted leading-relaxed">
-								<p>{t("contact.schedule.weekdays")}</p>
-								<p>{t("contact.schedule.saturday")}</p>
-								<p>{t("contact.schedule.sunday")}</p>
+								{scheduleLines.map((line) => (
+									<p key={line}>{line}</p>
+								))}
 							</div>
 						</CardContent>
 					</Card>
