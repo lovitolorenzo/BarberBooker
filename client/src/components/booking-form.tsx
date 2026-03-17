@@ -59,6 +59,12 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		? serviceConfigs.find((s) => s.key === selectedServiceKey)
 		: undefined;
 
+	const getServiceDisplayName = (service: ServiceConfig) => {
+		const translationKey = `services.${service.key}`;
+		const translated = t(translationKey);
+		return translated !== translationKey ? translated : service.name;
+	};
+
 	const form = useForm<BookingFormData>({
 		resolver: zodResolver(bookingSchema),
 		defaultValues: {
@@ -166,7 +172,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			return;
 		}
 
-		const serviceDisplayName = t(serviceInfo.key) || serviceInfo.name;
+		const serviceDisplayName = getServiceDisplayName(serviceInfo);
 		const appointmentData: InsertAppointment = {
 			customerFirstName: finalFirstName,
 			customerLastName: finalLastName,
@@ -210,7 +216,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						</SelectTrigger>
 						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
 							{serviceConfigs.map((service) => {
-								const title = t(service.key) || service.name;
+								const title = getServiceDisplayName(service);
 								return (
 									<SelectItem key={service.key} value={service.key} className="text-text-primary hover:bg-surface-secondary rounded-lg">
 										{title} - {service.duration}min - {formatPriceLabel(service.price)}
