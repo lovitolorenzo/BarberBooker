@@ -125,7 +125,7 @@
 			"description": "A partire da €4"
 		},
 		"fullService": {
-			"name": "Taglio e Shampoo",
+			"name": "Taglio con Shampoo",
 			"duration": "35 minuti",
 			"description": "Taglio completo con shampoo"
 		},
@@ -135,7 +135,7 @@
 		"styling": "Styling",
 		"wash": "Lavaggio",
 		"mustache": "Baffi",
-		"fullservice": "Taglio e Shampoo",
+		"fullservice": "Taglio con Shampoo",
 		"selectedAppointment": "Appuntamento Selezionato"
 	},
 	"hero": {
