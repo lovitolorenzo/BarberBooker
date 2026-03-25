@@ -34,6 +34,16 @@ const generateTimeSlots = (openTime: string, closeTime: string, slotIntervalMinu
   return slots;
 };
 
+const getEndOfCurrentWeek = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilSaturday = dayOfWeek === 0 ? 6 : 6 - dayOfWeek;
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + daysUntilSaturday);
+  endOfWeek.setHours(23, 59, 59, 999);
+  return endOfWeek;
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   const getSessionUser = (req: Request) => (req as any).session?.user as
     | { id?: string; role?: string; email?: string; firstName?: string; lastName?: string }
@@ -180,6 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", async (req, res) => {
     try {
       const validatedData = insertAppointmentSchema.parse(req.body);
+      const sessionUser = getSessionUser(req);
 
       const businessHours = await storage.getBusinessHoursConfig("default");
       if (!businessHours) {
@@ -187,6 +198,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const appointmentDate = new Date(`${validatedData.appointmentDate}T00:00:00`);
+      const bookingWindowEnd = getEndOfCurrentWeek();
+      const isAdmin = sessionUser?.role === "admin";
+
+      if (!isAdmin && appointmentDate.getTime() > bookingWindowEnd.getTime()) {
+        return res.status(400).json({ message: "You can only book appointments until the end of the current week" });
+      }
+
       const businessDay = businessHours.days.find((day) => day.dayOfWeek === appointmentDate.getDay());
 
       if (!businessDay || !businessDay.enabled) {

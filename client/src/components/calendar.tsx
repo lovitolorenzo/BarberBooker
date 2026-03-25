@@ -27,6 +27,16 @@ const formatMinutesToTime = (totalMinutes: number) => {
   return `${hours}:${minutes}`;
 };
 
+const getEndOfCurrentWeek = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilSaturday = dayOfWeek === 0 ? 6 : 6 - dayOfWeek;
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + daysUntilSaturday);
+  endOfWeek.setHours(23, 59, 59, 999);
+  return endOfWeek;
+};
+
 const getTimeSlotsForDate = (dateStr: string | null, businessHours?: BusinessHoursConfig): string[] => {
   if (!dateStr || !businessHours) {
     return [];
@@ -59,6 +69,7 @@ export default function CalendarComponent({
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const { t } = useTranslation();
+  const bookingWindowEnd = getEndOfCurrentWeek();
 
   // Get appointments for the current month
   const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString().split('T')[0];
@@ -138,14 +149,7 @@ export default function CalendarComponent({
       const dayConfig = businessHours?.days.find((day) => day.dayOfWeek === currentDate.getDay());
       const isClosedDay = !dayConfig?.enabled;
       
-      // Per i clienti (non admin): possono prenotare solo fino a sabato della settimana corrente
-      const today = new Date();
-      const dayOfWeek = today.getDay(); // 0 = domenica, 6 = sabato
-      const daysUntilSaturday = dayOfWeek === 0 ? 6 : 6 - dayOfWeek;
-      const endOfWeek = new Date(today);
-      endOfWeek.setDate(today.getDate() + daysUntilSaturday);
-      endOfWeek.setHours(23, 59, 59, 999);
-      const isBeyondWeek = !isAdmin && currentDate.getTime() > endOfWeek.getTime();
+      const isBeyondBookingWindow = !isAdmin && currentDate.getTime() > bookingWindowEnd.getTime();
 
       days.push(
         <Button
@@ -157,10 +161,10 @@ export default function CalendarComponent({
             ${isToday && !isSelected ? 'bg-accent-blue/10 text-accent-blue' : ''}
             ${isSelected ? 'bg-accent-blue text-white hover:bg-accent-blue/90' : ''}
             ${!isToday && !isSelected && isCurrentMonth ? 'hover:bg-surface-secondary' : ''}
-            ${isPast || isBeyondWeek || isClosedDay ? 'opacity-40 cursor-not-allowed' : ''}
+            ${isPast || isBeyondBookingWindow || isClosedDay ? 'opacity-40 cursor-not-allowed' : ''}
           `}
-          disabled={isPast || !isCurrentMonth || isBeyondWeek || isClosedDay}
-          onClick={() => !isPast && isCurrentMonth && !isBeyondWeek && !isClosedDay && onDateSelect(dateStr)}
+          disabled={isPast || !isCurrentMonth || isBeyondBookingWindow || isClosedDay}
+          onClick={() => !isPast && isCurrentMonth && !isBeyondBookingWindow && !isClosedDay && onDateSelect(dateStr)}
         >
           {currentDate.getDate()}
         </Button>
