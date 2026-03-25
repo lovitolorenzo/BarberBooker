@@ -34,7 +34,7 @@ const formatPriceLabel = (priceInCents: number) => `€${Math.round(priceInCents
 type BookingFormData = z.infer<typeof bookingSchema>;
 
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
-	const [selectedServiceKey, setSelectedServiceKey] = useState<string | null>(null);
+	const [selectedServiceKey, setSelectedServiceKey] = useState("");
 	const { toast } = useToast();
 	const { userFirstName, userLastName, userRole, userPhone } = useAuth();
 	const isAdmin = userRole === 'admin';
@@ -96,7 +96,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
 			onBookingConfirmed(appointment);
 			form.reset();
-			setSelectedServiceKey(null);
+			setSelectedServiceKey("");
 			toast({
 				title: t("bookingConfirmed.title"),
 				description: t("bookingConfirmed.description"),
@@ -210,13 +210,9 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					<Label htmlFor="service" className="text-sm font-medium text-text-primary">
 						{t("selectService")}
 					</Label>
-					<Select value={selectedServiceKey ?? undefined} onValueChange={handleServiceChange}>
+					<Select value={selectedServiceKey} onValueChange={handleServiceChange}>
 						<SelectTrigger className="w-full px-4 py-3 bg-white/60 border border-border rounded-xl text-text-primary focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all">
-							<SelectValue
-								placeholder={t("chooseService")}
-							>
-								{selectedService ? `${getServiceDisplayName(selectedService)} - ${selectedService.duration}min - ${formatPriceLabel(selectedService.price)}` : undefined}
-							</SelectValue>
+							<SelectValue placeholder={t("chooseService")} />
 						</SelectTrigger>
 						<SelectContent className="bg-white border-border rounded-xl shadow-glass">
 							{serviceConfigs.map((service) => {
