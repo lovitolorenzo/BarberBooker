@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { apiPost } from "@/config/api";
+import { persistAuthUser } from "@/hooks/use-auth";
 
 const logoUrl = new URL("../assets/WhatsApp Image 2026-01-28 at 22.36.13.jpeg", import.meta.url).href;
 
@@ -35,6 +36,7 @@ export default function LoginPage() {
 			const data = await response.json();
 
 			if (response.ok) {
+				persistAuthUser(data.user);
 				window.dispatchEvent(new Event("auth-change"));
 
 				toast({

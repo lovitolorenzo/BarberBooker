@@ -10,15 +10,74 @@ interface AuthState {
   userPhone: string | null;
 }
 
+type AuthUserPayload = {
+  role?: string | null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+};
+
+const AUTH_STORAGE_KEY = 'barberbooker_auth_user';
+
+const emptyAuthState: AuthState = {
+  isLoggedIn: false,
+  userRole: null,
+  userEmail: null,
+  userFirstName: null,
+  userLastName: null,
+  userPhone: null,
+};
+
+const mapUserToAuthState = (user?: AuthUserPayload | null): AuthState => ({
+  isLoggedIn: !!user,
+  userRole: user?.role || null,
+  userEmail: user?.email || null,
+  userFirstName: user?.firstName || null,
+  userLastName: user?.lastName || null,
+  userPhone: user?.phone || null,
+});
+
+const loadPersistedAuthState = (): AuthState => {
+  if (typeof window === 'undefined') {
+    return emptyAuthState;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) {
+      return emptyAuthState;
+    }
+
+    const user = JSON.parse(raw) as AuthUserPayload;
+    return mapUserToAuthState(user);
+  } catch {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    return emptyAuthState;
+  }
+};
+
+export const persistAuthUser = (user?: AuthUserPayload | null) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (!user) {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+    role: user.role || null,
+    email: user.email || null,
+    firstName: user.firstName || null,
+    lastName: user.lastName || null,
+    phone: user.phone || null,
+  }));
+};
+
 export function useAuth() {
-  const [authState, setAuthState] = useState<AuthState>({
-    isLoggedIn: false,
-    userRole: null,
-    userEmail: null,
-    userFirstName: null,
-    userLastName: null,
-    userPhone: null,
-  });
+  const [authState, setAuthState] = useState<AuthState>(() => loadPersistedAuthState());
 
   // Check authentication status on mount and storage changes
   useEffect(() => {
@@ -32,24 +91,12 @@ export function useAuth() {
 
         const data = await response.json();
         const user = data?.user;
+        const nextState = mapUserToAuthState(user);
 
-        setAuthState({
-          isLoggedIn: !!user,
-          userRole: user?.role || null,
-          userEmail: user?.email || null,
-          userFirstName: user?.firstName || null,
-          userLastName: user?.lastName || null,
-          userPhone: user?.phone || null,
-        });
+        persistAuthUser(user);
+        setAuthState(nextState);
       } catch {
-        setAuthState({
-          isLoggedIn: false,
-          userRole: null,
-          userEmail: null,
-          userFirstName: null,
-          userLastName: null,
-          userPhone: null,
-        });
+        setAuthState(loadPersistedAuthState());
       }
     };
 
@@ -74,14 +121,8 @@ export function useAuth() {
       // ignore
     }
 
-    setAuthState({
-      isLoggedIn: false,
-      userRole: null,
-      userEmail: null,
-      userFirstName: null,
-      userLastName: null,
-      userPhone: null,
-    });
+    persistAuthUser(null);
+    setAuthState(emptyAuthState);
 
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('auth-change'));
