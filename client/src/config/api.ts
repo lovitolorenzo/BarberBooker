@@ -13,8 +13,7 @@ declare global {
 // API Configuration for different environments
 export const API_CONFIG = {
   // Base URL for API calls
-  baseURL: import.meta.env.VITE_API_URL || 
-           (import.meta.env.DEV ? '' : 'https://barberbooker.onrender.com'),
+  baseURL: import.meta.env.VITE_API_URL || '',
   
   // Request timeout in milliseconds
   timeout: 10000,
