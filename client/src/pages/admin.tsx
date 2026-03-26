@@ -42,7 +42,7 @@ export default function AdminPage() {
     }
   });
 
-  const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
+  const { data: serviceConfigs = [], isLoading: isServicesLoading } = useQuery<ServiceConfig[]>({
     queryKey: ["/api/admin/services"],
     enabled: isAdmin,
     queryFn: async () => {
@@ -52,7 +52,7 @@ export default function AdminPage() {
     },
   });
 
-  const { data: businessHoursConfig } = useQuery<BusinessHoursConfig>({
+  const { data: businessHoursConfig, isLoading: isBusinessHoursLoading } = useQuery<BusinessHoursConfig>({
     queryKey: ["/api/admin/business-hours"],
     enabled: isAdmin,
     queryFn: async () => {
@@ -431,139 +431,190 @@ export default function AdminPage() {
               </div>
 
               <div className="space-y-3">
-                {serviceConfigs.map((service) => (
-                  <div
-                    key={service.key}
-                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
-                  >
-                    <Input
-                      defaultValue={service.name}
-                      onBlur={(e) => {
-                        if (e.target.value !== service.name) {
-                          updateServiceMutation.mutate({ key: service.key, update: { name: e.target.value } });
-                        }
-                      }}
-                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                    />
-                    <Input
-                      defaultValue={String(service.duration)}
-                      onBlur={(e) => {
-                        const duration = Number(e.target.value);
-                        if (Number.isInteger(duration) && duration > 0 && duration !== service.duration) {
-                          updateServiceMutation.mutate({ key: service.key, update: { duration } });
-                        }
-                      }}
-                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                    />
-                    <Input
-                      defaultValue={(service.price / 100).toFixed(2)}
-                      onBlur={(e) => {
-                        const price = parsePriceToCents(e.target.value);
-                        if (Number.isInteger(price) && price >= 0 && price !== service.price) {
-                          updateServiceMutation.mutate({ key: service.key, update: { price } });
-                        }
-                      }}
-                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                    />
-                    <Input
-                      defaultValue={String(service.sortOrder)}
-                      onBlur={(e) => {
-                        const sortOrder = Number(e.target.value);
-                        if (Number.isInteger(sortOrder) && sortOrder !== service.sortOrder) {
-                          updateServiceMutation.mutate({ key: service.key, update: { sortOrder } });
-                        }
-                      }}
-                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                    />
-                    <div className="flex items-center justify-between gap-3">
-                      <Switch
-                        checked={service.enabled}
-                        onCheckedChange={(enabled) =>
-                          updateServiceMutation.mutate({ key: service.key, update: { enabled } })
-                        }
-                      />
-                      <Button
-                        variant="destructive"
-                        onClick={() => deleteServiceMutation.mutate(service.key)}
-                        disabled={deleteServiceMutation.isPending}
-                      >
-                        Elimina
-                      </Button>
-                    </div>
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-barbershop-text">Servizi esistenti</h3>
+                  <Badge variant="secondary">{serviceConfigs.length}</Badge>
+                </div>
+                {isServicesLoading ? (
+                  <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
+                    Caricamento servizi...
                   </div>
-                ))}
+                ) : serviceConfigs.length === 0 ? (
+                  <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
+                    Nessun servizio configurato.
+                  </div>
+                ) : (
+                  serviceConfigs.map((service) => (
+                    <div
+                      key={service.key}
+                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                    >
+                      <div className="space-y-1">
+                        <span className="text-xs text-barbershop-muted md:hidden">Nome</span>
+                        <Input
+                          defaultValue={service.name}
+                          onBlur={(e) => {
+                            if (e.target.value !== service.name) {
+                              updateServiceMutation.mutate({ key: service.key, update: { name: e.target.value } });
+                            }
+                          }}
+                          className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-barbershop-muted md:hidden">Durata</span>
+                        <Input
+                          defaultValue={String(service.duration)}
+                          onBlur={(e) => {
+                            const duration = Number(e.target.value);
+                            if (Number.isInteger(duration) && duration > 0 && duration !== service.duration) {
+                              updateServiceMutation.mutate({ key: service.key, update: { duration } });
+                            }
+                          }}
+                          className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-barbershop-muted md:hidden">Prezzo</span>
+                        <Input
+                          defaultValue={(service.price / 100).toFixed(2)}
+                          onBlur={(e) => {
+                            const price = parsePriceToCents(e.target.value);
+                            if (Number.isInteger(price) && price >= 0 && price !== service.price) {
+                              updateServiceMutation.mutate({ key: service.key, update: { price } });
+                            }
+                          }}
+                          className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-barbershop-muted md:hidden">Ordine</span>
+                        <Input
+                          defaultValue={String(service.sortOrder)}
+                          onBlur={(e) => {
+                            const sortOrder = Number(e.target.value);
+                            if (Number.isInteger(sortOrder) && sortOrder !== service.sortOrder) {
+                              updateServiceMutation.mutate({ key: service.key, update: { sortOrder } });
+                            }
+                          }}
+                          className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center justify-between rounded-md border border-barbershop-charcoal px-3 py-2 md:border-0 md:px-0 md:py-0">
+                          <span className="text-sm text-barbershop-muted">Attivo</span>
+                          <Switch
+                            checked={service.enabled}
+                            onCheckedChange={(enabled) =>
+                              updateServiceMutation.mutate({ key: service.key, update: { enabled } })
+                            }
+                          />
+                        </div>
+                        <Button
+                          variant="destructive"
+                          onClick={() => deleteServiceMutation.mutate(service.key)}
+                          disabled={deleteServiceMutation.isPending}
+                          className="w-full sm:w-auto"
+                        >
+                          Elimina
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
         )}
 
-        {isAdmin && editableBusinessHours && (
+        {isAdmin && (
           <Card className="barbershop-card border-barbershop-dark mb-8">
             <CardHeader>
               <CardTitle className="text-barbershop-text">Orari di Apertura</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 items-center">
-                <span className="text-sm text-barbershop-muted">Intervallo slot (minuti)</span>
-                <Input
-                  type="number"
-                  min="5"
-                  step="5"
-                  value={String(editableBusinessHours.slotIntervalMinutes)}
-                  onChange={(e) =>
-                    setEditableBusinessHours({
-                      ...editableBusinessHours,
-                      slotIntervalMinutes: Number(e.target.value) || editableBusinessHours.slotIntervalMinutes,
-                    })
-                  }
-                  className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                />
-              </div>
+              {isBusinessHoursLoading ? (
+                <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
+                  Caricamento orari di apertura...
+                </div>
+              ) : editableBusinessHours ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 items-center">
+                    <span className="text-sm text-barbershop-muted">Intervallo slot (minuti)</span>
+                    <Input
+                      type="number"
+                      min="5"
+                      step="5"
+                      value={String(editableBusinessHours.slotIntervalMinutes)}
+                      onChange={(e) =>
+                        setEditableBusinessHours({
+                          ...editableBusinessHours,
+                          slotIntervalMinutes: Number(e.target.value) || editableBusinessHours.slotIntervalMinutes,
+                        })
+                      }
+                      className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                    />
+                  </div>
 
-              <div className="space-y-3">
-                {editableBusinessHours.days
-                  .slice()
-                  .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
-                  .map((day) => (
-                    <div
-                      key={day.dayOfWeek}
-                      className="grid grid-cols-1 md:grid-cols-[180px_120px_1fr_1fr] gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                  <div className="space-y-3">
+                    {editableBusinessHours.days
+                      .slice()
+                      .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+                      .map((day) => (
+                        <div
+                          key={day.dayOfWeek}
+                          className="grid grid-cols-1 md:grid-cols-[180px_120px_1fr_1fr] gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
+                        >
+                          <div className="space-y-1">
+                            <span className="text-xs text-barbershop-muted md:hidden">Giorno</span>
+                            <span className="text-sm text-barbershop-text">{weekdayLabels[day.dayOfWeek]}</span>
+                          </div>
+                          <div className="flex items-center justify-between rounded-md border border-barbershop-charcoal px-3 py-2 md:border-0 md:px-0 md:py-0">
+                            <span className="text-sm text-barbershop-muted">Aperto</span>
+                            <Switch
+                              checked={day.enabled}
+                              onCheckedChange={(enabled) => updateBusinessDay(day.dayOfWeek, "enabled", enabled)}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs text-barbershop-muted md:hidden">Apertura</span>
+                            <Input
+                              type="time"
+                              value={day.openTime}
+                              disabled={!day.enabled}
+                              onChange={(e) => updateBusinessDay(day.dayOfWeek, "openTime", e.target.value)}
+                              className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs text-barbershop-muted md:hidden">Chiusura</span>
+                            <Input
+                              type="time"
+                              value={day.closeTime}
+                              disabled={!day.enabled}
+                              onChange={(e) => updateBusinessDay(day.dayOfWeek, "closeTime", e.target.value)}
+                              className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={() => updateBusinessHoursMutation.mutate(editableBusinessHours)}
+                      disabled={updateBusinessHoursMutation.isPending}
+                      className="barbershop-gold text-white w-full sm:w-auto"
                     >
-                      <span className="text-sm text-barbershop-text">{weekdayLabels[day.dayOfWeek]}</span>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm text-barbershop-muted">Aperto</span>
-                        <Switch
-                          checked={day.enabled}
-                          onCheckedChange={(enabled) => updateBusinessDay(day.dayOfWeek, "enabled", enabled)}
-                        />
-                      </div>
-                      <Input
-                        type="time"
-                        value={day.openTime}
-                        disabled={!day.enabled}
-                        onChange={(e) => updateBusinessDay(day.dayOfWeek, "openTime", e.target.value)}
-                        className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                      />
-                      <Input
-                        type="time"
-                        value={day.closeTime}
-                        disabled={!day.enabled}
-                        onChange={(e) => updateBusinessDay(day.dayOfWeek, "closeTime", e.target.value)}
-                        className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
-                      />
-                    </div>
-                  ))}
-              </div>
-
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => updateBusinessHoursMutation.mutate(editableBusinessHours)}
-                  disabled={updateBusinessHoursMutation.isPending}
-                  className="barbershop-gold text-white"
-                >
-                  {updateBusinessHoursMutation.isPending ? "Salvataggio..." : "Salva orari"}
-                </Button>
-              </div>
+                      {updateBusinessHoursMutation.isPending ? "Salvataggio..." : "Salva orari"}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
+                  Nessun orario di apertura disponibile.
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
