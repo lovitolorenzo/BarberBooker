@@ -52,6 +52,15 @@ export default function AdminPage() {
     },
   });
 
+  const { data: publicServiceConfigs = [], isLoading: isPublicServicesLoading } = useQuery<ServiceConfig[]>({
+    queryKey: ["/api/services"],
+    queryFn: async () => {
+      const response = await apiGet("/api/services");
+      if (!response.ok) throw new Error("Failed to fetch public services");
+      return response.json();
+    },
+  });
+
   const { data: businessHoursConfig, isLoading: isBusinessHoursLoading } = useQuery<BusinessHoursConfig>({
     queryKey: ["/api/admin/business-hours"],
     enabled: isAdmin,
@@ -62,11 +71,21 @@ export default function AdminPage() {
     },
   });
 
+  const { data: publicBusinessHoursConfig, isLoading: isPublicBusinessHoursLoading } = useQuery<BusinessHoursConfig>({
+    queryKey: ["/api/business-hours"],
+    queryFn: async () => {
+      const response = await apiGet("/api/business-hours");
+      if (!response.ok) throw new Error("Failed to fetch public business hours");
+      return response.json();
+    },
+  });
+
   useEffect(() => {
-    if (businessHoursConfig) {
-      setEditableBusinessHours(businessHoursConfig);
+    const resolvedBusinessHoursConfig = businessHoursConfig ?? publicBusinessHoursConfig;
+    if (resolvedBusinessHoursConfig) {
+      setEditableBusinessHours(resolvedBusinessHoursConfig);
     }
-  }, [businessHoursConfig]);
+  }, [businessHoursConfig, publicBusinessHoursConfig]);
 
   const createServiceMutation = useMutation({
     mutationFn: async (payload: InsertServiceConfig) => {
@@ -327,6 +346,11 @@ export default function AdminPage() {
     return t(`admin.status.${status}`) || status;
   };
 
+  const resolvedServiceConfigs = serviceConfigs.length > 0 ? serviceConfigs : publicServiceConfigs;
+  const resolvedBusinessHours = editableBusinessHours ?? businessHoursConfig ?? publicBusinessHoursConfig ?? null;
+  const servicesSectionLoading = isServicesLoading || (resolvedServiceConfigs.length === 0 && isPublicServicesLoading);
+  const businessHoursSectionLoading = isBusinessHoursLoading || (!resolvedBusinessHours && isPublicBusinessHoursLoading);
+
   return (
     <div className="min-h-screen barbershop-bg text-barbershop-text">
       <Navbar />
@@ -433,18 +457,18 @@ export default function AdminPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="text-sm font-semibold text-barbershop-text">Servizi esistenti</h3>
-                  <Badge variant="secondary">{serviceConfigs.length}</Badge>
+                  <Badge variant="secondary">{resolvedServiceConfigs.length}</Badge>
                 </div>
-                {isServicesLoading ? (
+                {servicesSectionLoading ? (
                   <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
                     Caricamento servizi...
                   </div>
-                ) : serviceConfigs.length === 0 ? (
+                ) : resolvedServiceConfigs.length === 0 ? (
                   <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
                     Nessun servizio configurato.
                   </div>
                 ) : (
-                  serviceConfigs.map((service) => (
+                  resolvedServiceConfigs.map((service) => (
                     <div
                       key={service.key}
                       className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 items-center rounded-lg border border-barbershop-charcoal p-3 barbershop-dark"
@@ -533,11 +557,11 @@ export default function AdminPage() {
               <CardTitle className="text-barbershop-text">Orari di Apertura</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {isBusinessHoursLoading ? (
+              {businessHoursSectionLoading ? (
                 <div className="rounded-lg border border-barbershop-charcoal p-4 text-sm text-barbershop-muted barbershop-dark">
                   Caricamento orari di apertura...
                 </div>
-              ) : editableBusinessHours ? (
+              ) : resolvedBusinessHours ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 items-center">
                     <span className="text-sm text-barbershop-muted">Intervallo slot (minuti)</span>
@@ -545,11 +569,11 @@ export default function AdminPage() {
                       type="number"
                       min="5"
                       step="5"
-                      value={String(editableBusinessHours.slotIntervalMinutes)}
+                      value={String(resolvedBusinessHours.slotIntervalMinutes)}
                       onChange={(e) =>
                         setEditableBusinessHours({
-                          ...editableBusinessHours,
-                          slotIntervalMinutes: Number(e.target.value) || editableBusinessHours.slotIntervalMinutes,
+                          ...resolvedBusinessHours,
+                          slotIntervalMinutes: Number(e.target.value) || resolvedBusinessHours.slotIntervalMinutes,
                         })
                       }
                       className="barbershop-dark text-barbershop-text border-barbershop-charcoal"
@@ -557,7 +581,7 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {editableBusinessHours.days
+                    {resolvedBusinessHours.days
                       .slice()
                       .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
                       .map((day) => (
@@ -602,7 +626,7 @@ export default function AdminPage() {
 
                   <div className="flex justify-end">
                     <Button
-                      onClick={() => updateBusinessHoursMutation.mutate(editableBusinessHours)}
+                      onClick={() => updateBusinessHoursMutation.mutate(resolvedBusinessHours)}
                       disabled={updateBusinessHoursMutation.isPending}
                       className="barbershop-gold text-white w-full sm:w-auto"
                     >
