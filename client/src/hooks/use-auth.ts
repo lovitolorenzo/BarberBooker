@@ -86,7 +86,13 @@ export function useAuth() {
         const response = await apiGet('/auth/me');
 
         if (!response.ok) {
-          throw new Error('Not authenticated');
+          if (response.status === 401) {
+            persistAuthUser(null);
+            setAuthState(emptyAuthState);
+            return;
+          }
+
+          throw new Error('Failed to verify authentication');
         }
 
         const data = await response.json();
