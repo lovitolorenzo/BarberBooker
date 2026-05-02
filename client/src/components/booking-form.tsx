@@ -3,9 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Calendar, CalendarCheck, LogIn } from "lucide-react";
+import { Calendar, CalendarCheck, LogIn, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,7 +20,9 @@ import { useEffect } from "react";
 interface BookingFormProps {
   selectedDate: string | null;
   selectedTime: string | null;
+  selectedAppointment: Appointment | null;
   onBookingConfirmed: (booking: Appointment) => void;
+  onAppointmentDeleted: () => void;
 }
 
 const bookingSchema = z.object({
@@ -34,18 +35,24 @@ type BookingFormData = z.infer<typeof bookingSchema>;
 
 const formatPriceLabel = (priceInCents: number) => `€${Math.round(priceInCents / 100)}`;
 
-export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
+export default function BookingForm({
+  selectedDate,
+  selectedTime,
+  selectedAppointment,
+  onBookingConfirmed,
+  onAppointmentDeleted,
+}: BookingFormProps) {
   const [selectedServiceKey, setSelectedServiceKey] = useState("");
   const { toast } = useToast();
   const { userFirstName, userLastName, userRole, userPhone } = useAuth();
   const isAdmin = userRole === 'admin';
-  // State per admin che prenota a nome di altri clienti
   const [adminCustomerFirstName, setAdminCustomerFirstName] = useState('');
   const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
   const [adminCustomerPhone, setAdminCustomerPhone] = useState('');
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [_, navigate] = useLocation();
+  const isManagingAppointment = isAdmin && !!selectedAppointment;
 
   const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
     queryKey: ["/api/services"],
@@ -56,16 +63,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
     },
   });
 
-  const selectedService = selectedServiceKey
-    ? serviceConfigs.find((s) => s.key === selectedServiceKey)
-    : undefined;
-
-  const getServiceDisplayName = (service: ServiceConfig) => {
-    const translationKey = `services.${service.key}`;
-    const translated = t(translationKey);
-    return translated !== translationKey ? translated : service.name;
-  };
-
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -75,19 +72,82 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
     },
   });
 
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const response = await apiRequest("DELETE", `/api/appointments/${appointmentId}`);
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to delete appointment");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/all"] });
+      form.reset();
+      setSelectedServiceKey("");
+      setAdminCustomerFirstName("");
+      setAdminCustomerLastName("");
+      setAdminCustomerPhone("");
+      onAppointmentDeleted();
+      toast({
+        title: "Successo",
+        description: "Appuntamento cancellato",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   useEffect(() => {
-    if (!isAdmin || selectedServiceKey || serviceConfigs.length === 0) {
+    if (!isAdmin || serviceConfigs.length === 0) {
       return;
     }
 
-    const defaultService = serviceConfigs.find((service) => service.key === "haircut");
-    if (!defaultService) {
+    if (selectedAppointment) {
+      const matchedService = serviceConfigs.find(
+        (service) => service.key === selectedAppointment.serviceKey || service.name === selectedAppointment.service
+      );
+
+      if (matchedService) {
+        setSelectedServiceKey(matchedService.key);
+        form.setValue("service", matchedService.key, { shouldValidate: true });
+      }
+
+      setAdminCustomerFirstName(selectedAppointment.customerFirstName || "");
+      setAdminCustomerLastName(selectedAppointment.customerLastName || "");
+      setAdminCustomerPhone(selectedAppointment.customerPhone || "");
+      form.setValue("notes", selectedAppointment.notes || "");
       return;
     }
 
-    setSelectedServiceKey(defaultService.key);
-    form.setValue("service", defaultService.key, { shouldValidate: true });
-  }, [form, isAdmin, selectedServiceKey, serviceConfigs]);
+    setAdminCustomerFirstName("");
+    setAdminCustomerLastName("");
+    setAdminCustomerPhone("");
+    form.setValue("notes", "");
+
+    const defaultService = serviceConfigs.find((service) => service.key === "haircut") || serviceConfigs[0];
+    if (defaultService) {
+      setSelectedServiceKey(defaultService.key);
+      form.setValue("service", defaultService.key, { shouldValidate: true });
+    }
+  }, [form, isAdmin, selectedAppointment, serviceConfigs]);
+
+  const selectedService = selectedServiceKey
+    ? serviceConfigs.find((s) => s.key === selectedServiceKey)
+    : undefined;
+
+  const getServiceDisplayName = (service: ServiceConfig) => {
+    const translationKey = `services.${service.key}`;
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : service.name;
+  };
 
   const phoneRegex = /^\+?[0-9\s().-]{6,}$/;
 
@@ -145,6 +205,10 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
   };
 
   const onSubmit = (data: BookingFormData) => {
+    if (isManagingAppointment) {
+      return;
+    }
+
     if (!selectedDate || !selectedTime || !selectedServiceKey) {
       toast({
         title: t("missingInformation.title"),
@@ -214,10 +278,24 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
     createAppointmentMutation.mutate(appointmentData);
   };
 
+  const handleDeleteAppointment = () => {
+    if (!selectedAppointment?._id) {
+      return;
+    }
+
+    const confirmed = window.confirm("Vuoi davvero cancellare questo appuntamento?");
+    if (!confirmed) {
+      return;
+    }
+
+    deleteAppointmentMutation.mutate(selectedAppointment._id);
+  };
+
   const handleServiceChange = (value: string) => {
     setSelectedServiceKey(value);
     form.setValue("service", value);
   };
+
 	const isFormValid = selectedDate && selectedTime && selectedServiceKey &&
 		(isAdmin
 			? (adminCustomerFirstName && adminCustomerLastName)
@@ -225,15 +303,16 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 
 	return (
 		<div className="glass-card rounded-3xl p-6 shadow-glass">
-			<h2 className="text-xl font-semibold text-text-primary mb-6">{t("bookAppointment")}</h2>
+			<h2 className="text-xl font-semibold text-text-primary mb-6">
+				{isManagingAppointment ? "Gestisci Appuntamento" : t("bookAppointment")}
+			</h2>
 
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-				{/* Service Selection */}
 				<div className="space-y-2">
 					<Label htmlFor="service" className="text-sm font-medium text-text-primary">
 						{t("selectService")}
 					</Label>
-					<Select value={selectedServiceKey} onValueChange={handleServiceChange}>
+					<Select value={selectedServiceKey} onValueChange={handleServiceChange} disabled={isManagingAppointment}>
 						<SelectTrigger className="w-full px-4 py-3 bg-white/60 border border-border rounded-xl text-text-primary focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all">
 							<SelectValue placeholder={t("chooseService")} />
 						</SelectTrigger>
@@ -253,7 +332,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					)}
 				</div>
 
-				{/* Selected Date/Time Display */}
 				{selectedDate && selectedTime && (
 					<div className="bg-accent-blue/5 rounded-2xl p-4 border border-accent-blue/20">
 						<div className="flex items-center gap-2 mb-2">
@@ -271,7 +349,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					</div>
 				)}
 
-				{/* Customer Information */}
 				{isAdmin ? (
 					<div className="space-y-3">
 						<Label className="text-sm font-medium text-text-primary">{t("bookingFor")} {t("booking.adminSuffix")}</Label>
@@ -281,6 +358,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 								placeholder={t("auth.firstName")}
 								value={adminCustomerFirstName}
 								onChange={(e) => setAdminCustomerFirstName(e.target.value)}
+								disabled={isManagingAppointment}
 								className="input-glass rounded-xl"
 							/>
 							<Input
@@ -288,6 +366,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 								placeholder={t("auth.lastName")}
 								value={adminCustomerLastName}
 								onChange={(e) => setAdminCustomerLastName(e.target.value)}
+								disabled={isManagingAppointment}
 								className="input-glass rounded-xl"
 							/>
 						</div>
@@ -297,6 +376,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 								placeholder={t("phoneNumber")}
 								value={adminCustomerPhone}
 								onChange={(e) => setAdminCustomerPhone(e.target.value)}
+								disabled={isManagingAppointment}
 								className="input-glass rounded-xl"
 							/>
 						</div>
@@ -321,7 +401,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 					</div>
 				)}
 
-				{/* Special Requests */}
 				<div className="space-y-2">
 					<Label htmlFor="notes" className="text-sm font-medium text-text-primary">
 						{t("specialRequests")}
@@ -330,19 +409,32 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 						{...form.register("notes")}
 						rows={3}
 						placeholder={t("anySpecificRequests")}
+						disabled={isManagingAppointment}
 						className="input-glass rounded-xl resize-none"
 					/>
 				</div>
 
-				{/* Submit Button */}
-				<Button
-					type="submit"
-					disabled={!isFormValid || createAppointmentMutation.isPending}
-					className="w-full btn-accent py-4 h-auto text-base font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					<CalendarCheck className="mr-2 h-5 w-5" />
-					{createAppointmentMutation.isPending ? t("booking") : t("bookAppointment")}
-				</Button>
+				{isManagingAppointment ? (
+					<Button
+						type="button"
+						variant="destructive"
+						onClick={handleDeleteAppointment}
+						disabled={deleteAppointmentMutation.isPending}
+						className="w-full py-4 h-auto text-base font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<Trash2 className="mr-2 h-5 w-5" />
+						{deleteAppointmentMutation.isPending ? "Cancellazione..." : "Cancella Appuntamento"}
+					</Button>
+				) : (
+					<Button
+						type="submit"
+						disabled={!isFormValid || createAppointmentMutation.isPending}
+						className="w-full btn-accent py-4 h-auto text-base font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<CalendarCheck className="mr-2 h-5 w-5" />
+						{createAppointmentMutation.isPending ? t("booking") : t("bookAppointment")}
+					</Button>
+				)}
 			</form>
 		</div>
 	);

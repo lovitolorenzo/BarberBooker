@@ -10,7 +10,8 @@ interface CalendarProps {
   selectedDate: string | null;
   selectedTime: string | null;
   onDateSelect: (date: string) => void;
-  onTimeSelect: (time: string) => void;
+  onTimeSelect: (time: string | null) => void;
+  onAppointmentSelect: (appointment: Appointment | null) => void;
   isAdmin?: boolean;
 }
 
@@ -72,6 +73,7 @@ export default function CalendarComponent({
   selectedTime, 
   onDateSelect, 
   onTimeSelect,
+  onAppointmentSelect,
   isAdmin = false
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -191,6 +193,8 @@ export default function CalendarComponent({
           onClick={() => {
             if (!isPast && isCurrentMonth && !isBeyondBookingWindow && !isClosedDay) {
               setActiveBookedSlotKey(null);
+              onTimeSelect(null);
+              onAppointmentSelect(null);
               onDateSelect(dateStr);
             }
           }}
@@ -231,6 +235,7 @@ export default function CalendarComponent({
             const isBookedSlotPopupOpen = activeBookedSlotKey === slotKey;
             const bookedAppointment = isAdmin && isBooked ? getBookedAppointment(selectedDate, time) : undefined;
             const bookedSlotLabel = isAdmin && isBooked ? getBookedSlotLabel(selectedDate, time) : undefined;
+            const isManagedBookedSlot = isAdmin && isBooked && isSelected;
 
             return (
               <div key={time} className="relative">
@@ -240,9 +245,10 @@ export default function CalendarComponent({
                   title={bookedSlotLabel ? `${t("booked")}: ${bookedSlotLabel}` : undefined}
                   className={`
                     w-full py-2.5 px-3 text-sm font-medium rounded-xl transition-all border
-                    ${isSelected ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
-                    ${isBooked ? 'bg-gray-100 text-gray-400 border-gray-200' : ''}
                     ${isPast ? 'bg-gray-50 text-gray-300 cursor-not-allowed border-gray-100' : ''}
+                    ${isManagedBookedSlot ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
+                    ${isBooked && !isManagedBookedSlot && !isPast ? 'bg-gray-100 text-gray-400 border-gray-200' : ''}
+                    ${isSelected && !isManagedBookedSlot && !isBooked ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
                     ${!isSelected && !isBooked && !isPast ? 'bg-accent-green/10 text-accent-green border-accent-green/30 hover:bg-accent-green hover:text-white hover:border-accent-green' : ''}
                     ${isBooked && isAdmin ? 'cursor-pointer' : ''}
                     ${isBooked && !isAdmin ? 'cursor-not-allowed' : ''}
@@ -259,10 +265,13 @@ export default function CalendarComponent({
                       }
 
                       setActiveBookedSlotKey((current) => current === slotKey ? null : slotKey);
+                      onTimeSelect(time);
+                      onAppointmentSelect(bookedAppointment ?? null);
                       return;
                     }
 
                     setActiveBookedSlotKey(null);
+                    onAppointmentSelect(null);
                     onTimeSelect(time);
                   }}
                 >

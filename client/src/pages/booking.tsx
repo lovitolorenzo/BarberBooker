@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import CalendarComponent from "@/components/calendar";
 import BookingForm from "@/components/booking-form";
 import ConfirmationModal from "@/components/confirmation-modal";
@@ -13,10 +12,11 @@ import type { Appointment } from "@shared/schema";
 export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [managedAppointment, setManagedAppointment] = useState<Appointment | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<Appointment | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [, setLocation] = useLocation();
-  const { isLoggedIn, userEmail, userFirstName, userLastName, userRole, logout } = useAuth();
+  const { userRole, logout } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -29,6 +29,26 @@ export default function BookingPage() {
     setShowConfirmation(false);
     setConfirmedBooking(null);
     setSelectedDate(null);
+    setSelectedTime(null);
+    setManagedAppointment(null);
+  };
+
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+    setSelectedTime(null);
+    setManagedAppointment(null);
+  };
+
+  const handleTimeSelect = (time: string | null) => {
+    setSelectedTime(time);
+  };
+
+  const handleAppointmentSelect = (appointment: Appointment | null) => {
+    setManagedAppointment(appointment);
+  };
+
+  const handleAppointmentDeleted = () => {
+    setManagedAppointment(null);
     setSelectedTime(null);
   };
 
@@ -56,15 +76,18 @@ export default function BookingPage() {
           <CalendarComponent
             selectedDate={selectedDate}
             selectedTime={selectedTime}
-            onDateSelect={setSelectedDate}
-            onTimeSelect={setSelectedTime}
+            onDateSelect={handleDateSelect}
+            onTimeSelect={handleTimeSelect}
+            onAppointmentSelect={handleAppointmentSelect}
             isAdmin={userRole === 'admin'}
           />
           
           <BookingForm
             selectedDate={selectedDate}
             selectedTime={selectedTime}
+            selectedAppointment={managedAppointment}
             onBookingConfirmed={handleBookingConfirmed}
+            onAppointmentDeleted={handleAppointmentDeleted}
           />
         </div>
       </main>
