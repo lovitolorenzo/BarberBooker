@@ -613,7 +613,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete an appointment
-  app.delete("/api/appointments/:id", async (req, res) => {
+  app.delete("/api/appointments/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteAppointment(id);

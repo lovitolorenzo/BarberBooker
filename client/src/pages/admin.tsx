@@ -158,6 +158,32 @@ export default function AdminPage() {
     },
   });
 
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const response = await apiRequest("DELETE", `/api/appointments/${appointmentId}`);
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to delete appointment");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
+      toast({
+        title: "Successo",
+        description: "Prenotazione eliminata",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateBusinessHoursMutation = useMutation({
     mutationFn: async (payload: BusinessHoursConfig) => {
       const response = await apiRequest("PUT", "/api/admin/business-hours", {
@@ -275,6 +301,19 @@ export default function AdminPage() {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
+
+  const handleDeleteAppointment = (appointmentId?: string) => {
+    if (!appointmentId || !isAdmin) {
+      return;
+    }
+
+    const confirmed = window.confirm("Vuoi davvero eliminare questa prenotazione?");
+    if (!confirmed) {
+      return;
+    }
+
+    deleteAppointmentMutation.mutate(appointmentId);
+  };
 
   const updateBusinessDay = (
     dayOfWeek: number,
@@ -750,6 +789,18 @@ export default function AdminPage() {
                           <div className="mt-3 text-sm">
                             <span className="text-barbershop-gold">{t('admin.notes')}: </span>
                             <span className="text-barbershop-muted">{appointment.notes}</span>
+                          </div>
+                        )}
+
+                        {isAdmin && appointment._id && (
+                          <div className="mt-4 flex justify-end">
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDeleteAppointment(appointment._id)}
+                              disabled={deleteAppointmentMutation.isPending}
+                            >
+                              Elimina prenotazione
+                            </Button>
                           </div>
                         )}
                       </div>
