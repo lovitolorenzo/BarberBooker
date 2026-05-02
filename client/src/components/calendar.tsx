@@ -211,7 +211,7 @@ export default function CalendarComponent({
     if (timeSlots.length === 0) {
       return (
         <div className="space-y-4">
-          <h3 className="text-base font-medium text-text-primary">{t('available_times')}</h3>
+          <h3 className="text-base font-medium text-text-primary">{t('calendar.available_times')}</h3>
           <p className="text-sm text-text-secondary">
             {t("booking.noSlotsForDay", { defaultValue: "Nessun orario disponibile per questo giorno" })}
           </p>
@@ -221,7 +221,7 @@ export default function CalendarComponent({
 
     return (
       <div className="space-y-4">
-        <h3 className="text-base font-medium text-text-primary">{t('available_times')}</h3>
+        <h3 className="text-base font-medium text-text-primary">{t('calendar.available_times')}</h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {timeSlots.map(time => {
             const isBooked = isSlotBooked(selectedDate, time);
