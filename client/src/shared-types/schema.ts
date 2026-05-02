@@ -7,6 +7,7 @@ export interface MongoAppointment {
   customerLastName: string;
   customerEmail?: string;
   customerPhone: string;
+  serviceKey?: string;
   service: string;
   appointmentDate: string;
   appointmentTime: string;
@@ -24,6 +25,7 @@ export interface Appointment {
   customerLastName: string;
   customerEmail?: string;
   customerPhone: string;
+  serviceKey?: string;
   service: string;
   appointmentDate: string;
   appointmentTime: string;
@@ -41,6 +43,7 @@ export interface User {
   email?: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   password?: string;
   profileImageUrl?: string;
   role?: string;
@@ -84,6 +87,34 @@ export interface ServiceProduct {
   costPerService: number;
 }
 
+export interface ServiceConfig {
+  _id?: string;
+  key: string;
+  name: string;
+  duration: number;
+  price: number;
+  enabled: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BusinessHoursDay {
+  dayOfWeek: number;
+  enabled: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
+export interface BusinessHoursConfig {
+  _id?: string;
+  key: string;
+  slotIntervalMinutes: number;
+  days: BusinessHoursDay[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AnalyticsData {
   _id?: string;
   date: string;
@@ -101,6 +132,7 @@ export const insertAppointmentSchema = z.object({
   customerLastName: z.string().min(1, "Last name is required"),
   customerEmail: z.string().email().optional(),
   customerPhone: z.string().min(1, "Phone number is required"),
+  serviceKey: z.string().min(1).optional(),
   service: z.string().min(1, "Service selection is required"),
   appointmentDate: z.string().min(1, "Date is required"),
   appointmentTime: z.string().min(1, "Time is required"),
@@ -116,6 +148,7 @@ export const insertUserSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  phone: z.string().optional(),
   password: z.string().optional(), // Add password field
   profileImageUrl: z.string().optional(),
   role: z.string().optional(),
@@ -148,6 +181,39 @@ export const insertServiceProductSchema = z.object({
   costPerService: z.number().min(0),
 });
 
+export const insertServiceConfigSchema = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1),
+  duration: z.number().int().min(1),
+  price: z.number().int().min(0),
+  enabled: z.boolean().default(true),
+  sortOrder: z.number().int().default(0),
+});
+
+export const updateServiceConfigSchema = insertServiceConfigSchema.partial().extend({
+  key: z.string().min(1).optional(),
+});
+
+const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const businessHoursDaySchema = z.object({
+  dayOfWeek: z.number().int().min(0).max(6),
+  enabled: z.boolean().default(true),
+  openTime: z.string().regex(timeRegex),
+  closeTime: z.string().regex(timeRegex),
+});
+
+export const insertBusinessHoursConfigSchema = z.object({
+  key: z.string().default("default"),
+  slotIntervalMinutes: z.number().int().min(5).max(120).default(30),
+  days: z.array(businessHoursDaySchema).length(7),
+});
+
+export const updateBusinessHoursConfigSchema = insertBusinessHoursConfigSchema.partial().extend({
+  key: z.string().optional(),
+  days: z.array(businessHoursDaySchema).length(7).optional(),
+});
+
 export const insertAnalyticsSchema = z.object({
   date: z.string(),
   dailyRevenue: z.number().min(0),
@@ -163,6 +229,22 @@ export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type InsertServiceProduct = z.infer<typeof insertServiceProductSchema>;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type InsertServiceConfig = z.infer<typeof insertServiceConfigSchema>;
+export type UpdateServiceConfig = z.infer<typeof updateServiceConfigSchema>;
+export type InsertBusinessHoursConfig = z.infer<typeof insertBusinessHoursConfigSchema>;
+export type UpdateBusinessHoursConfig = z.infer<typeof updateBusinessHoursConfigSchema>;
+
+export const defaultBusinessHoursDays: BusinessHoursDay[] = [
+  { dayOfWeek: 0, enabled: true, openTime: "10:00", closeTime: "16:00" },
+  { dayOfWeek: 1, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 2, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 3, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 4, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 5, enabled: true, openTime: "09:00", closeTime: "18:00" },
+  { dayOfWeek: 6, enabled: true, openTime: "09:00", closeTime: "17:00" },
+];
+
+export const defaultSlotIntervalMinutes = 30;
 
 // Service definitions
 export const services = {
