@@ -391,7 +391,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
 
-      (req as any).session.user = userResponse;
+      const session = (req as any).session;
+      session.user = userResponse;
+
+      await new Promise<void>((resolve, reject) => {
+        session.save((saveError: any) => {
+          if (saveError) {
+            reject(saveError);
+            return;
+          }
+
+          resolve();
+        });
+      });
 
       console.log("Login successful for:", `${firstName} ${lastName}`);
       res.json({ 
