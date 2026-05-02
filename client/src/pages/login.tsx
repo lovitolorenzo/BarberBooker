@@ -33,6 +33,11 @@ export default function LoginPage() {
 				password,
 			});
 
+			const contentType = response.headers.get("content-type") || "";
+			if (!contentType.includes("application/json")) {
+				throw new Error("Authentication API is not reachable from the current deployment");
+			}
+
 			const data = await response.json();
 
 			if (response.ok) {
@@ -61,7 +66,7 @@ export default function LoginPage() {
 			console.error("Login error:", error);
 			toast({
 				title: t("login.failure.title"),
-				description: t("login.failure.description"),
+				description: error instanceof Error ? error.message : t("login.failure.description"),
 				variant: "destructive",
 			});
 		} finally {
