@@ -75,6 +75,7 @@ export default function CalendarComponent({
   isAdmin = false
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [activeBookedSlotKey, setActiveBookedSlotKey] = useState<string | null>(null);
   const { t } = useTranslation();
   const bookingWindowEnd = getEndOfCurrentWeek();
 
@@ -128,17 +129,19 @@ export default function CalendarComponent({
     );
   };
 
-  const getBookedSlotLabel = (date: string, time: string) => {
-    const appointment = appointments.find((apt) =>
+  const getBookedAppointment = (date: string, time: string) => {
+    return appointments.find((apt) =>
       apt.appointmentDate === date &&
       apt.appointmentTime === time &&
       apt.status === 'confirmed'
     );
+  };
 
+  const getBookedSlotLabel = (date: string, time: string) => {
+    const appointment = getBookedAppointment(date, time);
     if (!appointment) {
       return undefined;
     }
-
     return `${appointment.customerFirstName} ${appointment.customerLastName}`.trim();
   };
 
@@ -185,7 +188,12 @@ export default function CalendarComponent({
             ${isPast || isBeyondBookingWindow || isClosedDay ? 'opacity-40 cursor-not-allowed' : ''}
           `}
           disabled={isPast || !isCurrentMonth || isBeyondBookingWindow || isClosedDay}
-          onClick={() => !isPast && isCurrentMonth && !isBeyondBookingWindow && !isClosedDay && onDateSelect(dateStr)}
+          onClick={() => {
+            if (!isPast && isCurrentMonth && !isBeyondBookingWindow && !isClosedDay) {
+              setActiveBookedSlotKey(null);
+              onDateSelect(dateStr);
+            }
+          }}
         >
           {currentDate.getDate()}
         </Button>
@@ -219,26 +227,56 @@ export default function CalendarComponent({
             const isBooked = isSlotBooked(selectedDate, time);
             const isPast = isPastSlot(selectedDate, time);
             const isSelected = selectedTime === time;
+            const slotKey = `${selectedDate}-${time}`;
+            const isBookedSlotPopupOpen = activeBookedSlotKey === slotKey;
+            const bookedAppointment = isAdmin && isBooked ? getBookedAppointment(selectedDate, time) : undefined;
             const bookedSlotLabel = isAdmin && isBooked ? getBookedSlotLabel(selectedDate, time) : undefined;
 
             return (
-              <Button
-                key={time}
-                variant="outline"
-                size="sm"
-                title={bookedSlotLabel ? `${t("booked")}: ${bookedSlotLabel}` : undefined}
-                className={`
-                  py-2.5 px-3 text-sm font-medium rounded-xl transition-all border
-                  ${isSelected ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
-                  ${isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : ''}
-                  ${isPast ? 'bg-gray-50 text-gray-300 cursor-not-allowed border-gray-100' : ''}
-                  ${!isSelected && !isBooked && !isPast ? 'bg-accent-green/10 text-accent-green border-accent-green/30 hover:bg-accent-green hover:text-white hover:border-accent-green' : ''}
-                `}
-                disabled={isBooked || isPast}
-                onClick={() => !isBooked && !isPast && onTimeSelect(time)}
-              >
-                {formatTime(time)}
-              </Button>
+              <div key={time} className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  title={bookedSlotLabel ? `${t("booked")}: ${bookedSlotLabel}` : undefined}
+                  className={`
+                    w-full py-2.5 px-3 text-sm font-medium rounded-xl transition-all border
+                    ${isSelected ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
+                    ${isBooked ? 'bg-gray-100 text-gray-400 border-gray-200' : ''}
+                    ${isPast ? 'bg-gray-50 text-gray-300 cursor-not-allowed border-gray-100' : ''}
+                    ${!isSelected && !isBooked && !isPast ? 'bg-accent-green/10 text-accent-green border-accent-green/30 hover:bg-accent-green hover:text-white hover:border-accent-green' : ''}
+                    ${isBooked && isAdmin ? 'cursor-pointer' : ''}
+                    ${isBooked && !isAdmin ? 'cursor-not-allowed' : ''}
+                  `}
+                  disabled={isPast || (isBooked && !isAdmin)}
+                  onClick={() => {
+                    if (isPast) {
+                      return;
+                    }
+
+                    if (isBooked) {
+                      if (!isAdmin) {
+                        return;
+                      }
+
+                      setActiveBookedSlotKey((current) => current === slotKey ? null : slotKey);
+                      return;
+                    }
+
+                    setActiveBookedSlotKey(null);
+                    onTimeSelect(time);
+                  }}
+                >
+                  {formatTime(time)}
+                </Button>
+
+                {isAdmin && isBookedSlotPopupOpen && bookedAppointment && (
+                  <div className="absolute left-1/2 top-full z-20 mt-2 w-max max-w-[160px] -translate-x-1/2 rounded-xl border border-border bg-white px-3 py-2 text-center shadow-lg">
+                    <p className="text-xs font-medium text-text-primary">
+                      {bookedAppointment.customerFirstName} {bookedAppointment.customerLastName}
+                    </p>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
