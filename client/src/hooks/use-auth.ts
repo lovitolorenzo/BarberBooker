@@ -96,8 +96,7 @@ export function useAuth() {
         persistAuthUser(user);
         setAuthState(nextState);
       } catch {
-        persistAuthUser(null);
-        setAuthState(emptyAuthState);
+        setAuthState(loadPersistedAuthState());
       }
     };
 
