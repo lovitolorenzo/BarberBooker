@@ -331,7 +331,15 @@ export default function CalendarComponent({
       {/* Calendar Grid */}
       <div className="mb-6">
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {[t('sunday'), t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday')].map(day => (
+          {[
+            t('calendar.sunday'),
+            t('calendar.monday'),
+            t('calendar.tuesday'),
+            t('calendar.wednesday'),
+            t('calendar.thursday'),
+            t('calendar.friday'),
+            t('calendar.saturday')
+          ].map(day => (
             <div key={day} className="text-center text-xs font-medium text-text-secondary py-2">
               {day}
             </div>
