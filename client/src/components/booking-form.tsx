@@ -16,194 +16,208 @@ import { apiGet, apiRequest } from "@/config/api";
 import { useTranslation } from "react-i18next";
 import type { Appointment, InsertAppointment, ServiceConfig } from "@shared/schema";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 interface BookingFormProps {
-	selectedDate: string | null;
-	selectedTime: string | null;
-	onBookingConfirmed: (booking: Appointment) => void;
+  selectedDate: string | null;
+  selectedTime: string | null;
+  onBookingConfirmed: (booking: Appointment) => void;
 }
 
 const bookingSchema = z.object({
-	customerPhone: z.string().optional(),
-	service: z.string().min(1, "Please select a service"),
-	notes: z.string().optional(),
+  customerPhone: z.string().optional(),
+  service: z.string().min(1, "Please select a service"),
+  notes: z.string().optional(),
 });
-
-const formatPriceLabel = (priceInCents: number) => `€${Math.round(priceInCents / 100)}`;
 
 type BookingFormData = z.infer<typeof bookingSchema>;
 
+const formatPriceLabel = (priceInCents: number) => `€${Math.round(priceInCents / 100)}`;
+
 export default function BookingForm({ selectedDate, selectedTime, onBookingConfirmed }: BookingFormProps) {
-	const [selectedServiceKey, setSelectedServiceKey] = useState("");
-	const { toast } = useToast();
-	const { userFirstName, userLastName, userRole, userPhone } = useAuth();
-	const isAdmin = userRole === 'admin';
-	// State per admin che prenota a nome di altri clienti
-	const [adminCustomerFirstName, setAdminCustomerFirstName] = useState('');
-	const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
-	const [adminCustomerPhone, setAdminCustomerPhone] = useState('');
-	const queryClient = useQueryClient();
-	const { t } = useTranslation();
-	const [_, navigate] = useLocation();
+  const [selectedServiceKey, setSelectedServiceKey] = useState("");
+  const { toast } = useToast();
+  const { userFirstName, userLastName, userRole, userPhone } = useAuth();
+  const isAdmin = userRole === 'admin';
+  // State per admin che prenota a nome di altri clienti
+  const [adminCustomerFirstName, setAdminCustomerFirstName] = useState('');
+  const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
+  const [adminCustomerPhone, setAdminCustomerPhone] = useState('');
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  const [_, navigate] = useLocation();
 
-	const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
-		queryKey: ["/api/services"],
-		queryFn: async () => {
-			const response = await apiGet("/api/services");
-			if (!response.ok) throw new Error("Failed to fetch services");
-			return response.json();
-		},
-	});
+  const { data: serviceConfigs = [] } = useQuery<ServiceConfig[]>({
+    queryKey: ["/api/services"],
+    queryFn: async () => {
+      const response = await apiGet("/api/services");
+      if (!response.ok) throw new Error("Failed to fetch services");
+      return response.json();
+    },
+  });
 
-	const selectedService = selectedServiceKey
-		? serviceConfigs.find((s) => s.key === selectedServiceKey)
-		: undefined;
+  const selectedService = selectedServiceKey
+    ? serviceConfigs.find((s) => s.key === selectedServiceKey)
+    : undefined;
 
-	const getServiceDisplayName = (service: ServiceConfig) => {
-		const translationKey = `services.${service.key}`;
-		const translated = t(translationKey);
-		return translated !== translationKey ? translated : service.name;
-	};
+  const getServiceDisplayName = (service: ServiceConfig) => {
+    const translationKey = `services.${service.key}`;
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : service.name;
+  };
 
-	const form = useForm<BookingFormData>({
-		resolver: zodResolver(bookingSchema),
-		defaultValues: {
-			customerPhone: "",
-			service: "",
-			notes: "",
-		},
-	});
+  const form = useForm<BookingFormData>({
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      customerPhone: "",
+      service: "",
+      notes: "",
+    },
+  });
 
-	const phoneRegex = /^\+?[0-9\s().-]{6,}$/;
+  useEffect(() => {
+    if (!isAdmin || selectedServiceKey || serviceConfigs.length === 0) {
+      return;
+    }
 
-	const createAppointmentMutation = useMutation({
-		mutationFn: async (data: InsertAppointment) => {
-			const response = await apiRequest("POST", "/api/appointments", data);
-			if (!response.ok) {
-				let message = "";
-				try {
-					const errorData = await response.json();
-					message = errorData?.message || "";
-				} catch {
-					// ignore
-				}
-				throw new Error(message || `Request failed: ${response.status} ${response.statusText}`);
-			}
+    const defaultService = serviceConfigs.find((service) => service.key === "haircut");
+    if (!defaultService) {
+      return;
+    }
 
-			return response.json();
-		},
-		onSuccess: (appointment: Appointment) => {
-			queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
-			onBookingConfirmed(appointment);
-			form.reset();
-			setSelectedServiceKey("");
-			toast({
-				title: t("bookingConfirmed.title"),
-				description: t("bookingConfirmed.description"),
-			});
-		},
-		onError: (error: any) => {
-			toast({
-				title: t("bookingFailed.title"),
-				description: error.message || t("bookingFailed.description"),
-				variant: "destructive",
-			});
-		},
-	});
+    setSelectedServiceKey(defaultService.key);
+    form.setValue("service", defaultService.key, { shouldValidate: true });
+  }, [form, isAdmin, selectedServiceKey, serviceConfigs]);
 
-	const formatDisplayDate = (dateStr: string) => {
-		const date = new Date(dateStr + "T00:00:00");
-		return date.toLocaleDateString("en-US", {
-			weekday: "long",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-		});
-	};
+  const phoneRegex = /^\+?[0-9\s().-]{6,}$/;
 
-	const formatTime = (timeStr: string) => {
-		const [hours, minutes] = timeStr.split(":");
-		const hour = parseInt(hours);
-		const ampm = hour >= 12 ? "PM" : "AM";
-		const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-		return `${displayHour}:${minutes} ${ampm}`;
-	};
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (data: InsertAppointment) => {
+      const response = await apiRequest("POST", "/api/appointments", data);
+      if (!response.ok) {
+        let message = "";
+        try {
+          const errorData = await response.json();
+          message = errorData?.message || "";
+        } catch {
+          // ignore
+        }
+        throw new Error(message || `Request failed: ${response.status} ${response.statusText}`);
+      }
 
-	const onSubmit = (data: BookingFormData) => {
-		if (!selectedDate || !selectedTime || !selectedServiceKey) {
-			toast({
-				title: t("missingInformation.title"),
-				description: t("missingInformation.description"),
-				variant: "destructive",
-			});
-			return;
-		}
+      return response.json();
+    },
+    onSuccess: (appointment: Appointment) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/range"] });
+      onBookingConfirmed(appointment);
+      form.reset();
+      setSelectedServiceKey("");
+      toast({
+        title: t("bookingConfirmed.title"),
+        description: t("bookingConfirmed.description"),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("bookingFailed.title"),
+        description: error.message || t("bookingFailed.description"),
+        variant: "destructive",
+      });
+    },
+  });
 
-		// Per admin: usa i nomi inseriti manualmente, altrimenti usa i dati dell'utente loggato
-		const finalFirstName = isAdmin ? adminCustomerFirstName : userFirstName;
-		const finalLastName = isAdmin ? adminCustomerLastName : userLastName;
-		const finalPhone = (isAdmin ? adminCustomerPhone : userPhone)?.trim();
+  const formatDisplayDate = (dateStr: string) => {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
-		if (!finalFirstName || !finalLastName) {
-			toast({
-				title: isAdmin ? t("missingInformation.title") : t("authenticationRequired.title"),
-				description: isAdmin ? t("missingInformation.description") : t("authenticationRequired.description"),
-				variant: "destructive",
-			});
-			return;
-		}
+  const formatTime = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
 
-		if (!isAdmin && (!finalPhone || !phoneRegex.test(finalPhone))) {
-			toast({
-				title: t("missingInformation.title"),
-				description: t("booking.phoneRequired"),
-				variant: "destructive",
-			});
-			return;
-		}
+  const onSubmit = (data: BookingFormData) => {
+    if (!selectedDate || !selectedTime || !selectedServiceKey) {
+      toast({
+        title: t("missingInformation.title"),
+        description: t("missingInformation.description"),
+        variant: "destructive",
+      });
+      return;
+    }
 
-		if (isAdmin && finalPhone && !phoneRegex.test(finalPhone)) {
-			toast({
-				title: t("missingInformation.title"),
-				description: t("booking.phoneRequired"),
-				variant: "destructive",
-			});
-			return;
-		}
+    // Per admin: usa i nomi inseriti manualmente, altrimenti usa i dati dell'utente loggato
+    const finalFirstName = isAdmin ? adminCustomerFirstName : userFirstName;
+    const finalLastName = isAdmin ? adminCustomerLastName : userLastName;
+    const finalPhone = (isAdmin ? adminCustomerPhone : userPhone)?.trim();
 
-		const serviceInfo = selectedService;
-		if (!serviceInfo) {
-			toast({
-				title: t("missingInformation.title"),
-				description: t("missingInformation.description"),
-				variant: "destructive",
-			});
-			return;
-		}
+    if (!finalFirstName || !finalLastName) {
+      toast({
+        title: isAdmin ? t("missingInformation.title") : t("authenticationRequired.title"),
+        description: isAdmin ? t("missingInformation.description") : t("authenticationRequired.description"),
+        variant: "destructive",
+      });
+      return;
+    }
 
-		const serviceDisplayName = getServiceDisplayName(serviceInfo);
-		const appointmentData: InsertAppointment = {
-			customerFirstName: finalFirstName,
-			customerLastName: finalLastName,
-			customerPhone: finalPhone || undefined,
-			serviceKey: serviceInfo.key,
-			service: serviceDisplayName,
-			notes: data.notes,
-			appointmentDate: selectedDate,
-			appointmentTime: selectedTime,
-			duration: serviceInfo.duration,
-			price: serviceInfo.price,
-			status: "confirmed",
-		};
+    if (!isAdmin && (!finalPhone || !phoneRegex.test(finalPhone))) {
+      toast({
+        title: t("missingInformation.title"),
+        description: t("booking.phoneRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
 
-		createAppointmentMutation.mutate(appointmentData);
-	};
+    if (isAdmin && finalPhone && !phoneRegex.test(finalPhone)) {
+      toast({
+        title: t("missingInformation.title"),
+        description: t("booking.phoneRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
 
-	const handleServiceChange = (value: string) => {
-		setSelectedServiceKey(value);
-		form.setValue("service", value);
-	};
+    const serviceInfo = selectedService;
+    if (!serviceInfo) {
+      toast({
+        title: t("missingInformation.title"),
+        description: t("missingInformation.description"),
+        variant: "destructive",
+      });
+      return;
+    }
 
+    const serviceDisplayName = getServiceDisplayName(serviceInfo);
+    const appointmentData: InsertAppointment = {
+      customerFirstName: finalFirstName,
+      customerLastName: finalLastName,
+      customerPhone: finalPhone || undefined,
+      serviceKey: serviceInfo.key,
+      service: serviceDisplayName,
+      notes: data.notes,
+      appointmentDate: selectedDate,
+      appointmentTime: selectedTime,
+      duration: serviceInfo.duration,
+      price: serviceInfo.price,
+      status: "confirmed",
+    };
+
+    createAppointmentMutation.mutate(appointmentData);
+  };
+
+  const handleServiceChange = (value: string) => {
+    setSelectedServiceKey(value);
+    form.setValue("service", value);
+  };
 	const isFormValid = selectedDate && selectedTime && selectedServiceKey &&
 		(isAdmin
 			? (adminCustomerFirstName && adminCustomerLastName)
