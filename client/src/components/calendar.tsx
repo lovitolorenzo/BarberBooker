@@ -128,6 +128,20 @@ export default function CalendarComponent({
     );
   };
 
+  const getBookedSlotLabel = (date: string, time: string) => {
+    const appointment = appointments.find((apt) =>
+      apt.appointmentDate === date &&
+      apt.appointmentTime === time &&
+      apt.status === 'confirmed'
+    );
+
+    if (!appointment) {
+      return undefined;
+    }
+
+    return `${appointment.customerFirstName} ${appointment.customerLastName}`.trim();
+  };
+
   const isPastSlot = (date: string, time: string) => {
     const now = new Date();
     const slotDateTime = new Date(`${date}T${time}:00`);
@@ -205,12 +219,14 @@ export default function CalendarComponent({
             const isBooked = isSlotBooked(selectedDate, time);
             const isPast = isPastSlot(selectedDate, time);
             const isSelected = selectedTime === time;
+            const bookedSlotLabel = isAdmin && isBooked ? getBookedSlotLabel(selectedDate, time) : undefined;
 
             return (
               <Button
                 key={time}
                 variant="outline"
                 size="sm"
+                title={bookedSlotLabel ? `${t("booked")}: ${bookedSlotLabel}` : undefined}
                 className={`
                   py-2.5 px-3 text-sm font-medium rounded-xl transition-all border
                   ${isSelected ? 'bg-accent-blue text-white border-accent-blue hover:bg-accent-blue/90' : ''}
