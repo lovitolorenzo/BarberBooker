@@ -50,7 +50,7 @@ export default function BookingForm({
   const [adminCustomerLastName, setAdminCustomerLastName] = useState('');
   const [adminCustomerPhone, setAdminCustomerPhone] = useState('');
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [_, navigate] = useLocation();
   const isManagingAppointment = isAdmin && !!selectedAppointment;
 
@@ -188,6 +188,15 @@ export default function BookingForm({
 
   const formatDisplayDate = (dateStr: string) => {
     const date = new Date(dateStr + "T00:00:00");
+    if (i18n.language === "it") {
+      return date.toLocaleDateString("it-IT", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -197,6 +206,10 @@ export default function BookingForm({
   };
 
   const formatTime = (timeStr: string) => {
+    if (i18n.language === "it") {
+      return timeStr;
+    }
+
     const [hours, minutes] = timeStr.split(":");
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? "PM" : "AM";
@@ -339,7 +352,7 @@ export default function BookingForm({
 							<span className="text-sm font-medium text-text-primary">{t("selectedAppointment")}</span>
 						</div>
 						<div className="text-text-secondary text-sm">
-							{formatDisplayDate(selectedDate)} at {formatTime(selectedTime)}
+							{formatDisplayDate(selectedDate)} {i18n.language === "it" ? "alle" : "at"} {formatTime(selectedTime)}
 						</div>
 						{selectedService && (
 							<div className="text-xs text-text-secondary mt-1">
