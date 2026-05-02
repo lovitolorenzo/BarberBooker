@@ -11,9 +11,11 @@ declare global {
 }
 
 // API Configuration for different environments
+const baseURL = import.meta.env.DEV ? import.meta.env.VITE_API_URL || '' : '';
+
 export const API_CONFIG = {
   // Base URL for API calls
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL,
   
   // Request timeout in milliseconds
   timeout: 10000,
