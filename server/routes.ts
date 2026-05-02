@@ -205,6 +205,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "You can only book appointments until the end of the current week" });
       }
 
+      if (!isAdmin && !validatedData.customerPhone) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+
       const businessDay = businessHours.days.find((day) => day.dayOfWeek === appointmentDate.getDay());
 
       if (!businessDay || !businessDay.enabled) {

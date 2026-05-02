@@ -686,7 +686,7 @@ export default function AdminPage() {
               <div className="space-y-4">
                 {filteredAppointments.map((appointment) => (
                   <div
-                    key={appointment._id || `${appointment.customerPhone}-${appointment.appointmentDate}-${appointment.appointmentTime}`}
+                    key={appointment._id || `${appointment.customerPhone || 'no-phone'}-${appointment.appointmentDate}-${appointment.appointmentTime}`}
                     className="barbershop-dark rounded-lg p-4 border border-barbershop-charcoal"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -734,7 +734,7 @@ export default function AdminPage() {
                           <div className="flex items-center space-x-2">
                             <Phone className="h-4 w-4 text-barbershop-gold" />
                             <span className="text-barbershop-muted">
-                              {appointment.customerPhone}
+                              {appointment.customerPhone || '-'}
                             </span>
                           </div>
                           

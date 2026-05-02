@@ -142,7 +142,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		// Per admin: usa i nomi inseriti manualmente, altrimenti usa i dati dell'utente loggato
 		const finalFirstName = isAdmin ? adminCustomerFirstName : userFirstName;
 		const finalLastName = isAdmin ? adminCustomerLastName : userLastName;
-		const finalPhone = isAdmin ? adminCustomerPhone : userPhone;
+		const finalPhone = (isAdmin ? adminCustomerPhone : userPhone)?.trim();
 
 		if (!finalFirstName || !finalLastName) {
 			toast({
@@ -153,7 +153,16 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 			return;
 		}
 
-		if (!finalPhone || !phoneRegex.test(finalPhone)) {
+		if (!isAdmin && (!finalPhone || !phoneRegex.test(finalPhone))) {
+			toast({
+				title: t("missingInformation.title"),
+				description: t("booking.phoneRequired"),
+				variant: "destructive",
+			});
+			return;
+		}
+
+		if (isAdmin && finalPhone && !phoneRegex.test(finalPhone)) {
 			toast({
 				title: t("missingInformation.title"),
 				description: t("booking.phoneRequired"),
@@ -176,7 +185,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 		const appointmentData: InsertAppointment = {
 			customerFirstName: finalFirstName,
 			customerLastName: finalLastName,
-			customerPhone: finalPhone,
+			customerPhone: finalPhone || undefined,
 			serviceKey: serviceInfo.key,
 			service: serviceDisplayName,
 			notes: data.notes,
@@ -197,7 +206,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBookingConfi
 
 	const isFormValid = selectedDate && selectedTime && selectedServiceKey &&
 		(isAdmin
-			? (adminCustomerFirstName && adminCustomerLastName && adminCustomerPhone)
+			? (adminCustomerFirstName && adminCustomerLastName)
 			: (userFirstName && userLastName && userPhone));
 
 	return (
