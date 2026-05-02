@@ -27,6 +27,13 @@ const formatMinutesToTime = (totalMinutes: number) => {
   return `${hours}:${minutes}`;
 };
 
+const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const getEndOfCurrentWeek = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
@@ -72,8 +79,8 @@ export default function CalendarComponent({
   const bookingWindowEnd = getEndOfCurrentWeek();
 
   // Get appointments for the current month
-  const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString().split('T')[0];
-  const endDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).toISOString().split('T')[0];
+  const startDate = formatLocalDate(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1));
+  const endDate = formatLocalDate(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0));
   
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments/range', { startDate, endDate }],
@@ -93,7 +100,7 @@ export default function CalendarComponent({
     }
   });
 
-  const formatDate = (date: Date) => date.toISOString().split('T')[0];
+  const formatDate = (date: Date) => formatLocalDate(date);
   
   const formatDisplayDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00');
